@@ -76,6 +76,8 @@ class InventoryReservationService
                 ]);
             }
 
+            $this->releaseExpiredReservationsForLockedInventory($inventory);
+
             $available = (int) $inventory->quantity_on_hand - (int) $inventory->quantity_reserved;
 
             if ($available < $quantity) {
@@ -225,6 +227,43 @@ class InventoryReservationService
                 ]);
             }
         });
+    }
+
+    /**
+     * Release expired holds on an inventory row that is already locked.
+     *
+     * Hobby Vercel Cron runs once per day, so checkout must not wait for that job
+     * before expired quantity_reserved can be reused.
+     */
+    protected function releaseExpiredReservationsForLockedInventory(Inventory $inventory): void
+    {
+        $expired = InventoryReservation::query()
+            ->where('inventory_id', $inventory->id)
+            ->where('status', 'ACTIVE')
+            ->where('expires_at', '<', Carbon::now())
+            ->lockForUpdate()
+            ->get();
+
+        if ($expired->isEmpty()) {
+            return;
+        }
+
+        foreach ($expired as $reservation) {
+            $inventory->quantity_reserved = max(0, $inventory->quantity_reserved - $reservation->quantity);
+            $reservation->status = 'RELEASED';
+            $reservation->save();
+
+            InventoryMovement::create([
+                'inventory_id' => $inventory->id,
+                'movement_type' => 'adjustment',
+                'quantity_change' => 0,
+                'reference_type' => InventoryReservation::class,
+                'reference_id' => $reservation->id,
+                'notes' => "Released {$reservation->quantity} reserved units: expired_reservation_timeout",
+            ]);
+        }
+
+        $inventory->save();
     }
 
     /**

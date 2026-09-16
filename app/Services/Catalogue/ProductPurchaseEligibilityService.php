@@ -12,13 +12,15 @@ use App\Exceptions\ProductNotPurchasableException;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\Compliance\ProductComplianceService;
+use App\Services\Inventory\InventoryReservationService;
 use App\Services\Pricing\PricingService;
 
 class ProductPurchaseEligibilityService
 {
     public function __construct(
         protected ProductComplianceService $complianceService,
-        protected PricingService $pricingService
+        protected PricingService $pricingService,
+        protected InventoryReservationService $reservations
     ) {}
 
     /**
@@ -91,6 +93,9 @@ class ProductPurchaseEligibilityService
         }
 
         if ($checkInventory && $quantity > 0) {
+            $this->reservations->releaseExpiredReservations();
+            $product->unsetRelation('inventory');
+            $variant?->unsetRelation('inventory');
             $inventory = $variant ? $variant->inventory : $product->inventory;
             if ($inventory) {
                 $available = $inventory->available();

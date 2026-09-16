@@ -42,7 +42,7 @@
   "crons": [
     {
       "path": "/internal/cron/release-expired-inventory",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 3 * * *"
     }
   ],
   "routes": [

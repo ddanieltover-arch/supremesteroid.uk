@@ -17,7 +17,7 @@ The customer storefront is Laravel + Inertia + React. `laravel-vite-plugin` comp
 
 ## Cron
 
-`vercel.json` schedules `GET /internal/cron/release-expired-inventory` every 5 minutes.
+`vercel.json` schedules `GET /internal/cron/release-expired-inventory` once per day at 03:00 UTC so a Vercel Hobby account can deploy. Checkout releases expired holds for the inventory row being reserved, so the daily job is a backstop, not the only release path.
 
 The endpoint is rejected unless `Authorization: Bearer <CRON_SECRET>` or `X-Cron-Secret` matches `store.cron_secret`. Re-running the cleanup is safe.
 

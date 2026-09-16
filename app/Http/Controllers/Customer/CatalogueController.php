@@ -10,6 +10,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\Catalogue\SeoService;
+use App\Services\Inventory\InventoryReservationService;
 use App\Services\Shipping\ShippingEngine;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -23,7 +24,8 @@ class CatalogueController extends Controller
 
     public function __construct(
         protected SeoService $seoService,
-        protected ShippingEngine $shippingEngine
+        protected ShippingEngine $shippingEngine,
+        protected InventoryReservationService $reservations
     ) {}
 
     public function index(Request $request): Response
@@ -72,6 +74,8 @@ class CatalogueController extends Controller
 
     public function show(Request $request, string $slug): Response
     {
+        $this->reservations->releaseExpiredReservations();
+
         $product = Product::query()
             ->purchasable()
             ->with(['brand', 'category', 'images', 'attributes', 'variants.inventory', 'inventory', 'seoMetadata'])
@@ -116,6 +120,8 @@ class CatalogueController extends Controller
         $availability = $request->query('availability');
         $minPrice = $request->query('min_price');
         $maxPrice = $request->query('max_price');
+
+        $this->reservations->releaseExpiredReservations();
 
         $query = Product::query()
             ->purchasable()

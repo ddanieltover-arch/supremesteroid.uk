@@ -38,7 +38,7 @@ Application mail covers order placement, payment submission acknowledgement, pay
 
 ## Cron
 
-Vercel schedules `GET /internal/cron/release-expired-inventory` (`*/5 * * * *`). The application validates `Authorization: Bearer CRON_SECRET`. Vercel does not run `schedule:work`. Re-running the command only releases reservations still marked `ACTIVE`.
+Vercel schedules `GET /internal/cron/release-expired-inventory` once per day at 03:00 UTC (`0 3 * * *`). Hobby plans reject schedules that run more than once a day. Checkout also releases expired holds for the locked inventory row, so stock is not stuck until the daily job. The application validates `Authorization: Bearer CRON_SECRET`. Vercel does not run `schedule:work`. Re-running the command only releases reservations still marked `ACTIVE`.
 
 Readiness is `GET /internal/readiness` with the same bearer secret. It returns `READY` or `NOT_READY` and does not include secret values.
 

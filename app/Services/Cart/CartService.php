@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Services\Catalogue\ProductPurchaseEligibilityService;
+use App\Services\Inventory\InventoryReservationService;
 use App\Services\Pricing\PricingService;
 use App\Services\Shipping\ShippingEngine;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -22,7 +23,8 @@ class CartService
     public function __construct(
         protected ProductPurchaseEligibilityService $eligibilityService,
         protected PricingService $pricingService,
-        protected ShippingEngine $shippingEngine
+        protected ShippingEngine $shippingEngine,
+        protected InventoryReservationService $reservations
     ) {}
 
     public function findCart(?User $user = null, ?string $sessionId = null): ?Cart
@@ -195,8 +197,10 @@ class CartService
     public function mergeGuestCart(Cart $guestCart, User $user): Cart
     {
         return DB::transaction(function () use ($guestCart, $user) {
+            $this->reservations->releaseExpiredReservations();
             $userCart = $this->getOrCreateCart($user);
 
+            $guestCart->unsetRelation('items');
             $guestCart->load(['items.product', 'items.variant']);
 
             foreach ($guestCart->items as $guestItem) {
