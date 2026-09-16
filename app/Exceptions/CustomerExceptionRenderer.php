@@ -36,22 +36,28 @@ class CustomerExceptionRenderer
         $payload = $this->payloadFor($e);
 
         if ($payload === null) {
+            $safe = preg_replace(
+                '/(?:postgres|postgresql|mysql|pgsql):\/\/\S+/i',
+                '[redacted-url]',
+                $e->getMessage()
+            ) ?? $e->getMessage();
+
             if ($request->expectsJson() && ! config('app.debug')) {
-            try {
-                Log::error('Unhandled customer-facing failure', [
-                    'exception' => $e::class,
-                ]);
-            } catch (Throwable) {
-                // A broken log channel must not replace the customer response with an empty 500.
-            }
+                try {
+                    Log::error('Unhandled customer-facing failure', [
+                        'exception' => $e::class,
+                    ]);
+                } catch (Throwable) {
+                    // A broken log channel must not replace the customer response with an empty 500.
+                }
 
                 return response()->json([
-                    'message' => 'We could not complete that request. Please try again.',
+                    'message' => $e::class.': '.$safe,
                     'code' => 'SERVER_ERROR',
                 ], 500);
             }
 
-            return null;
+            return response($e::class.': '.$safe, 500);
         }
 
         try {

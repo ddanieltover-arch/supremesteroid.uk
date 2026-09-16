@@ -12,18 +12,29 @@ class HealthCheckController extends Controller
 {
     public function check(): JsonResponse
     {
-        $dbStatus = 'healthy';
-        try {
-            DB::connection()->getPdo();
-        } catch (\Throwable $e) {
-            $dbStatus = 'unreachable';
-            report($e);
+        if (! $this->criticalConfigurationPresent()) {
+            return response()->json(['status' => 'misconfigured'], 503);
         }
 
-        $healthy = $dbStatus === 'healthy';
+        try {
+            DB::connection()->getPdo();
+            DB::select('select 1');
+        } catch (\Throwable $e) {
+            report($e);
 
-        return response()->json([
-            'status' => $healthy ? 'operational' : 'degraded',
-        ], $healthy ? 200 : 503);
+            return response()->json([
+                'status' => 'unavailable',
+                'error' => $e::class.': '.(preg_replace('/(?:postgres|postgresql|mysql|pgsql):\/\/\S+/i', '[redacted-url]', $e->getMessage()) ?? $e->getMessage()),
+            ], 503);
+        }
+
+        return response()->json(['status' => 'operational'], 200);
+    }
+
+    protected function criticalConfigurationPresent(): bool
+    {
+        $key = config('app.key');
+
+        return is_string($key) && $key !== '' && ! str_contains($key, 'GENERATE');
     }
 }
