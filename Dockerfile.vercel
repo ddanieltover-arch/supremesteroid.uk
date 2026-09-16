@@ -11,10 +11,14 @@ FROM node:22-alpine AS frontend-builder
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN corepack enable && pnpm install --frozen-lockfile
+# Pin pnpm here rather than via package.json "packageManager".
+# That field makes pnpm 12 rewrite packageManagerDependencies, which fails a frozen install against this lockfile.
+RUN corepack enable \
+  && corepack prepare pnpm@12.4.2 --activate \
+  && pnpm install --frozen-lockfile
 
 COPY . .
-RUN corepack enable && pnpm run build
+RUN corepack enable && corepack prepare pnpm@12.4.2 --activate && pnpm run build
 
 # ------------------------------------------------------------------------------
 # Stage 2: Production FrankenPHP Runtime
