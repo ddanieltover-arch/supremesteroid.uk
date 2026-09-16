@@ -1,8 +1,16 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "cleanUrls": true,
   "regions": ["lhr1"],
+  "services": {
+    "app": {
+      "root": ".",
+      "entrypoint": "Dockerfile.vercel",
+      "runtime": "container"
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": { "service": "app" } }
+  ],
   "headers": [
     {
       "source": "/build/(.*)",
@@ -43,16 +51,6 @@
     {
       "path": "/internal/cron/release-expired-inventory",
       "schedule": "0 3 * * *"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/build/(.*)",
-      "dest": "/build/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.php"
     }
   ]
 }

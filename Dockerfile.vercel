@@ -69,6 +69,7 @@ COPY . .
 # Copy compiled frontend assets from Stage 1
 COPY --from=frontend-builder /app/public/build ./public/build
 
+COPY Caddyfile /etc/caddy/Caddyfile
 COPY docker/vercel-entrypoint.sh /usr/local/bin/vercel-entrypoint.sh
 RUN chmod +x /usr/local/bin/vercel-entrypoint.sh && \
     composer dump-autoload --optimize --no-dev --no-interaction
@@ -84,12 +85,11 @@ RUN mkdir -p \
     chown -R www-data:www-data storage bootstrap/cache && \
     chmod -R 775 storage bootstrap/cache
 
-# Expose Caddy/FrankenPHP port (configured to listen on PORT env or default 3000 / 8080)
-ENV PORT=3000
-ENV SERVER_NAME=":${PORT}"
-ENV FRANKENPHP_CONFIG="worker ./public/index.php"
+# Vercel injects PORT at runtime (often 80). Do not cache config here:
+# APP_KEY and database credentials exist only after the container starts.
+ENV PORT=80
 
-EXPOSE 3000
+EXPOSE 80
 
 # PORT is injected by Vercel at runtime. Do not bake SERVER_NAME at build time.
 ENTRYPOINT ["/usr/local/bin/vercel-entrypoint.sh"]
