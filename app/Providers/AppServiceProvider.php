@@ -24,7 +24,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $fallbacks = [
+            'database.default' => filled(env('DATABASE_URL')) ? 'pgsql' : 'sqlite',
+            'session.driver' => 'database',
+            'cache.default' => 'file',
+            'logging.default' => 'stderr',
+            'queue.default' => 'sync',
+            'mail.default' => 'log',
+            'filesystems.default' => 'local',
+            'hashing.driver' => 'bcrypt',
+            'app.maintenance.driver' => 'file',
+        ];
+
+        foreach ($fallbacks as $key => $fallback) {
+            if (blank(config($key))) {
+                config([$key => $fallback]);
+            }
+        }
     }
 
     /**

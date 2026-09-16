@@ -43,7 +43,18 @@ return Application::configure(basePath: dirname(__DIR__))
                 $e->getMessage()
             ) ?? $e->getMessage();
 
-            return $e::class.': '.$message;
+            $caller = '';
+
+            foreach ($e->getTrace() as $frame) {
+                $class = $frame['class'] ?? '';
+
+                if ($class !== '' && $class !== \Illuminate\Support\Manager::class) {
+                    $caller = ' ('.$class.'::'.($frame['function'] ?? '').')';
+                    break;
+                }
+            }
+
+            return $e::class.': '.$message.$caller;
         };
 
         $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) use ($sanitize) {

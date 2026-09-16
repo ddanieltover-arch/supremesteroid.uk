@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 return [
-    'default' => env('FILESYSTEM_DISK', 'local'),
+    'default' => env('FILESYSTEM_DISK') ?: 'local',
 
-    'cloud' => env('OBJECT_STORAGE_DISK', env('FILESYSTEM_DISK', 's3')),
+    'cloud' => env('OBJECT_STORAGE_DISK') ?: (env('FILESYSTEM_DISK') ?: 'local'),
 
     'disks' => [
         'local' => [
