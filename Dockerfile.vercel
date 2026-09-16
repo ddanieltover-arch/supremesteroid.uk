@@ -1,0 +1,90 @@
+# ==============================================================================
+# Multi-stage Dockerfile for Vercel Container Deployment with FrankenPHP
+# Project: SUPREME STEROIDS (Production E-Commerce)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Stage 1: Frontend Build (Vite + React + Inertia + Tailwind)
+# ------------------------------------------------------------------------------
+FROM node:22-alpine AS frontend-builder
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml* ./
+RUN corepack enable && pnpm install --frozen-lockfile
+
+COPY . .
+RUN corepack enable && pnpm run build
+
+# ------------------------------------------------------------------------------
+# Stage 2: Production FrankenPHP Runtime
+# ------------------------------------------------------------------------------
+FROM dunglas/frankenphp:1-php8.3-alpine AS runner
+
+# Install system dependencies and required PHP extensions for PostgreSQL and caching
+RUN apk add --no-cache \
+    curl \
+    git \
+    unzip \
+    postgresql-client \
+    && install-php-extensions \
+    pdo_pgsql \
+    pgsql \
+    intl \
+    zip \
+    bcmath \
+    opcache \
+    pcntl
+
+# Configure production PHP settings
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
+    sed -i -e 's/memory_limit = 128M/memory_limit = 512M/' "$PHP_INI_DIR/php.ini" && \
+    sed -i -e 's/upload_max_filesize = 2M/upload_max_filesize = 32M/' "$PHP_INI_DIR/php.ini" && \
+    sed -i -e 's/post_max_size = 8M/post_max_size = 32M/' "$PHP_INI_DIR/php.ini" && \
+    sed -i -e 's/;opcache.enable=1/opcache.enable=1/' "$PHP_INI_DIR/php.ini" && \
+    sed -i -e 's/;opcache.memory_consumption=128/opcache.memory_consumption=256/' "$PHP_INI_DIR/php.ini" && \
+    sed -i -e 's/;opcache.max_accelerated_files=10000/opcache.max_accelerated_files=20000/' "$PHP_INI_DIR/php.ini" && \
+    sed -i -e 's/;opcache.validate_timestamps=1/opcache.validate_timestamps=0/' "$PHP_INI_DIR/php.ini"
+
+# Set working directory
+WORKDIR /app
+
+# Copy Composer from official image
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
+
+# Copy composer manifests first for layer caching
+COPY composer.json composer.lock* ./
+
+# Install production dependencies without dev tools or running scripts before code is present
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+
+# Copy full application code
+COPY . .
+
+# Copy compiled frontend assets from Stage 1
+COPY --from=frontend-builder /app/public/build ./public/build
+
+COPY docker/vercel-entrypoint.sh /usr/local/bin/vercel-entrypoint.sh
+RUN chmod +x /usr/local/bin/vercel-entrypoint.sh && \
+    composer dump-autoload --optimize --no-dev --no-interaction
+
+# Vercel Serverless ephemeral filesystem adaptation:
+# Ensure storage and bootstrap/cache directories exist and have proper permissions
+RUN mkdir -p \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/framework/cache \
+    storage/logs \
+    bootstrap/cache && \
+    chown -R www-data:www-data storage bootstrap/cache && \
+    chmod -R 775 storage bootstrap/cache
+
+# Expose Caddy/FrankenPHP port (configured to listen on PORT env or default 3000 / 8080)
+ENV PORT=3000
+ENV SERVER_NAME=":${PORT}"
+ENV FRANKENPHP_CONFIG="worker ./public/index.php"
+
+EXPOSE 3000
+
+# PORT is injected by Vercel at runtime. Do not bake SERVER_NAME at build time.
+ENTRYPOINT ["/usr/local/bin/vercel-entrypoint.sh"]

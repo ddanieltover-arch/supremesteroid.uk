@@ -1,0 +1,6 @@
+{
+  "name": "Supreme Steroids",
+  "description": "Production e-commerce architecture and foundation for Supreme Steroids featuring Laravel, Inertia.js, React, TypeScript, Filament Admin, and Neon PostgreSQL.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
