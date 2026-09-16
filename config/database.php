@@ -3,6 +3,22 @@
 use Illuminate\Support\Str;
 use Pdo\Mysql;
 
+$databaseUrl = static function (?string $url): ?string {
+    if ($url === null || $url === '') {
+        return $url;
+    }
+
+    if (str_starts_with($url, 'postgres://')) {
+        $url = 'pgsql://'.substr($url, strlen('postgres://'));
+    }
+
+    // libpq builds in the container reject this Neon query param.
+    $url = preg_replace('/([?&])channel_binding=[^&]*/', '$1', $url) ?? $url;
+    $url = str_replace(['?&', '&&'], ['?', '&'], $url);
+
+    return rtrim($url, '?&');
+};
+
 return [
 
     /*
@@ -17,7 +33,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', env('DATABASE_URL') ? 'pgsql' : 'sqlite'),
 
     /*
     |--------------------------------------------------------------------------
@@ -93,7 +109,7 @@ return [
             'driver' => 'pgsql',
             // Runtime requests should use the Neon pooled DATABASE_URL.
             // DB_URL remains supported. Never log these values.
-            'url' => env('DATABASE_URL', env('DB_URL')),
+            'url' => $databaseUrl(env('DATABASE_URL', env('DB_URL'))),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'laravel'),
@@ -119,7 +135,7 @@ return [
         // Pooled PgBouncer connections can break migrations and advisory locks.
         'pgsql_direct' => [
             'driver' => 'pgsql',
-            'url' => env('DATABASE_URL_UNPOOLED', env('DB_DIRECT_URL', env('DATABASE_URL', env('DB_URL')))),
+            'url' => $databaseUrl(env('DATABASE_URL_UNPOOLED', env('DB_DIRECT_URL', env('DATABASE_URL', env('DB_URL'))))),
             'host' => env('DB_DIRECT_HOST', env('DB_HOST', '127.0.0.1')),
             'port' => env('DB_DIRECT_PORT', env('DB_PORT', '5432')),
             'database' => env('DB_DATABASE', 'laravel'),

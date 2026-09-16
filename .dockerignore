@@ -1,5 +1,7 @@
 .git
 .github
+public/hot
+bootstrap/cache/*.php
 .env
 .env.*
 !.env.example

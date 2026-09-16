@@ -37,9 +37,13 @@ class CustomerExceptionRenderer
 
         if ($payload === null) {
             if ($request->expectsJson() && ! config('app.debug')) {
-            Log::error('Unhandled customer-facing failure', [
-                'exception' => $e::class,
-            ]);
+            try {
+                Log::error('Unhandled customer-facing failure', [
+                    'exception' => $e::class,
+                ]);
+            } catch (Throwable) {
+                // A broken log channel must not replace the customer response with an empty 500.
+            }
 
                 return response()->json([
                     'message' => 'We could not complete that request. Please try again.',
@@ -50,10 +54,14 @@ class CustomerExceptionRenderer
             return null;
         }
 
-        Log::warning('Checkout pipeline exception', [
-            'code' => $payload['code'],
-            'exception' => $e::class,
-        ]);
+        try {
+            Log::warning('Checkout pipeline exception', [
+                'code' => $payload['code'],
+                'exception' => $e::class,
+            ]);
+        } catch (Throwable) {
+            //
+        }
 
         if ($request->expectsJson()) {
             return response()->json([

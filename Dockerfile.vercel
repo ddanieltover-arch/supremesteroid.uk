@@ -72,7 +72,10 @@ COPY --from=frontend-builder /app/public/build ./public/build
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY docker/vercel-entrypoint.sh /usr/local/bin/vercel-entrypoint.sh
 RUN chmod +x /usr/local/bin/vercel-entrypoint.sh && \
-    composer dump-autoload --optimize --no-dev --no-interaction
+    composer dump-autoload --optimize --no-dev --no-interaction && \
+    rm -f bootstrap/cache/packages.php bootstrap/cache/services.php bootstrap/cache/config.php
+
+RUN php artisan package:discover --ansi || true
 
 # Vercel Serverless ephemeral filesystem adaptation:
 # Ensure storage and bootstrap/cache directories exist and have proper permissions

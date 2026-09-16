@@ -36,7 +36,29 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
-            return app(\App\Exceptions\CustomerExceptionRenderer::class)->render($e, $request);
+        $sanitize = static function (\Throwable $e): string {
+            $message = preg_replace(
+                '/(?:postgres|postgresql|mysql|pgsql):\/\/\S+/i',
+                '[redacted-url]',
+                $e->getMessage()
+            ) ?? $e->getMessage();
+
+            return $e::class.': '.$message;
+        };
+
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) use ($sanitize) {
+            try {
+                return app(\App\Exceptions\CustomerExceptionRenderer::class)->render($e, $request);
+            } catch (\Throwable) {
+                return response($sanitize($e), 500);
+            }
+        });
+
+        $exceptions->respond(function ($response, \Throwable $e) use ($sanitize) {
+            if ($response->getStatusCode() >= 500 && trim((string) $response->getContent()) === '') {
+                return response($sanitize($e), $response->getStatusCode());
+            }
+
+            return $response;
         });
     })->create();

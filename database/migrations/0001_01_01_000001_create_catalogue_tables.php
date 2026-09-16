@@ -23,13 +23,19 @@ return new class extends Migration
 
         Schema::create('categories', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('parent_id')->nullable()->references('id')->on('categories')->nullOnDelete();
+            // PostgreSQL adds foreign keys before the primary key in the same
+            // create statement, so the self-reference must be added afterwards.
+            $table->uuid('parent_id')->nullable();
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->integer('display_order')->default(0);
             $table->boolean('is_visible')->default(true);
             $table->timestamps();
+        });
+
+        Schema::table('categories', function (Blueprint $table) {
+            $table->foreign('parent_id')->references('id')->on('categories')->nullOnDelete();
         });
 
         Schema::create('products', function (Blueprint $table) {
