@@ -38,7 +38,7 @@ Application mail covers order placement, payment submission acknowledgement, pay
 
 ## Cron
 
-Vercel schedules `GET /internal/cron/release-expired-inventory` once per day at 03:00 UTC (`0 3 * * *`). Hobby plans reject schedules that run more than once a day. Checkout also releases expired holds for the locked inventory row, so stock is not stuck until the daily job. The application validates `Authorization: Bearer CRON_SECRET`. Vercel does not run `schedule:work`. Re-running the command only releases reservations still marked `ACTIVE`.
+Vercel schedules `GET /internal/cron/release-expired-inventory` every 5 minutes (`*/5 * * * *`). There is one cron entry. Vercel sends the request; the application validates `Authorization: Bearer CRON_SECRET`. Vercel does not run `schedule:work`. Re-running the command only releases reservations still marked `ACTIVE`. Hobby plans reject schedules that run more than once a day. If the project is on Hobby, the schedule must be changed to `0 3 * * *` before deploy, and checkout still releases expired holds for the locked inventory row.
 
 Readiness is `GET /internal/readiness` with the same bearer secret. It returns `READY` or `NOT_READY` and does not include secret values.
 
@@ -50,7 +50,7 @@ Responses set `nosniff`, `DENY` framing, referrer policy, permissions policy, an
 
 `APP_KEY` `APP_ENV` `APP_DEBUG` `APP_URL` `APP_NAME`
 
-`DB_CONNECTION` `DATABASE_URL` `DATABASE_URL_UNPOOLED` `DB_SSLMODE`
+`DB_CONNECTION` `DATABASE_URL` `DATABASE_URL_UNPOOLED` `DB_SSLMODE` `PGHOST` `PGHOST_UNPOOLED` `PGUSER` `PGDATABASE` `PGPASSWORD` `POSTGRES_URL` `POSTGRES_URL_NON_POOLING` `POSTGRES_USER` `POSTGRES_HOST` `POSTGRES_PASSWORD` `POSTGRES_DATABASE` `POSTGRES_URL_NO_SSL` `POSTGRES_PRISMA_URL`
 
 `SESSION_DRIVER` `SESSION_SECURE_COOKIE` `CACHE_STORE` `QUEUE_CONNECTION` `LOG_CHANNEL`
 

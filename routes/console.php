@@ -10,4 +10,7 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('inventory:release-expired')->everyFiveMinutes();
+Schedule::command('inventory:release-expired')
+    ->everyFiveMinutes()
+    ->withoutOverlapping()
+    ->onOneServer();

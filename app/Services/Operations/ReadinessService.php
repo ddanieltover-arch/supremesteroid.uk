@@ -27,6 +27,7 @@ class ReadinessService
             'app_url' => $this->appUrl(),
             'app_debug' => config('app.debug') ? 'fail' : 'pass',
             'app_key' => $this->present('app.key') ? 'pass' : 'fail',
+            'app_env' => app()->environment('production') ? 'pass' : 'fail',
             'sessions' => config('session.driver') === 'file' && app()->environment('production') ? 'fail' : $this->sessionStore(),
             'cache' => config('cache.default') === 'file' && app()->environment('production') ? 'fail' : 'pass',
         ];

@@ -1,14 +1,12 @@
-# Supreme Steroids - Vercel & Container Deployment Guide
+# Deployment
 
-## 1. Deployment Model Overview
+The application is hosting-agnostic. Use `docs/DEPLOYMENT_STANDARD_SERVER.md` for a normal PHP, Docker, FrankenPHP, or Nginx + PHP-FPM deploy.
 
-Supreme Steroids is architected specifically for **Vercel's Container & Serverless execution model** powered by **FrankenPHP**.
+`Dockerfile.vercel` and `docs/VERCEL_COMPATIBILITY.md` remain for hosts that specifically deploy that container. They are optional.
 
-Because serverless containers run ephemerally:
-1. File writes to the local container disk are strictly temporary (`/tmp`).
-2. Sessions, cache, and application state reside in **Neon PostgreSQL**.
-3. File uploads, assets, and branding logos reside in **S3 / Cloudflare R2**.
-4. Workers and cron triggers are triggered via Vercel Cron or external webhook schedulers.
+## 1. Deployment model
+
+The application runs in a normal PHP process. Local disk is ephemeral on any container host. Orders, payments, sessions, and cache belong in PostgreSQL. Durable uploads belong in S3-compatible object storage. Inventory cleanup runs through `php artisan schedule:run`. The HTTP cron endpoint is optional and calls the same releaser.
 
 ---
 

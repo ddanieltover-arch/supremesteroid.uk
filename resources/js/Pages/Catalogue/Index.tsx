@@ -65,13 +65,13 @@ export default function CatalogueIndex({
         <Select
           label="Category"
           value={form.data.category}
-          options={[{ value: '', label: 'All categories' }, ...categories.map((category) => ({ value: category.slug, label: category.name }))]}
+          options={[{ value: '', label: 'All categories' }, ...(categories ?? []).map((category) => ({ value: category.slug, label: category.name }))]}
           onChange={(event) => form.setData('category', event.target.value)}
         />
         <Select
           label="Brand"
           value={form.data.brand}
-          options={[{ value: '', label: 'All brands' }, ...brands.map((brand) => ({ value: brand.slug, label: brand.name }))]}
+          options={[{ value: '', label: 'All brands' }, ...(brands ?? []).map((brand) => ({ value: brand.slug, label: brand.name }))]}
           onChange={(event) => form.setData('brand', event.target.value)}
         />
         <Select
@@ -104,10 +104,10 @@ export default function CatalogueIndex({
       </form>
 
       <p className="mt-6 font-mono text-xs text-slate-400">
-        Showing <strong className="text-slate-200">{products.total ?? products.data.length}</strong> products
+        Showing <strong className="text-slate-200">{products?.total ?? products?.data?.length ?? 0}</strong> products
       </p>
 
-      {(products.data ?? []).length === 0 ? (
+      {(products?.data ?? []).length === 0 ? (
         <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/40 p-12 text-center">
           <p className="text-sm font-semibold text-slate-200">No products match these filters.</p>
           <Button variant="secondary" className="mt-4" onClick={() => router.get('/shop')}>
@@ -116,7 +116,7 @@ export default function CatalogueIndex({
         </div>
       ) : (
         <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {products.data.map((product) => (
+          {(products?.data ?? []).map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

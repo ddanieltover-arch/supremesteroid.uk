@@ -43,6 +43,8 @@ return [
 
     'cron_secret' => env('CRON_SECRET'),
 
+    'hsts_enabled' => filter_var(env('HSTS_ENABLED', false), FILTER_VALIDATE_BOOL),
+
     /*
     |--------------------------------------------------------------------------
     | Compliance & Catalogue Safety Enforcement

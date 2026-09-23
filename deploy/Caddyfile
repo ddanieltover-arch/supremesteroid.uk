@@ -1,0 +1,32 @@
+{
+	email {$ACME_EMAIL:ops@supremesteroid.uk}
+	admin off
+	persist_config off
+
+	servers {
+		timeouts {
+			read_body 30s
+			read_header 10s
+			write 60s
+			idle 120s
+		}
+	}
+}
+
+www.supremesteroid.uk {
+	redir https://supremesteroid.uk{uri} permanent
+}
+
+supremesteroid.uk {
+	encode zstd gzip
+
+	header {
+		-Server
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+
+	reverse_proxy 127.0.0.1:8080
+}

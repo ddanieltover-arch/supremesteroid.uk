@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Internal;
 
-use App\Models\CheckoutSession;
-use App\Services\Inventory\InventoryReservationService;
+use App\Services\Inventory\ExpiredReservationReleaser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -13,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class InventoryExpiryCronController extends Controller
 {
-    public function __invoke(Request $request, InventoryReservationService $reservations): JsonResponse
+    public function __invoke(Request $request, ExpiredReservationReleaser $releaser): JsonResponse
     {
         $expected = (string) config('store.cron_secret', '');
         $provided = $this->extractSecret($request);
@@ -22,36 +21,18 @@ class InventoryExpiryCronController extends Controller
             return response()->json(['ok' => false], 403);
         }
 
-        $startedAt = now()->toIso8601String();
-
         try {
-            $result = $reservations->releaseExpiredReservations();
-            $expiredSessions = CheckoutSession::query()
-                ->where('status', CheckoutSession::STATUS_OPEN)
-                ->where('expires_at', '<', now())
-                ->update(['status' => CheckoutSession::STATUS_EXPIRED]);
-            $finishedAt = now()->toIso8601String();
-
-            Log::info('inventory.reservations.released', [
-                'started_at' => $startedAt,
-                'finished_at' => $finishedAt,
-                'reservations_examined' => $result['examined'],
-                'reservations_released' => $result['released'],
-                'checkout_sessions_expired' => $expiredSessions,
-                'errors' => 0,
-            ]);
+            $result = $releaser->release();
 
             return response()->json([
                 'ok' => true,
-                'started_at' => $startedAt,
-                'finished_at' => $finishedAt,
-                'reservations_examined' => $result['examined'],
-                'reservations_released' => $result['released'],
+                'started_at' => $result['started_at'],
+                'finished_at' => $result['finished_at'],
+                'reservations_examined' => $result['reservations_examined'],
+                'reservations_released' => $result['reservations_released'],
             ]);
         } catch (\Throwable) {
             Log::error('inventory.reservations.release_failed', [
-                'started_at' => $startedAt,
-                'finished_at' => now()->toIso8601String(),
                 'errors' => 1,
             ]);
 

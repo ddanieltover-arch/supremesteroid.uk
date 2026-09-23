@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary
 
-Supreme Steroids (`https://supremesteroid.uk`) is an enterprise-grade e-commerce application designed with a clean, modular architecture. The application is structured strictly for serverless and containerized deployment on **Vercel** with **FrankenPHP**, backed by **Neon PostgreSQL** and external object storage (AWS S3 / Cloudflare R2).
+Supreme Steroids (`https://supremesteroid.uk`) is a Laravel commerce application. It runs on PHP 8.4+ behind FrankenPHP or Nginx + PHP-FPM. PostgreSQL and S3-compatible object storage are the durable stores. No single hosting provider is required. See `docs/DEPLOYMENT_STANDARD_SERVER.md`.
 
 ## 2. Technology Stack
 

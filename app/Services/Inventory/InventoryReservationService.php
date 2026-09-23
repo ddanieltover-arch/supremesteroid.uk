@@ -232,8 +232,9 @@ class InventoryReservationService
     /**
      * Release expired holds on an inventory row that is already locked.
      *
-     * Hobby Vercel Cron runs once per day, so checkout must not wait for that job
-     * before expired quantity_reserved can be reused.
+     * The scheduler and the optional HTTP cron endpoint both call the same releaser.
+     * Checkout also releases expired holds on the locked inventory row so a buyer
+     * does not have to wait for the next scheduled run.
      */
     protected function releaseExpiredReservationsForLockedInventory(Inventory $inventory): void
     {

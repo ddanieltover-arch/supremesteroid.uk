@@ -21,7 +21,7 @@ export function Header({ cartCount, onOpenCart }: HeaderProps) {
   const threshold = page.props.shippingOverview?.free_shipping_threshold ?? '300.00';
   const currency = page.props.shippingOverview?.currency ?? 'GBP';
   const user = page.props.auth?.user;
-  const current = page.url;
+  const current = page.url ?? '';
 
   const nav = [
     { href: '/shop', label: 'Shop' },

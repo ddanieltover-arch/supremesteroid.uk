@@ -1,0 +1,23 @@
+[Unit]
+Description=Supreme Steroids FrankenPHP
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/supremesteroid/current
+EnvironmentFile=/var/www/supremesteroid/shared/.env
+ExecStart=/usr/local/bin/frankenphp run --config /var/www/supremesteroid/current/deploy/frankenphp/Caddyfile
+ExecReload=/bin/kill -USR2 $MAINPID
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+LimitNOFILE=65535
+MemoryHigh=3G
+MemoryMax=4G
+CPUQuota=150%
+
+[Install]
+WantedBy=multi-user.target

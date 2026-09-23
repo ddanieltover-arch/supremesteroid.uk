@@ -1,6 +1,6 @@
 # Supreme Steroids (https://supremesteroid.uk)
 
-Production-oriented e-commerce application foundation for **Supreme Steroids**. Architected for high security, testability, compliance rigor, and serverless execution on **Vercel** with **FrankenPHP** and **Neon PostgreSQL**.
+Production-oriented e-commerce application for **Supreme Steroids**. It runs on PHP 8.4+ with FrankenPHP or Nginx + PHP-FPM. Hosting is not tied to one provider. See `docs/DEPLOYMENT_STANDARD_SERVER.md`.
 
 ---
 

@@ -1,0 +1,15 @@
+{
+	admin off
+	auto_https off
+	persist_config off
+}
+
+http://127.0.0.1:8080 {
+	root * /var/www/supremesteroid/current/public
+	encode zstd gzip
+
+	php_server {
+		try_files {path} index.php
+		root /var/www/supremesteroid/current/public
+	}
+}

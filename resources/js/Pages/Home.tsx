@@ -45,7 +45,7 @@ export default function Home({
       <section className="mt-12">
         <h2 className="mb-6 text-xl font-semibold text-white">Featured products</h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {featuredProducts.map((product) => (
+          {(featuredProducts ?? []).map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
