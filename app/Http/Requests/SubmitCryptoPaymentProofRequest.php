@@ -10,7 +10,7 @@ class SubmitCryptoPaymentProofRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        return true;
     }
 
     /**
@@ -24,6 +24,7 @@ class SubmitCryptoPaymentProofRequest extends FormRequest
             'crypto_recipient_wallet' => ['required', 'string', 'max:120'],
             'crypto_submitted_amount' => ['required', 'numeric', 'min:0.00000001'],
             'submitted_fiat_amount' => ['required', 'numeric', 'min:0.01'],
+            'proof_file' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:10240'],
         ];
     }
 }

@@ -96,7 +96,7 @@ class CheckoutSessionService
         if (! $session->isOpen()) {
             throw new InvalidCheckoutException(
                 'Checkout session is expired or already converted.',
-                'Your checkout session has expired. Please review your cart and try again.'
+                'Your checkout session has expired.'
             );
         }
 
@@ -126,6 +126,96 @@ class CheckoutSessionService
         $recalculated['checkout_token'] = $session->token;
 
         return $recalculated;
+    }
+
+    public function findOwnedSession(?User $customer, ?string $token): ?CheckoutSession
+    {
+        if (! is_string($token) || $token === '') {
+            return null;
+        }
+
+        return CheckoutSession::query()
+            ->where('token', $token)
+            ->when($customer, fn ($query) => $query->where('user_id', $customer->id))
+            ->first();
+    }
+
+    /**
+     * Create or refresh an OPEN checkout session. Converted tokens start a new session.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    public function syncOpenSession(User $customer, ?string $token, array $data): array
+    {
+        $data['customer'] = $customer;
+        $session = $this->findOwnedSession($customer, $token);
+
+        if ($session && $session->status === CheckoutSession::STATUS_CONVERTED) {
+            $session = null;
+        }
+
+        if ($session && ! $session->isOpen()) {
+            throw new InvalidCheckoutException(
+                'Checkout session is expired or already converted.',
+                'Your checkout session has expired.'
+            );
+        }
+
+        $existing = $session?->snapshot ?? [];
+        $data['shipping_method_code'] = $data['shipping_method_code']
+            ?? $existing['shipping_method']['code']
+            ?? 'UK_STANDARD';
+        $data['payment_method'] = $data['payment_method'] ?? $existing['payment_method'] ?? null;
+        $data['idempotency_key'] = $data['idempotency_key'] ?? $existing['idempotency_key'] ?? (string) Str::uuid();
+        $data['address_id'] = $data['address_id'] ?? $existing['address_id'] ?? null;
+        $data['details_completed_at'] = $data['details_completed_at'] ?? $existing['details_completed_at'] ?? null;
+        $data['delivery_completed_at'] = $data['delivery_completed_at'] ?? $existing['delivery_completed_at'] ?? null;
+        $data['customer_notes'] = $data['customer_notes'] ?? $existing['customer_notes'] ?? null;
+        $data['billing_destination'] = $data['billing_destination'] ?? $existing['billing_destination'] ?? null;
+
+        $snapshot = $this->buildSnapshot($data);
+
+        if ($session) {
+            $session->update([
+                'snapshot' => $snapshot,
+                'expires_at' => now()->addMinutes(self::DEFAULT_TTL_MINUTES),
+            ]);
+
+            $snapshot['checkout_token'] = $session->token;
+            $snapshot['expires_at'] = $session->fresh()?->expires_at?->toIso8601String();
+
+            return $snapshot;
+        }
+
+        return $this->prepareCheckout($data);
+    }
+
+    /**
+     * Rebuild and persist an OPEN session from its stored destination and items.
+     *
+     * @return array<string, mixed>
+     */
+    public function refreshOpenSnapshot(CheckoutSession $session, User $customer, array $overrides = []): array
+    {
+        $stored = $session->snapshot ?? [];
+
+        return $this->syncOpenSession($customer, $session->token, array_merge([
+            'items' => collect($stored['items'] ?? [])->map(fn (array $item) => [
+                'product_id' => $item['product_id'],
+                'variant_id' => $item['variant_id'] ?? null,
+                'quantity' => $item['quantity'],
+            ])->all(),
+            'shipping_destination' => $overrides['shipping_destination'] ?? $stored['shipping_destination'] ?? [],
+            'shipping_method_code' => $overrides['shipping_method_code'] ?? $stored['shipping_method']['code'] ?? 'UK_STANDARD',
+            'billing_destination' => $overrides['billing_destination'] ?? $stored['billing_destination'] ?? null,
+            'customer_notes' => $overrides['customer_notes'] ?? $stored['customer_notes'] ?? null,
+            'payment_method' => $overrides['payment_method'] ?? $stored['payment_method'] ?? null,
+            'details_completed_at' => $overrides['details_completed_at'] ?? $stored['details_completed_at'] ?? null,
+            'delivery_completed_at' => $overrides['delivery_completed_at'] ?? $stored['delivery_completed_at'] ?? null,
+            'address_id' => $overrides['address_id'] ?? $stored['address_id'] ?? null,
+            'idempotency_key' => $stored['idempotency_key'] ?? null,
+        ], $overrides));
     }
 
     /**
@@ -171,6 +261,9 @@ class CheckoutSessionService
                 'discount' => 0,
             ];
 
+            $product->loadMissing('images');
+            $image = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
+
             $snapshotItems[] = [
                 'product_id' => $product->id,
                 'variant_id' => $variant?->id,
@@ -185,16 +278,19 @@ class CheckoutSessionService
                 'discount' => $line['discount_amount'],
                 'tax' => '0.00',
                 'line_total' => $line['line_total_amount'],
+                'image_url' => $image?->publicUrl() ?? $image?->url,
             ];
         }
 
         $initialTotals = $this->pricingService->calculateTotals($preparedPricingItems, 0, 0, 0, 'GBP');
-        $shippingRates = $this->shippingEngine->calculateRates($initialTotals['subtotal_amount'], $countryCode);
-        $selectedShipping = $this->shippingEngine->requireRate(
+        $shippingRates = $this->shippingEngine->calculateRates($initialTotals['subtotal_amount'], $countryCode)
+            ->map(fn (array $method) => $this->decorateShippingMethod($method))
+            ->values();
+        $selectedShipping = $this->decorateShippingMethod($this->shippingEngine->requireRate(
             $shippingRates,
             (string) ($data['shipping_method_code'] ?? 'UK_STANDARD'),
             $countryCode
-        );
+        ));
 
         $finalTotals = $this->pricingService->calculateTotals(
             items: $preparedPricingItems,
@@ -231,13 +327,49 @@ class CheckoutSessionService
             'shipping_destination' => $normalizedShippingDest,
             'billing_destination' => $normalizedBillingDest,
             'shipping_method' => $selectedShipping,
+            'available_shipping_methods' => $shippingRates->all(),
+            'shipping_eligibility' => $this->shippingEngine->freeShippingEligibility($initialTotals['subtotal_amount']),
             'shipping_cost' => $finalTotals['shipping_amount'],
             'discount' => $finalTotals['discount_amount'],
             'tax' => $finalTotals['tax_amount'],
             'grand_total' => $finalTotals['grand_total_amount'],
             'totals' => $finalTotals,
             'customer_notes' => $data['customer_notes'] ?? null,
+            'payment_method' => $data['payment_method'] ?? null,
+            'idempotency_key' => $data['idempotency_key'] ?? null,
+            'address_id' => $data['address_id'] ?? null,
+            'details_completed_at' => $data['details_completed_at'] ?? null,
+            'delivery_completed_at' => $data['delivery_completed_at'] ?? null,
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $method
+     * @return array<string, mixed>
+     */
+    public function decorateShippingMethod(array $method): array
+    {
+        if (! empty($method['description'])) {
+            return $method;
+        }
+
+        $parts = [];
+
+        if (! empty($method['estimated_days'])) {
+            $parts[] = 'Typical transit: '.$method['estimated_days'];
+        }
+
+        if (! empty($method['is_discreet'])) {
+            $parts[] = 'Discreet packaging';
+        }
+
+        if (! empty($method['is_free'])) {
+            $parts[] = 'No shipping charge on this order';
+        }
+
+        $method['description'] = $parts !== [] ? implode('. ', $parts).'.' : null;
+
+        return $method;
     }
 
     /**

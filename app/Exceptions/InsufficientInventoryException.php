@@ -30,7 +30,7 @@ class InsufficientInventoryException extends RuntimeException
 
     public function getCustomerMessage(): string
     {
-        return 'Sorry, this item is out of stock.';
+        return 'One item in your basket is no longer available in the selected quantity.';
     }
 
     public function getErrorCode(): string

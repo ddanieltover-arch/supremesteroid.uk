@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -40,6 +41,10 @@ class Product extends Model
         'brand_id',
         'category_id',
         'is_featured',
+        'published_at',
+        'sort_order',
+        'is_demo',
+        'image_not_required',
     ];
 
     protected function casts(): array
@@ -51,6 +56,10 @@ class Product extends Model
             'compare_at_price_amount' => 'decimal:2',
             'compliance_verified_at' => 'datetime',
             'is_featured' => 'boolean',
+            'published_at' => 'datetime',
+            'sort_order' => 'integer',
+            'is_demo' => 'boolean',
+            'image_not_required' => 'boolean',
         ];
     }
 
@@ -86,7 +95,19 @@ class Product extends Model
             ->whereNotNull('sku')
             ->where('sku', '!=', '')
             ->whereNotNull('name')
-            ->where('name', '!=', '');
+            ->where('name', '!=', '')
+            ->where('is_demo', false);
+    }
+
+    public function isPurchasable(): bool
+    {
+        return $this->status === ProductStatus::ACTIVE
+            && in_array($this->classification, ProductClassification::approvedForRetail(), true)
+            && $this->compliance_verified_at !== null
+            && (float) $this->price_amount > 0
+            && filled($this->sku)
+            && filled($this->name)
+            && ! $this->is_demo;
     }
 
     /**
@@ -104,8 +125,12 @@ class Product extends Model
      */
     public function scopeByCategory(Builder $query, string $category): Builder
     {
-        return $query->whereHas('category', function (Builder $q) use ($category) {
-            $q->where('id', $category)->orWhere('slug', $category);
+        return $query->where(function (Builder $q) use ($category) {
+            $q->whereHas('category', function (Builder $categoryQuery) use ($category) {
+                $categoryQuery->where('id', $category)->orWhere('slug', $category);
+            })->orWhereHas('categories', function (Builder $categoryQuery) use ($category) {
+                $categoryQuery->where('id', $category)->orWhere('slug', $category);
+            });
         });
     }
 
@@ -132,7 +157,14 @@ class Product extends Model
         return $query->where(function (Builder $q) use ($term) {
             $q->where('name', 'like', "%{$term}%")
                 ->orWhere('sku', 'like', "%{$term}%")
-                ->orWhere('description', 'like', "%{$term}%");
+                ->orWhere('description', 'like', "%{$term}%")
+                ->orWhereHas('brand', fn (Builder $brand) => $brand->where('name', 'like', "%{$term}%"))
+                ->orWhereHas('category', fn (Builder $category) => $category->where('name', 'like', "%{$term}%"))
+                ->orWhereHas('attributes', fn (Builder $attribute) => $attribute->where('attribute_value', 'like', "%{$term}%"))
+                ->orWhereHas('variants', fn (Builder $variant) => $variant
+                    ->where('sku', 'like', "%{$term}%")
+                    ->orWhere('name', 'like', "%{$term}%")
+                    ->orWhereHas('attributes', fn (Builder $attribute) => $attribute->where('attribute_value', 'like', "%{$term}%")));
         });
     }
 
@@ -168,11 +200,61 @@ class Product extends Model
 
     public function reviews(): HasMany
     {
-        return $this->hasMany(Review::class)->where('status', 'APPROVED');
+        return $this->hasMany(Review::class)->where('status', \App\Enums\ReviewStatus::APPROVED);
     }
 
     public function seoMetadata(): MorphOne
     {
         return $this->morphOne(SeoMetadata::class, 'seoable');
+    }
+
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'product_category')->withPivot('is_primary')->withTimestamps();
+    }
+
+    public function content(): HasOne
+    {
+        return $this->hasOne(ProductContent::class);
+    }
+
+    public function relations(): HasMany
+    {
+        return $this->hasMany(ProductRelation::class);
+    }
+
+    public function revisions(): HasMany
+    {
+        return $this->hasMany(ProductRevision::class)->orderByDesc('revision_number');
+    }
+
+    public function allReviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function importRecord(): HasOne
+    {
+        return $this->hasOne(CatalogueImportRecord::class, 'product_id');
+    }
+
+    public function isInternalSku(): bool
+    {
+        return str_starts_with((string) $this->sku, 'IMP-');
+    }
+
+    public function hasGenuineSku(): bool
+    {
+        return ! $this->isInternalSku() && filled($this->sku);
+    }
+
+    public function genuineSku(): ?string
+    {
+        return $this->isInternalSku() ? null : $this->sku;
+    }
+
+    public function displaySku(): string
+    {
+        return $this->hasGenuineSku() ? (string) $this->sku : 'None (Internal: '.$this->sku.')';
     }
 }

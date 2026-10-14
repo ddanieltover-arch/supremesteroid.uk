@@ -1,9 +1,8 @@
-import StorefrontLayout from '../../Layouts/StorefrontLayout';
-import { useForm } from '@inertiajs/react';
-import { Alert } from '@/components/ui/Alert';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { formatMoney } from '@/lib/money';
+import { AccountLayout } from '@/Layouts/AccountLayout';
+import { OrderSummary } from '@/components/checkout/OrderSummary';
+import { PaymentInstructions } from '@/components/checkout/PaymentInstructions';
+import { PaymentProofForm } from '@/components/checkout/PaymentProofForm';
+import { PaymentSummary } from '@/components/checkout/PaymentSummary';
 
 type Payment = {
   id: string;
@@ -14,18 +13,28 @@ type Payment = {
   amount_due: string;
   currency?: string;
   reference?: string | null;
+  proof?: { filename?: string | null; download_url?: string | null } | null;
 };
+
+type TimelineItem = { key: string; label: string; reached: boolean; at?: string | null };
 
 type Order = {
   id: string;
   order_number: string;
+  placed_at?: string | null;
   status_label?: string;
   total_amount: string;
+  subtotal_amount?: string;
+  shipping_amount?: string;
+  discount_amount?: string;
+  tax_amount?: string;
   currency?: string;
   shipping_method?: string | null;
-  shipping_address?: { address_line_1?: string; city?: string; postal_code?: string; country_code?: string };
-  items?: Array<{ product_name_snapshot: string; sku_snapshot: string; quantity: number; line_total: string }>;
+  shipping_address?: { full_name?: string; address_line_1?: string; city?: string; postal_code?: string; country_code?: string };
+  items?: Array<{ product_name_snapshot: string; sku_snapshot: string; variant_name?: string | null; quantity: number; unit_price?: string; line_total: string; image_url?: string | null }>;
   payments?: Payment[];
+  timeline?: TimelineItem[];
+  tracking?: { available: boolean; carrier?: string | null; number?: string | null; url?: string | null; message?: string | null };
 };
 
 type Instructions = {
@@ -36,108 +45,90 @@ type Instructions = {
 export default function OrdersShow({ order, paymentInstructions }: { order: Order; paymentInstructions?: Instructions }) {
   const payment = order.payments?.[0];
   const currency = order.currency ?? 'GBP';
-  const bankForm = useForm({
-    bank_payment_reference: '',
-    sender_account_name: '',
-    submitted_amount: payment?.amount_due ?? '',
-    transfer_date: '',
-    proof_file: null as File | null,
-  });
-  const cryptoForm = useForm({
-    crypto_network: paymentInstructions?.crypto?.networks?.[0]?.code ?? '',
-    crypto_transaction_hash: '',
-    crypto_recipient_wallet: paymentInstructions?.crypto?.networks?.[0]?.address ?? '',
-    crypto_submitted_amount: '',
-    submitted_fiat_amount: payment?.amount_due ?? '',
-  });
-
-  const canSubmitProof = payment && !['PAID', 'REJECTED'].includes(payment.status ?? '');
+  const address = order.shipping_address;
 
   return (
-    <StorefrontLayout seo={{ title: order.order_number, description: 'Order details.', robots: 'noindex,nofollow' }}>
-      <h1 className="text-3xl font-semibold text-white">{order.order_number}</h1>
-      <p className="mt-2 text-slate-400">{order.status_label}</p>
-      <p className="mt-2 text-amber-300">{formatMoney(order.total_amount, currency)}</p>
-      <p className="mt-2 text-sm text-slate-500">{order.shipping_method}</p>
-      <ul className="mt-8 space-y-2">
-        {(order.items ?? []).map((item) => (
-          <li key={item.sku_snapshot} className="text-sm text-slate-300">
-            {item.product_name_snapshot} × {item.quantity} — {formatMoney(item.line_total, currency)}
-          </li>
-        ))}
-      </ul>
+    <AccountLayout title={order.order_number} seo={{ title: order.order_number, description: 'Order details.', robots: 'noindex,nofollow' }}>
+      <p className="text-slate-400">
+        {order.placed_at ? new Date(order.placed_at).toLocaleDateString('en-GB') : ''}
+        {order.status_label ? ` · ${order.status_label}` : ''}
+      </p>
 
-      {payment?.method === 'BANK_TRANSFER' && paymentInstructions?.bank_transfer ? (
-        <section className="mt-8 max-w-lg rounded-xl border border-slate-800 p-4 text-sm text-slate-300">
-          <h2 className="text-lg text-white">Bank transfer instructions</h2>
-          {Object.entries(paymentInstructions.bank_transfer).map(([key, value]) =>
-            value ? (
-              <p key={key} className="mt-1">
-                <span className="text-slate-500">{key.replaceAll('_', ' ')}: </span>
-                {value}
-              </p>
-            ) : null,
-          )}
-        </section>
-      ) : null}
-
-      {payment?.method === 'CRYPTOCURRENCY' && paymentInstructions?.crypto?.networks?.length ? (
-        <section className="mt-8 max-w-lg rounded-xl border border-slate-800 p-4 text-sm text-slate-300">
-          <h2 className="text-lg text-white">Crypto instructions</h2>
-          {paymentInstructions.crypto.networks.map((network) => (
-            <p key={network.code} className="mt-2 font-mono text-xs">
-              {network.label}: {network.address}
-            </p>
+      {order.timeline && order.timeline.length > 0 ? (
+        <ol className="mt-8 space-y-3 border-l border-slate-800 pl-4">
+          {order.timeline.map((step) => (
+            <li key={step.key}>
+              <p className="text-sm font-semibold text-white">{step.label}</p>
+              {step.at ? <p className="text-xs text-slate-500">{new Date(step.at).toLocaleString('en-GB')}</p> : null}
+            </li>
           ))}
-          {paymentInstructions.crypto.reference_hint ? <p className="mt-2">{paymentInstructions.crypto.reference_hint}</p> : null}
-        </section>
+        </ol>
       ) : null}
 
-      {canSubmitProof && payment?.method === 'BANK_TRANSFER' ? (
-        <form
-          className="mt-8 grid max-w-lg gap-3"
-          onSubmit={(event) => {
-            event.preventDefault();
-            bankForm.post(`/orders/${order.id}/payments/${payment.id}/proof/bank`, { forceFormData: true });
+      <div className="mt-10 grid gap-6 lg:grid-cols-2">
+        <OrderSummary
+          items={order.items}
+          totals={{
+            subtotal: order.subtotal_amount,
+            discount: order.discount_amount,
+            shipping: order.shipping_amount,
+            tax: order.tax_amount,
+            grand_total: order.total_amount,
+            currency,
           }}
-        >
-          <h2 className="text-lg text-white">Submit bank transfer proof</h2>
-          <Alert type="info">Submitting proof does not mark the order as paid. Staff review the payment first.</Alert>
-          <Input label="Payment reference" value={bankForm.data.bank_payment_reference} onChange={(event) => bankForm.setData('bank_payment_reference', event.target.value)} required />
-          <Input label="Sender account name" value={bankForm.data.sender_account_name} onChange={(event) => bankForm.setData('sender_account_name', event.target.value)} required />
-          <Input label="Amount sent" value={bankForm.data.submitted_amount} onChange={(event) => bankForm.setData('submitted_amount', event.target.value)} required />
-          <Input label="Transfer date" type="date" value={bankForm.data.transfer_date} onChange={(event) => bankForm.setData('transfer_date', event.target.value)} required />
-          <Input
-            label="Proof file"
-            type="file"
-            accept="image/jpeg,image/png,image/webp,application/pdf"
-            onChange={(event) => bankForm.setData('proof_file', event.target.files?.[0] ?? null)}
+        />
+        <div className="space-y-6">
+          <PaymentSummary
+            method={payment?.method_label}
+            amountDue={payment?.amount_due ?? order.total_amount}
+            currency={payment?.currency ?? currency}
+            status={payment?.status}
+            statusLabel={payment?.status_label}
+            reference={payment?.reference ?? order.order_number}
           />
-          <Button type="submit" variant="gold" isLoading={bankForm.processing}>
-            Submit proof
-          </Button>
-        </form>
-      ) : null}
+          <section className="rounded-xl border border-slate-800 p-4">
+            <h2 className="text-sm font-semibold text-white">Delivery</h2>
+            <p className="mt-2 text-sm text-slate-400">{order.shipping_method || 'Shipping method confirmed at checkout'}</p>
+            {address ? (
+              <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                {address.full_name}
+                <br />
+                {address.address_line_1}
+                <br />
+                {address.city} {address.postal_code}
+                <br />
+                {address.country_code}
+              </p>
+            ) : null}
+          </section>
+          <section className="rounded-xl border border-slate-800 p-4">
+            <h2 className="text-sm font-semibold text-white">Tracking</h2>
+            {order.tracking?.available ? (
+              <p className="mt-2 text-sm text-slate-300">
+                {order.tracking.carrier ? `${order.tracking.carrier}: ` : ''}
+                {order.tracking.number}
+                {order.tracking.url ? (
+                  <a href={order.tracking.url} className="mt-2 block text-amber-300" rel="noreferrer">
+                    Track shipment
+                  </a>
+                ) : null}
+              </p>
+            ) : (
+              <p className="mt-2 text-sm text-slate-400">{order.tracking?.message}</p>
+            )}
+          </section>
+        </div>
+      </div>
 
-      {canSubmitProof && payment?.method === 'CRYPTOCURRENCY' ? (
-        <form
-          className="mt-8 grid max-w-lg gap-3"
-          onSubmit={(event) => {
-            event.preventDefault();
-            cryptoForm.post(`/orders/${order.id}/payments/${payment.id}/proof/crypto`);
-          }}
-        >
-          <h2 className="text-lg text-white">Submit crypto proof</h2>
-          <Input label="Network" value={cryptoForm.data.crypto_network} onChange={(event) => cryptoForm.setData('crypto_network', event.target.value)} required />
-          <Input label="Transaction hash" value={cryptoForm.data.crypto_transaction_hash} onChange={(event) => cryptoForm.setData('crypto_transaction_hash', event.target.value)} required />
-          <Input label="Recipient wallet" value={cryptoForm.data.crypto_recipient_wallet} onChange={(event) => cryptoForm.setData('crypto_recipient_wallet', event.target.value)} required />
-          <Input label="Crypto amount" value={cryptoForm.data.crypto_submitted_amount} onChange={(event) => cryptoForm.setData('crypto_submitted_amount', event.target.value)} required />
-          <Input label="Fiat amount" value={cryptoForm.data.submitted_fiat_amount} onChange={(event) => cryptoForm.setData('submitted_fiat_amount', event.target.value)} required />
-          <Button type="submit" variant="gold" isLoading={cryptoForm.processing}>
-            Submit proof
-          </Button>
-        </form>
-      ) : null}
-    </StorefrontLayout>
+      <div className="mt-8 max-w-lg">
+        <PaymentInstructions
+          method={payment?.method}
+          bank={paymentInstructions?.bank_transfer}
+          crypto={paymentInstructions?.crypto}
+          orderNumber={order.order_number}
+        />
+        <PaymentProofForm orderId={order.id} payment={payment} paymentInstructions={paymentInstructions} />
+      </div>
+    </AccountLayout>
   );
 }

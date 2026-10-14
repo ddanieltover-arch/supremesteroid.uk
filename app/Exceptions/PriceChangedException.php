@@ -10,7 +10,7 @@ class PriceChangedException extends CustomerFacingException
     {
         parent::__construct(
             $internalMessage,
-            'Your basket has changed. We have refreshed the latest pricing and availability.',
+            'Your basket has changed. We refreshed the latest pricing and availability.',
             'PRICE_CHANGED'
         );
     }

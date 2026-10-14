@@ -21,6 +21,9 @@ class Brand extends Model
         'country_of_origin',
         'is_verified',
         'is_active',
+        'logo_url',
+        'website_url',
+        'display_order',
     ];
 
     protected function casts(): array
@@ -28,6 +31,7 @@ class Brand extends Model
         return [
             'is_verified' => 'boolean',
             'is_active' => 'boolean',
+            'display_order' => 'integer',
         ];
     }
 

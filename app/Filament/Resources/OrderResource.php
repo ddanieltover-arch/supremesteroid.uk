@@ -50,7 +50,50 @@ class OrderResource extends Resource
                         Forms\Components\TextInput::make('total_amount')
                             ->prefix('£')
                             ->disabled(),
+                        Forms\Components\TextInput::make('subtotal_amount')
+                            ->prefix('£')
+                            ->disabled(),
+                        Forms\Components\TextInput::make('shipping_amount')
+                            ->prefix('£')
+                            ->disabled(),
+                        Forms\Components\Placeholder::make('payment_state')
+                            ->label('Payment')
+                            ->content(fn ($record) => $record?->latestPayment?->status?->value ?? '—'),
                     ])->columns(2),
+
+                Forms\Components\Section::make('Items')
+                    ->schema([
+                        Forms\Components\Repeater::make('items')
+                            ->relationship()
+                            ->disabled()
+                            ->schema([
+                                Forms\Components\TextInput::make('product_name')->label('Product'),
+                                Forms\Components\TextInput::make('variant_name_snapshot')->label('Variant'),
+                                Forms\Components\TextInput::make('quantity'),
+                                Forms\Components\TextInput::make('unit_price')->prefix('£'),
+                                Forms\Components\TextInput::make('line_total')->prefix('£'),
+                            ])
+                            ->columns(5)
+                            ->addable(false)
+                            ->deletable(false)
+                            ->reorderable(false),
+                    ]),
+
+                Forms\Components\Section::make('Status history')
+                    ->schema([
+                        Forms\Components\Repeater::make('statusHistory')
+                            ->relationship()
+                            ->disabled()
+                            ->schema([
+                                Forms\Components\TextInput::make('previous_status'),
+                                Forms\Components\TextInput::make('new_status'),
+                                Forms\Components\Textarea::make('notes'),
+                            ])
+                            ->columns(3)
+                            ->addable(false)
+                            ->deletable(false)
+                            ->reorderable(false),
+                    ]),
 
                 Forms\Components\Section::make('Notes')
                     ->schema([
@@ -110,7 +153,7 @@ class OrderResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\Action::make('startProcessing')
+                \Filament\Actions\Action::make('startProcessing')
                     ->label('Start processing')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->authorize(fn (Order $record) => auth()->user()?->can('updateStatus', $record))
@@ -124,7 +167,7 @@ class OrderResource extends Resource
                             'Fulfillment started from admin.'
                         );
                     }),
-                Tables\Actions\Action::make('markShipped')
+                \Filament\Actions\Action::make('markShipped')
                     ->label('Mark shipped')
                     ->icon('heroicon-o-truck')
                     ->authorize(fn (Order $record) => auth()->user()?->can('updateStatus', $record))
@@ -138,7 +181,7 @@ class OrderResource extends Resource
                             'Marked shipped from admin.'
                         );
                     }),
-                Tables\Actions\Action::make('cancelOrder')
+                \Filament\Actions\Action::make('cancelOrder')
                     ->label('Cancel')
                     ->color('danger')
                     ->icon('heroicon-o-x-circle')
@@ -160,7 +203,7 @@ class OrderResource extends Resource
                             Notification::make()->title('Cannot cancel order')->body('This order cannot be cancelled in its current state.')->danger()->send();
                         }
                     }),
-                Tables\Actions\EditAction::make(),
+                \Filament\Actions\EditAction::make(),
             ]);
     }
 

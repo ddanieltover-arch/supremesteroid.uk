@@ -15,7 +15,13 @@ class EmailVerificationController extends Controller
 {
     public function notice(): Response
     {
-        return Inertia::render('Auth/VerifyEmail');
+        return Inertia::render('Auth/VerifyEmail', [
+            'seo' => [
+                'title' => 'Verify email',
+                'description' => 'Verify your email address.',
+                'robots' => 'noindex,nofollow',
+            ],
+        ]);
     }
 
     public function verify(EmailVerificationRequest $request): RedirectResponse

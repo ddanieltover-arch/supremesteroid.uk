@@ -21,7 +21,7 @@ class EnsureUserHasRole
         $user = $request->user();
 
         if (! $user) {
-            return redirect()->route('login');
+            return redirect('/admin/login');
         }
 
         $userRole = $user->role instanceof UserRole ? $user->role->value : (string) $user->role;

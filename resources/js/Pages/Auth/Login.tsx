@@ -1,4 +1,4 @@
-import StorefrontLayout from '../../Layouts/StorefrontLayout';
+import { AuthCard } from '@/components/auth/AuthCard';
 import { Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -11,10 +11,9 @@ export default function Login() {
   });
 
   return (
-    <StorefrontLayout seo={{ title: 'Sign in', description: 'Sign in to your account.', robots: 'noindex,nofollow' }}>
-      <h1 className="text-3xl font-semibold text-white">Sign in</h1>
+    <AuthCard title="Sign in" seo={{ title: 'Sign in', description: 'Sign in to your account.', robots: 'noindex,nofollow' }}>
       <form
-        className="mt-8 grid max-w-md gap-3"
+        className="grid gap-3"
         onSubmit={(event) => {
           event.preventDefault();
           form.post('/login');
@@ -31,13 +30,13 @@ export default function Login() {
         </Button>
       </form>
       <div className="mt-4 flex flex-col gap-2 text-sm">
-        <Link href="/register" className="text-amber-400">
+        <Link href="/register" className="text-amber-300">
           Create an account
         </Link>
         <Link href="/forgot-password" className="text-slate-400">
           Forgot password
         </Link>
       </div>
-    </StorefrontLayout>
+    </AuthCard>
   );
 }

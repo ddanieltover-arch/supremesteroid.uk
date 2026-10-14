@@ -1,0 +1,308 @@
+{
+  "source": "qa-sample",
+  "notes": "Fictional lawful wellness fixtures for importer dry-run and staging only. Not copied from any live catalogue. 20-record onboarding sample with product-level and variant-level image references. Descriptions are structural placeholders — original store copy is generated at stage time.",
+  "products": [
+    {
+      "sku": "QA-IMP-VIT-D3",
+      "name": "Vitamin D3 Softgels",
+      "brand": "North Harbour Nutrition",
+      "category": "Vitamins & Minerals",
+      "product_type": "Softgels",
+      "format": "Softgels",
+      "pack_size": "120",
+      "price": 14.99,
+      "currency": "GBP",
+      "classification": "OTC_CONSUMER",
+      "source_url": "https://example.test/ref/vit-d3",
+      "images": [
+        { "url": "https://example.test/images/vit-d3-primary.png", "alt": "Vitamin D3 softgels bottle", "is_primary": true }
+      ],
+      "attributes": { "format": "Softgels", "pack_size": "120" }
+    },
+    {
+      "sku": "QA-IMP-OMEGA-3",
+      "name": "Omega-3 Fish Oil Capsules",
+      "brand": "North Harbour Nutrition",
+      "category": "Vitamins & Minerals",
+      "format": "Capsules",
+      "pack_size": "90",
+      "price": 18.50,
+      "currency": "GBP",
+      "classification": "OTC_CONSUMER",
+      "images": ["https://example.test/images/omega3.png"]
+    },
+    {
+      "sku": "QA-IMP-WHEY-900",
+      "name": "Whey Protein Concentrate",
+      "brand": "Harbour Labs",
+      "category": "Sports Nutrition",
+      "format": "Powder",
+      "pack_size": "900g",
+      "flavour": "Vanilla",
+      "price": 32.00,
+      "compare_at_price": 36.00,
+      "currency": "GBP",
+      "classification": "OTHER_LAWFUL_PRODUCT",
+      "images": [
+        { "url": "https://example.test/images/whey.png", "alt": "Whey protein tub", "is_primary": true }
+      ],
+      "variants": [
+        {
+          "sku": "QA-IMP-WHEY-900-VAN",
+          "name": "Vanilla",
+          "price": 32.00,
+          "attributes": { "flavour": "Vanilla", "pack_size": "900g" },
+          "images": [
+            { "url": "https://example.test/images/whey-vanilla.png", "alt": "Vanilla whey", "is_primary": true }
+          ]
+        },
+        {
+          "sku": "QA-IMP-WHEY-900-CHO",
+          "name": "Chocolate",
+          "price": 32.00,
+          "attributes": { "flavour": "Chocolate", "pack_size": "900g" },
+          "images": [
+            { "url": "https://example.test/images/whey-chocolate.png", "alt": "Chocolate whey", "is_primary": true }
+          ]
+        }
+      ]
+    },
+    {
+      "sku": "QA-IMP-CREATINE",
+      "name": "Creatine Monohydrate Powder",
+      "brand": "Harbour Labs",
+      "category": "Sports Nutrition",
+      "format": "Powder",
+      "pack_size": "500g",
+      "price": 19.99,
+      "currency": "GBP",
+      "classification": "OTHER_LAWFUL_PRODUCT",
+      "images": ["https://example.test/images/creatine.png"]
+    },
+    {
+      "sku": "QA-IMP-MAG-CIT",
+      "name": "Magnesium Citrate Tablets",
+      "brand": "Cedar Wellness",
+      "category": "Vitamins & Minerals",
+      "format": "Tablets",
+      "pack_size": "60",
+      "price": 11.25,
+      "currency": "GBP",
+      "classification": "OTC_CONSUMER"
+    },
+    {
+      "sku": "QA-IMP-COLLAGEN",
+      "name": "Collagen Peptides Powder",
+      "brand": "Cedar Wellness",
+      "category": "Wellness",
+      "format": "Powder",
+      "pack_size": "300g",
+      "price": 27.00,
+      "currency": "GBP",
+      "classification": "OTHER_LAWFUL_PRODUCT"
+    },
+    {
+      "sku": "QA-IMP-ELECTRO",
+      "name": "Electrolyte Drink Mix",
+      "brand": "Harbour Labs",
+      "category": "Sports Nutrition",
+      "format": "Powder sachets",
+      "pack_size": "20 sachets",
+      "flavour": "Citrus",
+      "price": 15.00,
+      "currency": "GBP",
+      "classification": "OTHER_LAWFUL_PRODUCT"
+    },
+    {
+      "sku": "QA-IMP-SHAKER",
+      "name": "Protein Shaker Bottle",
+      "brand": "Harbour Gear",
+      "category": "Accessories",
+      "product_type": "Bottle",
+      "colour": "Black",
+      "pack_size": "700ml",
+      "price": 8.50,
+      "currency": "GBP",
+      "classification": "OTHER_LAWFUL_PRODUCT",
+      "images": [
+        { "url": "https://example.test/images/shaker-product.png", "alt": "Shaker bottle", "is_primary": true }
+      ],
+      "variants": [
+        {
+          "sku": "QA-IMP-SHAKER-BLK",
+          "name": "Black",
+          "attributes": { "colour": "Black", "size": "700ml" },
+          "images": [{ "url": "https://example.test/images/shaker-black.png", "alt": "Black shaker", "is_primary": true }]
+        },
+        {
+          "sku": "QA-IMP-SHAKER-BLU",
+          "name": "Blue",
+          "attributes": { "colour": "Blue", "size": "700ml" },
+          "images": [{ "url": "https://example.test/images/shaker-blue.png", "alt": "Blue shaker", "is_primary": true }]
+        }
+      ]
+    },
+    {
+      "sku": "QA-IMP-ZINC",
+      "name": "Zinc Gluconate Tablets",
+      "brand": "North Harbour Nutrition",
+      "category": "Vitamins & Minerals",
+      "format": "Tablets",
+      "pack_size": "90",
+      "price": 9.99,
+      "currency": "GBP",
+      "classification": "OTC_CONSUMER"
+    },
+    {
+      "sku": "QA-IMP-BCAA",
+      "name": "BCAA Powder",
+      "brand": "Harbour Labs",
+      "category": "Sports Nutrition",
+      "format": "Powder",
+      "pack_size": "250g",
+      "flavour": "Berry",
+      "price": 21.00,
+      "currency": "GBP",
+      "classification": "OTHER_LAWFUL_PRODUCT"
+    },
+    {
+      "sku": "QA-IMP-RESIST",
+      "name": "Resistance Band Set",
+      "brand": "Harbour Gear",
+      "category": "Accessories",
+      "product_type": "Training accessory",
+      "pack_size": "3 bands",
+      "price": 16.00,
+      "currency": "GBP",
+      "classification": "OTHER_LAWFUL_PRODUCT"
+    },
+    {
+      "sku": "QA-IMP-MULTIVIT",
+      "name": "Daily Multivitamin Capsules",
+      "brand": "Cedar Wellness",
+      "category": "Vitamins & Minerals",
+      "format": "Capsules",
+      "pack_size": "60",
+      "price": 12.50,
+      "currency": "GBP",
+      "classification": "OTC_CONSUMER"
+    },
+    {
+      "sku": "QA-IMP-VIT-C",
+      "name": "Vitamin C Tablets",
+      "brand": "North Harbour Nutrition",
+      "category": "Vitamins & Minerals",
+      "format": "Tablets",
+      "pack_size": "100",
+      "price": 7.50,
+      "currency": "GBP",
+      "classification": "OTC_CONSUMER",
+      "images": ["https://example.test/images/vit-c.png"]
+    },
+    {
+      "sku": "QA-IMP-CASEIN",
+      "name": "Micellar Casein Protein",
+      "brand": "Harbour Labs",
+      "category": "Sports Nutrition",
+      "format": "Powder",
+      "pack_size": "900g",
+      "price": 34.00,
+      "currency": "GBP",
+      "classification": "OTHER_LAWFUL_PRODUCT",
+      "variants": [
+        {
+          "sku": "QA-IMP-CASEIN-VAN",
+          "name": "Vanilla",
+          "price": 34.00,
+          "attributes": { "flavour": "Vanilla", "pack_size": "900g" },
+          "images": [{ "url": "https://example.test/images/casein-vanilla.png", "alt": "Casein vanilla" }]
+        },
+        {
+          "sku": "QA-IMP-CASEIN-CHO",
+          "name": "Chocolate",
+          "price": 34.00,
+          "attributes": { "flavour": "Chocolate", "pack_size": "900g" },
+          "images": [{ "url": "https://example.test/images/casein-chocolate.png", "alt": "Casein chocolate" }]
+        }
+      ],
+      "images": [{ "url": "https://example.test/images/casein.png", "alt": "Casein tub", "is_primary": true }]
+    },
+    {
+      "sku": "QA-IMP-GLUTAMINE",
+      "name": "L-Glutamine Powder",
+      "brand": "Harbour Labs",
+      "category": "Sports Nutrition",
+      "format": "Powder",
+      "pack_size": "300g",
+      "price": 17.00,
+      "currency": "GBP",
+      "classification": "OTHER_LAWFUL_PRODUCT"
+    },
+    {
+      "sku": "QA-IMP-YOGA-MAT",
+      "name": "Yoga Mat",
+      "brand": "Harbour Gear",
+      "category": "Accessories",
+      "product_type": "Mat",
+      "colour": "Charcoal",
+      "pack_size": "6mm",
+      "price": 22.00,
+      "currency": "GBP",
+      "classification": "OTHER_LAWFUL_PRODUCT",
+      "variants": [
+        { "sku": "QA-IMP-YOGA-CHAR", "name": "Charcoal", "attributes": { "colour": "Charcoal" } },
+        { "sku": "QA-IMP-YOGA-TEAL", "name": "Teal", "attributes": { "colour": "Teal" } }
+      ],
+      "images": [
+        { "url": "https://example.test/images/yoga-mat.png", "alt": "Yoga mat" },
+        { "url": "https://example.test/images/yoga-mat-teal.png", "alt": "Teal yoga mat", "variant_sku": "QA-IMP-YOGA-TEAL", "variant_name": "Teal" }
+      ]
+    },
+    {
+      "sku": "QA-IMP-PROBIOTIC",
+      "name": "Daily Probiotic Capsules",
+      "brand": "Cedar Wellness",
+      "category": "Wellness",
+      "format": "Capsules",
+      "pack_size": "30",
+      "price": 19.50,
+      "currency": "GBP",
+      "classification": "OTC_CONSUMER"
+    },
+    {
+      "sku": "QA-IMP-IRON",
+      "name": "Iron Bisglycinate Capsules",
+      "brand": "North Harbour Nutrition",
+      "category": "Vitamins & Minerals",
+      "format": "Capsules",
+      "pack_size": "60",
+      "price": 10.99,
+      "currency": "GBP",
+      "classification": "OTC_CONSUMER"
+    },
+    {
+      "sku": "QA-IMP-TOWEL",
+      "name": "Gym Towel",
+      "brand": "Harbour Gear",
+      "category": "Accessories",
+      "product_type": "Towel",
+      "colour": "Grey",
+      "price": 6.00,
+      "currency": "GBP",
+      "classification": "OTHER_LAWFUL_PRODUCT"
+    },
+    {
+      "sku": "QA-IMP-HOLD-01",
+      "name": "Anabolic Research Reagent Sample",
+      "brand": "Internal Review Only",
+      "category": "Held for review",
+      "price": 1.00,
+      "currency": "GBP",
+      "requires_compliance_review": true,
+      "source_url": "https://example.test/ref/held-01",
+      "verification_documents": [
+        { "label": "Supplier certificate claim", "reference": "DOC-HOLD-01" }
+      ]
+    }
+  ]
+}

@@ -12,6 +12,7 @@ use App\Http\Resources\OrderDetailResource;
 use App\Http\Resources\OrderSummaryResource;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\User;
 use App\Services\Storage\ObjectStorageService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -41,23 +42,33 @@ class OrderController extends Controller
 
         return Inertia::render('Orders/Index', [
             'orders' => $orders,
+            'seo' => [
+                'title' => 'Orders',
+                'description' => 'Your order history.',
+                'robots' => 'noindex,nofollow',
+            ],
         ]);
     }
 
     public function show(Request $request, string $id): Response
     {
-        $order = Order::query()
-            ->where('user_id', $request->user()->id)
-            ->with(['items', 'payments.submissions.proofFile', 'statusHistory'])
-            ->findOrFail($id);
+        $order = $this->ownedOrder($request, $id)
+            ->load(['items.product.images', 'payments.submissions.proofFile', 'statusHistory']);
 
-        $this->authorize('view', $order);
+        if ($request->user()) {
+            $this->authorize('view', $order);
+        }
 
         return Inertia::render('Orders/Show', [
             'order' => (new OrderDetailResource($order))->resolve(),
             'paymentInstructions' => [
                 'bank_transfer' => array_filter(config('payments.bank_transfer', [])),
                 'crypto' => config('payments.crypto', ['networks' => [], 'reference_hint' => null]),
+            ],
+            'seo' => [
+                'title' => 'Order details',
+                'description' => 'Order details.',
+                'robots' => 'noindex,nofollow',
             ],
         ]);
     }
@@ -80,7 +91,7 @@ class OrderController extends Controller
             $payload['proof_file_id'] = $stored->id;
         }
 
-        $this->submitBankTransferPaymentAction->execute($payment, $request->user(), $payload);
+        $this->submitBankTransferPaymentAction->execute($payment, $this->checkoutActor($request, $order), $payload);
 
         return redirect()
             ->route('orders.show', $order->id)
@@ -93,7 +104,19 @@ class OrderController extends Controller
         string $paymentId
     ): RedirectResponse {
         [$order, $payment] = $this->authorizePaymentSubmission($request, $orderId, $paymentId);
-        $this->submitCryptoPaymentAction->execute($payment, $request->user(), $request->validated());
+        $payload = $request->safe()->except(['proof_file']);
+
+        if ($request->hasFile('proof_file')) {
+            $stored = $this->objectStorageService->storeUploadedFile(
+                $request->file('proof_file'),
+                (string) config('filesystems.uploads.payment_proofs_collection', 'payment_proofs'),
+                $request->user(),
+                $payment
+            );
+            $payload['proof_file_id'] = $stored->id;
+        }
+
+        $this->submitCryptoPaymentAction->execute($payment, $this->checkoutActor($request, $order), $payload);
 
         return redirect()
             ->route('orders.show', $order->id)
@@ -120,10 +143,24 @@ class OrderController extends Controller
                 $payload['proof_file_id'] = $stored->id;
             }
 
-            $this->submitBankTransferPaymentAction->execute($payment, $request->user(), $payload);
+            $this->submitBankTransferPaymentAction->execute($payment, $this->checkoutActor($request, $order), $payload);
         } else {
-            $validated = $request->validate((new SubmitCryptoPaymentProofRequest())->rules());
-            $this->submitCryptoPaymentAction->execute($payment, $request->user(), $validated);
+            $formRequest = SubmitCryptoPaymentProofRequest::createFrom($request);
+            $formRequest->setContainer(app())->setRedirector(app('redirect'));
+            $formRequest->validateResolved();
+            $payload = $formRequest->safe()->except(['proof_file']);
+
+            if ($request->hasFile('proof_file')) {
+                $stored = $this->objectStorageService->storeUploadedFile(
+                    $request->file('proof_file'),
+                    (string) config('filesystems.uploads.payment_proofs_collection', 'payment_proofs'),
+                    $request->user(),
+                    $payment
+                );
+                $payload['proof_file_id'] = $stored->id;
+            }
+
+            $this->submitCryptoPaymentAction->execute($payment, $this->checkoutActor($request, $order), $payload);
         }
 
         return redirect()
@@ -136,24 +173,57 @@ class OrderController extends Controller
      */
     protected function authorizePaymentSubmission(Request $request, string $orderId, string $paymentId): array
     {
-        $order = Order::query()->where('user_id', $request->user()->id)->findOrFail($orderId);
+        $order = $this->ownedOrder($request, $orderId);
         $payment = Payment::query()->where('order_id', $order->id)->findOrFail($paymentId);
 
-        $this->authorize('submitPaymentProof', $order);
-        $this->authorize('submitProof', $payment);
+        if ($request->user()) {
+            $this->authorize('submitPaymentProof', $order);
+            $this->authorize('submitProof', $payment);
+        }
 
         return [$order, $payment];
     }
 
+    protected function ownedOrder(Request $request, string $orderId): Order
+    {
+        $query = Order::query();
+
+        if ($request->user()) {
+            $query->where('user_id', $request->user()->id);
+        } else {
+            $query->where('id', $request->session()->get('checkout_order_id'));
+        }
+
+        return $query->findOrFail($orderId);
+    }
+
+    protected function checkoutActor(Request $request, Order $order): User
+    {
+        if ($request->user()) {
+            return $request->user();
+        }
+
+        $customerId = $request->session()->get('checkout_customer_id') ?? $order->user_id;
+        $user = is_string($customerId) ? User::query()->find($customerId) : $order->user;
+
+        abort_unless($user instanceof User, 403);
+
+        return $user;
+    }
+
     public function downloadPaymentProof(Request $request, string $orderId, string $paymentId): \Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $order = Order::query()->findOrFail($orderId);
         $payment = Payment::query()
-            ->where('order_id', $order->id)
-            ->with('submissions.proofFile')
+            ->where('order_id', $orderId)
+            ->with(['order', 'submissions.proofFile'])
             ->findOrFail($paymentId);
 
-        $this->authorize('view', $payment);
+        $user = $request->user();
+        if ($user) {
+            abort_unless($user->can('view', $payment), 404);
+        } else {
+            abort_unless($request->session()->get('checkout_order_id') === $payment->order_id, 404);
+        }
 
         $file = $payment->submissions
             ->sortByDesc('created_at')

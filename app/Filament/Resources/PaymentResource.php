@@ -8,11 +8,14 @@ use App\Enums\PaymentStatus;
 use App\Filament\Resources\PaymentResource\Pages;
 use App\Models\Payment;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 class PaymentResource extends Resource
@@ -53,13 +56,29 @@ class PaymentResource extends Resource
                     ->label('Order #')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('order.customer_name_snapshot')
+                    ->label('Customer')
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('method')
                     ->badge(),
                 Tables\Columns\TextColumn::make('amount')
                     ->money('GBP')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('reference')
+                    ->label('Reference')
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('latestSubmission.proofFile.original_filename')
+                    ->label('Proof')
+                    ->placeholder('None')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('latestSubmission.created_at')
+                    ->label('Submitted')
+                    ->dateTime()
+                    ->placeholder('—')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -70,14 +89,14 @@ class PaymentResource extends Resource
                     ->options(collect(PaymentStatus::cases())->mapWithKeys(fn ($status) => [$status->value => $status->label()])),
             ])
             ->actions([
-                Tables\Actions\Action::make('viewProof')
+                Action::make('viewProof')
                     ->label('View proof')
                     ->icon('heroicon-o-document')
                     ->authorize(fn (Payment $record) => auth()->user()?->can('review', $record) ?? false)
                     ->visible(fn (Payment $record) => $record->submissions()->whereNotNull('proof_file_id')->exists())
                     ->url(fn (Payment $record) => route('orders.payment.proof.download', [$record->order_id, $record->id]))
                     ->openUrlInNewTab(),
-                Tables\Actions\Action::make('approve')
+                Action::make('approve')
                     ->label('Approve Payment')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -97,7 +116,7 @@ class PaymentResource extends Resource
                             reason: $data['admin_notes'] ?? 'Approved via Filament Admin'
                         );
                     }),
-                Tables\Actions\Action::make('reject')
+                Action::make('reject')
                     ->label('Reject Payment')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
@@ -118,8 +137,13 @@ class PaymentResource extends Resource
                             reason: $data['reason']
                         );
                     }),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with(['order', 'latestSubmission.proofFile']);
     }
 
     public static function getPages(): array

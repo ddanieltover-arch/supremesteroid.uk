@@ -1,4 +1,4 @@
-import StorefrontLayout from '../../Layouts/StorefrontLayout';
+import { AuthCard } from '@/components/auth/AuthCard';
 import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -12,10 +12,9 @@ export default function ResetPassword({ email, token }: { email?: string; token:
   });
 
   return (
-    <StorefrontLayout seo={{ title: 'Set new password', description: 'Choose a new password.', robots: 'noindex,nofollow' }}>
-      <h1 className="text-3xl font-semibold text-white">Set a new password</h1>
+    <AuthCard title="Set a new password" seo={{ title: 'Set new password', description: 'Choose a new password.', robots: 'noindex,nofollow' }}>
       <form
-        className="mt-8 grid max-w-md gap-3"
+        className="grid gap-3"
         onSubmit={(event) => {
           event.preventDefault();
           form.post('/reset-password');
@@ -28,6 +27,6 @@ export default function ResetPassword({ email, token }: { email?: string; token:
           Update password
         </Button>
       </form>
-    </StorefrontLayout>
+    </AuthCard>
   );
 }

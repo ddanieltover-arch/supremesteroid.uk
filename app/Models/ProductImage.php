@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use InvalidArgumentException;
 
 class ProductImage extends Model
 {
@@ -19,6 +20,9 @@ class ProductImage extends Model
         'alt_text',
         'display_order',
         'is_primary',
+        'caption',
+        'thumbnail_url',
+        'product_variant_id',
     ];
 
     protected function casts(): array
@@ -29,9 +33,32 @@ class ProductImage extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::saving(function (ProductImage $image): void {
+            if ($image->product_variant_id === null) {
+                return;
+            }
+
+            $belongs = ProductVariant::query()
+                ->whereKey($image->product_variant_id)
+                ->where('product_id', $image->product_id)
+                ->exists();
+
+            if (! $belongs) {
+                throw new InvalidArgumentException('Cannot assign an image to a variant that belongs to another product.');
+            }
+        });
+    }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
 
     public function publicUrl(): ?string

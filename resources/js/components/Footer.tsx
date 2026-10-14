@@ -1,82 +1,113 @@
 import { Link, usePage } from '@inertiajs/react';
-import { AlertOctagon, ShieldCheck } from 'lucide-react';
-import { formatMoney } from '@/lib/money';
-import type { ShippingMethod } from '@/types';
+
+type Policy = { title: string; slug: string; url: string };
 
 export function Footer() {
   const page = usePage<{
-    store?: { name?: string; support_email?: string };
-    shippingOverview?: {
-      currency: string;
-      free_shipping_threshold: string;
-      methods: ShippingMethod[];
+    store?: {
+      name?: string;
+      support_email?: string;
+      support_phone?: string | null;
+      address?: {
+        street?: string;
+        locality?: string;
+        city?: string;
+        postal_code?: string;
+        country?: string;
+      };
+    };
+    chrome?: {
+      policies?: Policy[];
+      social?: Record<string, string>;
     };
   }>();
-  const methods = page.props.shippingOverview?.methods ?? [];
-  const currency = page.props.shippingOverview?.currency ?? 'GBP';
   const storeName = page.props.store?.name ?? 'Supreme Steroids';
+  const address = page.props.store?.address;
+  const policies = page.props.chrome?.policies ?? [];
+  const social = Object.fromEntries(Object.entries(page.props.chrome?.social ?? {}).filter(([, url]) => Boolean(url)));
+  const company = policies.filter((item) => ['about', 'contact'].includes(item.slug));
+  const legal = policies.filter((item) => !['about', 'contact'].includes(item.slug));
 
   return (
-    <footer className="mt-20 border-t border-slate-900 bg-slate-950 text-xs text-slate-400">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-10 rounded-xl border border-slate-800/80 bg-slate-900/50 p-4">
-          <div className="flex items-start gap-3">
-            <AlertOctagon className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" aria-hidden="true" />
-            <div>
-              <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-slate-200">
-                Regulatory & product compliance
-              </h2>
-              <p className="leading-relaxed text-slate-400">
-                {storeName} offers lawful OTC nutritional products, wellness cofactors, and analytical research reagents.
-                Controlled substances and unlicensed medicines are not sold.
+    <footer className="mt-20 border-t border-slate-900 bg-slate-950 text-sm text-slate-400">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
+          <div>
+            <h2 className="text-sm font-semibold text-white">Contact</h2>
+            {address ? (
+              <p className="mt-3 leading-relaxed">
+                {address.street}
+                <br />
+                {address.locality}
+                <br />
+                {address.city} {address.postal_code}
+                <br />
+                {address.country}
               </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-10 grid grid-cols-1 gap-8 md:grid-cols-3">
-          <div>
-            <h3 className="mb-3 text-sm font-bold text-slate-100">{storeName}</h3>
-            <p className="mb-4 leading-relaxed">Precision-formulated sports nutrition and verified laboratory reagents.</p>
-            <p className="inline-flex items-center gap-2 font-mono text-[11px] text-emerald-400">
-              <ShieldCheck className="h-4 w-4" aria-hidden="true" /> Lab verified batches
+            ) : null}
+            <p className="mt-4">
+              <a href={`mailto:${page.props.store?.support_email ?? 'info@supremesteroid.uk'}`} className="hover:text-amber-300">
+                {page.props.store?.support_email ?? 'info@supremesteroid.uk'}
+              </a>
             </p>
+            {page.props.store?.support_phone ? <p className="mt-2">{page.props.store.support_phone}</p> : null}
           </div>
+
           <div>
-            <h3 className="mb-3 text-sm font-bold text-slate-100">Shipping</h3>
-            <ul className="space-y-2">
-              {methods.map((method) => (
-                <li key={method.code}>
-                  {method.name} — {formatMoney(method.rate_amount ?? '0.00', currency)}
-                  {method.is_eligible_for_free_threshold ? ' (free when eligible)' : ''}
+            <h2 className="text-sm font-semibold text-white">Shop</h2>
+            <ul className="mt-3 space-y-2">
+              <li><Link href="/shop" className="hover:text-amber-300">Catalogue</Link></li>
+              <li><Link href="/shop?collection=featured" className="hover:text-amber-300">Featured</Link></li>
+              <li><Link href="/shop?collection=new" className="hover:text-amber-300">New arrivals</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="text-sm font-semibold text-white">Customer service</h2>
+            <ul className="mt-3 space-y-2">
+              <li><Link href="/contact" className="hover:text-amber-300">Contact</Link></li>
+              <li><Link href="/shipping" className="hover:text-amber-300">Shipping</Link></li>
+              <li><Link href="/returns" className="hover:text-amber-300">Returns</Link></li>
+              <li><Link href="/faq" className="hover:text-amber-300">FAQ</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="text-sm font-semibold text-white">Company</h2>
+            <ul className="mt-3 space-y-2">
+              {company.map((item) => (
+                <li key={item.slug}>
+                  <Link href={item.url} className="hover:text-amber-300">{item.title}</Link>
                 </li>
               ))}
             </ul>
           </div>
+
           <div>
-            <h3 className="mb-3 text-sm font-bold text-slate-100">Help</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/shop" className="hover:text-slate-200">
-                  Shop
-                </Link>
-              </li>
-              <li>
-                <Link href="/account" className="hover:text-slate-200">
-                  Account
-                </Link>
-              </li>
-              <li>
-                <a href={`mailto:${page.props.store?.support_email ?? 'info@supremesteroid.uk'}`} className="hover:text-slate-200">
-                  Support
-                </a>
-              </li>
+            <h2 className="text-sm font-semibold text-white">Policies</h2>
+            <ul className="mt-3 space-y-2">
+              {legal.map((item) => (
+                <li key={item.slug}>
+                  <Link href={item.url} className="hover:text-amber-300">{item.title}</Link>
+                </li>
+              ))}
             </ul>
+            {Object.keys(social).length > 0 ? (
+              <ul className="mt-6 flex flex-wrap gap-3">
+                {Object.entries(social).map(([network, url]) => (
+                  <li key={network}>
+                    <a href={url} className="capitalize hover:text-amber-300" rel="noreferrer">
+                      {network}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-900 pt-6 text-slate-500 sm:flex-row">
-          <p>© {new Date().getFullYear()} {storeName}. All rights reserved.</p>
+        <div className="mt-12 border-t border-slate-900 pt-6 text-xs text-slate-500">
+          <p>© {new Date().getFullYear()} {storeName}</p>
         </div>
       </div>
     </footer>

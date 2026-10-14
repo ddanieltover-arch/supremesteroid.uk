@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -22,12 +23,15 @@ class Category extends Model
         'description',
         'display_order',
         'is_visible',
+        'is_featured',
+        'image_url',
     ];
 
     protected function casts(): array
     {
         return [
             'is_visible' => 'boolean',
+            'is_featured' => 'boolean',
             'display_order' => 'integer',
         ];
     }
@@ -45,6 +49,11 @@ class Category extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function assignedProducts(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'product_category')->withPivot('is_primary')->withTimestamps();
     }
 
     public function seoMetadata(): MorphOne

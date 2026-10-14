@@ -58,6 +58,7 @@ class PricingService
      *     effective_price_amount: string,
      *     effective_price_pence: int,
      *     is_on_sale: bool,
+     *     discount_percent: ?int,
      *     currency: string
      * }
      */
@@ -113,6 +114,9 @@ class PricingService
             'effective_price_amount' => $this->toDecimalString($effectivePricePence),
             'effective_price_pence' => $effectivePricePence,
             'is_on_sale' => $isOnSale,
+            'discount_percent' => $isOnSale && $basePricePence > 0
+                ? (int) floor((($basePricePence - $effectivePricePence) / $basePricePence) * 100)
+                : null,
             'currency' => $currency,
         ];
     }

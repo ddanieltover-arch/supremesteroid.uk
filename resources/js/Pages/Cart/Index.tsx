@@ -11,7 +11,7 @@ export default function CartIndex({ cart }: { cart: CartPayload }) {
   const eligibility = cart.shipping_eligibility;
 
   return (
-    <StorefrontLayout seo={{ title: 'Cart', description: 'Review your Supreme Steroids basket.' }}>
+    <StorefrontLayout seo={{ title: 'Cart', description: 'Review your Supreme Steroids basket.', robots: 'noindex,nofollow' }}>
       <h1 className="text-3xl font-semibold text-white">Cart</h1>
       {eligibility ? (
         <p className="mt-3 text-sm text-slate-400">

@@ -63,21 +63,27 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 }
 
 createInertiaApp({
-  title: (title) => (title ? `${title} | Supreme Steroids` : 'Supreme Steroids'),
+  title: (title) => {
+    if (!title) {
+      return 'Supreme Steroids';
+    }
+    return /supreme\s*steroids/i.test(title) ? title : `${title} | Supreme Steroids`;
+  },
   progress: {
     color: '#f59e0b',
     delay: 120,
   },
   resolve: (name) => {
-    const pages = import.meta.glob('./Pages/**/*.tsx', { eager: true }) as Record<
-      string,
-      { default: ComponentType }
-    >;
+    const pages = import.meta.glob('./Pages/**/*.tsx');
     const page = pages[`./Pages/${name}.tsx`];
     if (!page) {
       throw new Error(`Inertia page not found: ${name}`);
     }
-    return page;
+
+    return page().then((module) => {
+      const resolved = module as { default?: ComponentType } & ComponentType;
+      return resolved.default ?? resolved;
+    });
   },
   setup({ el, App, props }) {
     createRoot(el).render(

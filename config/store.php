@@ -39,7 +39,7 @@ return [
     | Points to external object storage (AWS S3 / Cloudflare R2 / CDN).
     |
     */
-    'logo_url' => env('STORE_APPROVED_LOGO_URL', '/assets/branding/supreme-steroids-logo.svg'),
+    'logo_url' => env('STORE_APPROVED_LOGO_URL', '/assets/branding/supreme-steroids-logo.png'),
 
     'cron_secret' => env('CRON_SECRET'),
 
@@ -54,6 +54,13 @@ return [
     | review may be exposed to consumers or purchased.
     |
     */
+    'catalogue' => [
+        'low_stock_threshold' => (int) env('CATALOGUE_LOW_STOCK_THRESHOLD', 5),
+        'expose_exact_stock' => filter_var(env('CATALOGUE_EXPOSE_EXACT_STOCK', false), FILTER_VALIDATE_BOOL),
+        'new_product_days' => (int) env('CATALOGUE_NEW_PRODUCT_DAYS', 14),
+        'allow_stock_notifications' => filter_var(env('CATALOGUE_STOCK_NOTIFICATIONS', true), FILTER_VALIDATE_BOOL),
+    ],
+
     'compliance' => [
         'enforce_strict_approval' => true,
         'prohibit_medical_dosing' => true,

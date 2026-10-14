@@ -4,6 +4,7 @@ export type MoneyPricing = {
   sale_price: string | null;
   effective_price: string;
   is_on_sale: boolean;
+  discount_percent?: number | null;
 };
 
 export type ProductCard = {
@@ -26,6 +27,10 @@ export type ProductCard = {
   pricing: MoneyPricing | null;
   is_purchasable: boolean;
   is_featured?: boolean;
+  variant_count?: number;
+  has_variants?: boolean;
+  badges?: Array<{ code: string; label: string }>;
+  stock?: { label: string; code: string; quantity?: number | null };
 };
 
 export type ProductVariant = {
@@ -36,6 +41,10 @@ export type ProductVariant = {
   is_active: boolean;
   is_purchasable: boolean;
   available_quantity?: number | null;
+  stock?: { label: string; code: string; quantity?: number | null };
+  is_on_sale?: boolean;
+  compare_at_price?: string | null;
+  attributes?: Array<{ name: string; value: string }>;
 };
 
 export type ProductDetail = Omit<ProductCard, 'brand' | 'category'> & {
@@ -44,12 +53,39 @@ export type ProductDetail = Omit<ProductCard, 'brand' | 'category'> & {
   safety_guidelines?: string | null;
   brand?: { id: string; name: string; slug: string } | null;
   category?: { id: string; name: string; slug: string } | null;
-  images: Array<{ id: string; url: string; alt_text?: string | null; is_primary: boolean }>;
+  images: Array<{ id: string; url: string; alt_text?: string | null; caption?: string | null; thumbnail_url?: string | null; is_primary: boolean; variant_id?: string | null }>;
   variants: ProductVariant[];
   specifications?: Array<{ name: string; value: string }>;
   related_products?: ProductCard[];
+  related_groups?: {
+    related?: ProductCard[];
+    alternative?: ProductCard[];
+    complementary?: ProductCard[];
+  };
   shipping_methods?: ShippingMethod[];
   ineligibility_reasons?: string[];
+  highlights?: string[];
+  content?: Record<string, string>;
+  faqs?: Array<{ question: string; answer: string }>;
+  reviews?: {
+    average?: number | null;
+    count?: number;
+    items?: Array<{
+      id: string;
+      rating: number;
+      title?: string | null;
+      body?: string | null;
+      display_name?: string | null;
+      verified_purchase?: boolean;
+      created_at?: string | null;
+    }>;
+  };
+  breadcrumbs?: Array<{ name: string; url: string }>;
+  structured_data?: Array<Record<string, unknown>>;
+  stock?: { label: string; code: string; quantity?: number | null };
+  badges?: Array<{ code: string; label: string }>;
+  allow_stock_notification?: boolean;
+  is_preview?: boolean;
 };
 
 export type CartItem = {
@@ -107,6 +143,7 @@ export type ShippingMethod = {
   is_discreet?: boolean;
   is_free?: boolean;
   is_eligible_for_free_threshold?: boolean;
+  description?: string | null;
 };
 
 export type SeoProps = {
@@ -125,6 +162,68 @@ export type Paginated<T> = {
   current_page?: number;
   last_page?: number;
   total?: number;
+};
+
+export type CatalogueNav = {
+  categories: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    children?: Array<{ id: string; name: string; slug: string }>;
+  }>;
+  brands: Array<{ id: string; name: string; slug: string; logo_url?: string | null }>;
+  featured: ProductCard[];
+  new_arrivals: ProductCard[];
+};
+
+export type CatalogueFilters = {
+  category?: string | null;
+  brand?: string | null;
+  search?: string | null;
+  q?: string | null;
+  sort?: string;
+  availability?: string | null;
+  min_price?: string | null;
+  max_price?: string | null;
+  collection?: string | null;
+  attributes?: Record<string, string>;
+};
+
+export type SuggestResponse = {
+  results: Array<{ id: string; name: string; slug?: string; sku?: string; url: string; brand?: string | null; image_url?: string | null; pricing?: MoneyPricing | null }>;
+  products?: Array<{ id: string; name: string; url: string; brand?: string | null; image_url?: string | null; pricing?: MoneyPricing | null }>;
+  brands?: Array<{ id: string; name: string; url: string }>;
+  categories?: Array<{ id: string; name: string; url: string }>;
+  view_all?: string;
+};
+
+export type HomepageCta = { label: string; url: string };
+
+export type HomepageSection = { key: string; enabled: boolean; position: number };
+
+export type HomepagePayload = {
+  announcement?: { enabled: boolean; message: string } | null;
+  hero: {
+    eyebrow: string;
+    headline: string;
+    description: string;
+    primary_cta: HomepageCta;
+    secondary_cta: HomepageCta;
+    products: ProductCard[];
+  };
+  categories: Array<{ id: string; name: string; slug: string; description?: string | null; image_url?: string | null; product_count: number; url: string }>;
+  featuredProducts: ProductCard[];
+  newProducts: ProductCard[];
+  saleProducts: ProductCard[];
+  brands: Array<{ id: string; name: string; slug: string; description?: string | null; logo_url?: string | null; product_count: number; url: string }>;
+  intent: Array<{ key: string; label: string; url: string }>;
+  editorial?: { label: string; heading: string; body: string; cta: HomepageCta; image_url?: string | null } | null;
+  trustItems: Array<{ title: string; body: string }>;
+  shipping: { currency: string; free_shipping_threshold: string; methods: ShippingMethod[] };
+  faqs: Array<{ id: string; question: string; answer: string }>;
+  reviews?: Array<{ id: string; rating: number; title?: string | null; body?: string | null; display_name?: string | null; product_name?: string | null; product_url?: string | null; verified_purchase?: boolean }>;
+  newsletter?: { heading: string; body: string } | null;
+  sections: HomepageSection[];
 };
 
 export type CheckoutPreview = {

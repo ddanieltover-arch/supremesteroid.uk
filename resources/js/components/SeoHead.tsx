@@ -3,12 +3,13 @@ import type { SeoProps } from '@/types';
 
 export default function SeoHead({ seo, defaultTitle = 'Supreme Steroids' }: { seo?: SeoProps; defaultTitle?: string }) {
   const title = seo?.title || defaultTitle;
-  const description = seo?.description || 'Lawful sports nutrition, wellness, and certified research formulations.';
+  const description = seo?.description || 'Explore the published Supreme Steroids catalogue with server-confirmed product information.';
 
   return (
     <Head title={title}>
       <meta name="description" content={description} />
       {seo?.canonical ? <link rel="canonical" href={seo.canonical} /> : null}
+      <meta name="theme-color" content="#020617" />
       <meta name="robots" content={seo?.robots || 'index,follow'} />
       <meta property="og:title" content={seo?.og_title || title} />
       <meta property="og:description" content={seo?.og_description || description} />

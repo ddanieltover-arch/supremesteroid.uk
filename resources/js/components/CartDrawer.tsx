@@ -1,6 +1,7 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight, ShoppingBag, Trash2, Truck, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { formatMoney } from '@/lib/money';
 import type { CartPayload } from '@/types';
@@ -14,6 +15,8 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const page = usePage<{ cart: CartPayload; auth?: { user?: unknown } }>();
   const cart = page.props.cart;
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const previousFocus = useRef<HTMLElement | null>(null);
   const currency = cart?.totals?.currency ?? 'GBP';
   const eligibility = cart?.shipping_eligibility;
 
@@ -21,13 +24,43 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     if (!isOpen) {
       return;
     }
+    previousFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const panel = panelRef.current;
+    panel?.querySelector<HTMLElement>('button, [href], input, select, textarea')?.focus();
+
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        event.preventDefault();
         onClose();
+        return;
+      }
+      if (event.key !== 'Tab' || !panel) {
+        return;
+      }
+      const items = Array.from(panel.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')).filter(
+        (item) => !item.hasAttribute('disabled'),
+      );
+      if (items.length === 0) {
+        return;
+      }
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    const original = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = original;
+      previousFocus.current?.focus();
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) {
@@ -46,7 +79,8 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     <div className="fixed inset-0 z-50 overflow-hidden">
       <button type="button" className="absolute inset-0 bg-slate-950/75 backdrop-blur-sm" aria-label="Close cart" onClick={onClose} />
       <div
-        className="fixed inset-y-0 right-0 flex max-w-full pl-10"
+        ref={panelRef}
+        className="fixed inset-y-0 right-0 flex max-w-full pl-4 sm:pl-10"
         role="dialog"
         aria-modal="true"
         aria-labelledby="cart-drawer-title"
@@ -65,6 +99,11 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             </button>
           </div>
 
+          {cart?.items?.some((item) => !item.is_eligible) ? (
+            <Alert type="warning" className="m-4">
+              Your basket has changed. We refreshed the latest availability and pricing.
+            </Alert>
+          ) : null}
           {eligibility ? (
             <div className="border-b border-slate-800 bg-slate-950/60 p-4 text-xs">
               <div className="mb-1.5 flex items-center justify-between font-medium">
@@ -159,14 +198,17 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 <span className="text-lg font-extrabold text-slate-100">{formatMoney(cart.totals.subtotal_amount, currency)}</span>
               </div>
               <Link
-                href={page.props.auth?.user ? '/checkout' : '/login'}
+                href="/checkout"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 px-4 py-3 text-sm font-bold uppercase tracking-wide text-slate-950"
                 onClick={onClose}
               >
                 Proceed to secure checkout
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
-              <Button variant="ghost" className="w-full" onClick={() => router.delete('/cart', { preserveScroll: true })}>
+              <Link href="/shop" className="inline-flex w-full min-h-11 items-center justify-center text-sm text-slate-300 hover:text-amber-300" onClick={onClose}>
+                Continue shopping
+              </Link>
+              <Button variant="ghost" className="w-full" disabled={pendingId !== null} onClick={() => router.delete('/cart', { preserveScroll: true })}>
                 Clear basket
               </Button>
             </div>

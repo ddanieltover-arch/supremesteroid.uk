@@ -1,4 +1,4 @@
-import StorefrontLayout from '../../Layouts/StorefrontLayout';
+import { AuthCard } from '@/components/auth/AuthCard';
 import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -7,10 +7,9 @@ export default function ForgotPassword() {
   const form = useForm({ email: '' });
 
   return (
-    <StorefrontLayout seo={{ title: 'Reset password', description: 'Request a password reset.', robots: 'noindex,nofollow' }}>
-      <h1 className="text-3xl font-semibold text-white">Reset password</h1>
+    <AuthCard title="Reset password" seo={{ title: 'Reset password', description: 'Request a password reset.', robots: 'noindex,nofollow' }}>
       <form
-        className="mt-8 grid max-w-md gap-3"
+        className="grid gap-3"
         onSubmit={(event) => {
           event.preventDefault();
           form.post('/forgot-password');
@@ -21,6 +20,6 @@ export default function ForgotPassword() {
           Send reset link
         </Button>
       </form>
-    </StorefrontLayout>
+    </AuthCard>
   );
 }

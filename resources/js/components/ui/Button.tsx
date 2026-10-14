@@ -22,17 +22,15 @@ export function Button({
     <button
       type={type}
       className={clsx(
-        'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex items-center justify-center rounded-md font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-50',
         {
-          'px-3 py-1.5 text-xs min-h-9': size === 'sm',
-          'px-4 py-2 text-sm min-h-10': size === 'md',
-          'px-6 py-3 text-base min-h-12': size === 'lg',
-          'bg-slate-100 text-slate-950 hover:bg-white font-semibold': variant === 'primary',
-          'bg-slate-800/90 text-slate-200 hover:bg-slate-700/80 border border-slate-700/60': variant === 'secondary',
-          'bg-rose-900/40 text-rose-300 border border-rose-700/50 hover:bg-rose-900/60': variant === 'danger',
-          'text-slate-400 hover:text-slate-100 hover:bg-slate-800/40': variant === 'ghost',
-          'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-bold shadow-lg shadow-amber-500/20 hover:brightness-110':
-            variant === 'gold',
+          'min-h-9 px-3 py-1.5 text-xs': size === 'sm',
+          'min-h-10 px-4 py-2 text-sm': size === 'md',
+          'min-h-12 px-6 py-3 text-base': size === 'lg',
+          'bg-amber-400 font-semibold text-slate-950 hover:bg-amber-300': variant === 'primary' || variant === 'gold',
+          'border border-slate-700 bg-slate-900 text-slate-100 hover:border-amber-400 hover:text-amber-300': variant === 'secondary',
+          'border border-rose-500/40 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20': variant === 'danger',
+          'text-slate-300 hover:bg-slate-800 hover:text-white': variant === 'ghost',
         },
         className,
       )}

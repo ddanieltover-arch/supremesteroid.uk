@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title inertia>{{ config('store.name', 'Supreme Steroids') }}</title>
+    <link rel="icon" type="image/png" href="/assets/branding/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/branding/favicon.png">
     <meta name="description" content="{{ config('store.tagline') ?: 'Premium lawful sports nutrition, wellness, and lab-tested formulations.' }}">
 
     <link rel="preconnect" href="https://fonts.bunny.net">

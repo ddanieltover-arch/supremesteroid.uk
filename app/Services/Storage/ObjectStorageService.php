@@ -28,13 +28,38 @@ class ObjectStorageService
     ): StoredFile {
         $this->assertAllowedUpload($file);
 
+        return $this->storeValidatedBinary(
+            contents: (string) file_get_contents($file->getRealPath()),
+            originalFilename: $file->getClientOriginalName(),
+            mimeType: (string) ($file->getMimeType() ?: $file->getClientMimeType()),
+            sizeBytes: (int) $file->getSize(),
+            extension: strtolower((string) ($file->guessExtension() ?: $file->getClientOriginalExtension() ?: 'bin')),
+            collection: $collection,
+            uploader: $uploader,
+            fileable: $fileable,
+        );
+    }
+
+    /**
+     * Persist already-validated binary content (e.g. approved catalogue media).
+     */
+    public function storeValidatedBinary(
+        string $contents,
+        string $originalFilename,
+        string $mimeType,
+        int $sizeBytes,
+        string $extension,
+        string $collection,
+        ?User $uploader = null,
+        ?object $fileable = null
+    ): StoredFile {
         $collection = trim($collection, '/');
         $this->assertCollection($collection);
+        $this->assertBinaryAllowed($mimeType, $extension, $sizeBytes);
 
-        $safeName = $this->safeFilename($file->getClientOriginalName());
-        $extension = strtolower((string) ($file->guessExtension() ?: pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION)));
-        $extension = preg_replace('/[^a-z0-9]/', '', $extension) ?: 'bin';
-        $key = $collection.'/'.now()->format('Y/m/d').'/'.Str::uuid().'-'.$safeName.'.'.$extension;
+        $safeName = $this->safeFilename($originalFilename);
+        $extension = preg_replace('/[^a-z0-9]/', '', strtolower($extension)) ?: 'bin';
+        $key = $collection.'/'.now()->format('Y/m/d').'/'.Str::uuid().'.'.$extension;
         $key = str_replace('\\', '/', $key);
 
         if (str_contains($key, '..') || str_starts_with($key, '/')) {
@@ -44,25 +69,43 @@ class ObjectStorageService
         $disk = $this->diskName();
         $this->assertProductionDisk($disk);
 
-        Storage::disk($disk)->putFileAs(
-            dirname($key),
-            $file,
-            basename($key),
-            ['visibility' => $this->visibilityFor($collection)]
-        );
+        Storage::disk($disk)->put($key, $contents, [
+            'visibility' => $this->visibilityFor($collection),
+            'ContentType' => $mimeType,
+        ]);
 
         return StoredFile::create([
             'disk' => $disk,
             'path' => $key,
-            'original_filename' => Str::limit($file->getClientOriginalName(), 255, ''),
-            'mime_type' => (string) ($file->getMimeType() ?: $file->getClientMimeType()),
-            'size_bytes' => (int) $file->getSize(),
+            'original_filename' => Str::limit($originalFilename, 255, ''),
+            'mime_type' => $mimeType,
+            'size_bytes' => $sizeBytes,
             'collection' => $collection,
             'fileable_type' => $fileable ? $fileable::class : null,
             'fileable_id' => $fileable->id ?? null,
             'uploaded_by' => $uploader?->id,
             'uploaded_at' => now(),
         ]);
+    }
+
+    protected function assertBinaryAllowed(string $mimeType, string $extension, int $sizeBytes): void
+    {
+        $maxKilobytes = (int) config('filesystems.uploads.max_kilobytes', 10240);
+        $allowed = config('filesystems.uploads.allowed_mimes', ['jpg', 'jpeg', 'png', 'webp', 'pdf']);
+        $extension = strtolower($extension);
+
+        if ($sizeBytes > $maxKilobytes * 1024) {
+            throw new InvalidArgumentException('The uploaded file exceeds the maximum allowed size.');
+        }
+
+        if (! in_array($extension, $allowed, true)) {
+            throw new InvalidArgumentException('That file type is not allowed.');
+        }
+
+        $imageMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+        if (in_array($extension, ['jpg', 'jpeg', 'png', 'webp'], true) && ! in_array(strtolower($mimeType), $imageMimes, true)) {
+            throw new InvalidArgumentException('The file MIME type does not match a safe image type.');
+        }
     }
 
     public function temporaryUrl(StoredFile $file, ?int $minutes = null): string

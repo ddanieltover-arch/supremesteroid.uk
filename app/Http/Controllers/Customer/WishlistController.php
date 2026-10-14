@@ -31,6 +31,11 @@ class WishlistController extends Controller
 
         return Inertia::render('Account/Wishlist', [
             'products' => ProductCardResource::collection($products)->resolve(),
+            'seo' => [
+                'title' => 'Wishlist',
+                'description' => 'Saved products.',
+                'robots' => 'noindex,nofollow',
+            ],
         ]);
     }
 

@@ -23,7 +23,8 @@ class SubmitCryptoPaymentAction
      *     crypto_transaction_hash: string,
      *     crypto_recipient_wallet: string,
      *     crypto_submitted_amount: float,
-     *     submitted_fiat_amount: float
+     *     submitted_fiat_amount: float,
+     *     proof_file_id?: ?string
      * } $data
      */
     public function execute(Payment $payment, User $customer, array $data): PaymentSubmission
@@ -38,6 +39,7 @@ class SubmitCryptoPaymentAction
                 'crypto_transaction_hash' => $data['crypto_transaction_hash'],
                 'crypto_recipient_wallet' => $data['crypto_recipient_wallet'],
                 'crypto_submitted_amount' => $data['crypto_submitted_amount'],
+                'proof_file_id' => $data['proof_file_id'] ?? null,
                 'review_status' => PaymentStatus::PAYMENT_SUBMITTED,
             ]);
 

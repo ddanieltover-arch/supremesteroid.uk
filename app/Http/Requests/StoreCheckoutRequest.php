@@ -13,7 +13,7 @@ class StoreCheckoutRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        return true;
     }
 
     protected function prepareForValidation(): void
@@ -25,9 +25,9 @@ class StoreCheckoutRequest extends FormRequest
         $this->request->remove('total_amount');
         $this->request->remove('tax_amount');
 
-        if (! $this->filled('items') && ! $this->filled('checkout_token') && $this->user()) {
+        if (! $this->filled('items') && ! $this->filled('checkout_token')) {
             $cartService = app(CartService::class);
-            $cart = $cartService->getOrCreateCart($this->user(), $this->session()->getId());
+            $cart = $cartService->resolveRequestCart($this);
             $calculated = $cartService->calculateCart($cart);
 
             $this->merge([
@@ -61,12 +61,29 @@ class StoreCheckoutRequest extends FormRequest
             'shipping_destination.postal_code' => ['required_without:checkout_token', 'string', 'max:20'],
             'shipping_destination.phone' => ['nullable', 'string', 'max:30'],
             'shipping_method_code' => ['nullable', 'string', 'max:50'],
-            'payment_method' => ['required', 'string', Rule::in([
-                PaymentMethodType::BANK_TRANSFER->value,
-                PaymentMethodType::CRYPTOCURRENCY->value,
-            ])],
+            'payment_method' => ['required', 'string', Rule::in($this->allowedPaymentMethods())],
             'idempotency_key' => ['nullable', 'string', 'max:100'],
             'customer_notes' => ['nullable', 'string', 'max:500'],
         ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function allowedPaymentMethods(): array
+    {
+        $allowed = array_values(array_filter(array_map(
+            static fn (array $method) => $method['code'] ?? null,
+            config('payments.methods', [])
+        )));
+
+        if ($allowed === []) {
+            return [
+                PaymentMethodType::BANK_TRANSFER->value,
+                PaymentMethodType::CRYPTOCURRENCY->value,
+            ];
+        }
+
+        return $allowed;
     }
 }

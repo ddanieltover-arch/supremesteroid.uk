@@ -15,6 +15,7 @@ use App\Services\Inventory\InventoryReservationService;
 use App\Services\Pricing\PricingService;
 use App\Services\Shipping\ShippingEngine;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -67,6 +68,34 @@ class CartService
         }
 
         throw new InvalidArgumentException('Either a user or a guest session_id is required to resolve a cart.');
+    }
+
+    public function resolveRequestCart(Request $request): Cart
+    {
+        if ($request->user()) {
+            return $this->getOrCreateCart($request->user(), $request->hasSession() ? $request->session()->getId() : null);
+        }
+
+        $sessionId = $request->hasSession() ? $request->session()->getId() : null;
+        $cartId = $request->hasSession() ? $request->session()->get('cart_id') : null;
+
+        if (is_string($cartId) && $cartId !== '') {
+            $existing = Cart::query()->where('id', $cartId)->whereNull('user_id')->first();
+            if ($existing) {
+                if ($sessionId && $existing->session_id !== $sessionId) {
+                    $existing->update(['session_id' => $sessionId]);
+                }
+
+                return $existing;
+            }
+        }
+
+        $cart = $this->getOrCreateCart(null, $sessionId);
+        if ($request->hasSession()) {
+            $request->session()->put('cart_id', $cart->id);
+        }
+
+        return $cart;
     }
 
     /**

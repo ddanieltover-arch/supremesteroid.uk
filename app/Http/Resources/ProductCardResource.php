@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\Product;
+use App\Services\Catalogue\CataloguePresentation;
 use App\Services\Catalogue\ProductPurchaseEligibilityService;
 use App\Services\Pricing\PricingService;
 use Illuminate\Http\Request;
@@ -39,7 +40,9 @@ class ProductCardResource extends JsonResource
 
         return [
             'id' => $product->id,
-            'sku' => $product->sku,
+            'sku' => $product->isInternalSku() ? null : $product->sku,
+            'has_genuine_sku' => ! $product->isInternalSku(),
+            'internal_identifier' => $product->isInternalSku() ? $product->sku : null,
             'name' => $product->name,
             'slug' => $product->slug,
             'status' => $product->status?->value,
@@ -53,16 +56,21 @@ class ProductCardResource extends JsonResource
             'image_alt' => $primaryImage?->alt_text ?: $product->name,
             'batch_number' => $product->batch_number,
             'lab_verification_reference' => $product->lab_verification_reference,
-            'available_quantity' => $product->inventory?->available(),
+            'available_quantity' => config('store.catalogue.expose_exact_stock') ? $product->inventory?->available() : null,
             'pricing' => $pricing ? [
                 'currency' => $pricing['currency'],
                 'base_price' => $pricing['base_price_amount'],
                 'sale_price' => $pricing['sale_price_amount'],
                 'effective_price' => $pricing['effective_price_amount'],
                 'is_on_sale' => $pricing['is_on_sale'],
+                'discount_percent' => $pricing['discount_percent'] ?? null,
             ] : null,
             'is_purchasable' => $eligibility['is_eligible'],
             'is_featured' => (bool) $product->is_featured,
+            'variant_count' => (int) ($product->variant_count ?? 0),
+            'has_variants' => (int) ($product->variant_count ?? 0) > 0,
+            'badges' => app(CataloguePresentation::class)->badges($product),
+            'stock' => app(CataloguePresentation::class)->stock($product),
         ];
     }
 }

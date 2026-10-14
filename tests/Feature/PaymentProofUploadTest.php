@@ -64,5 +64,13 @@ class PaymentProofUploadTest extends TestCase
         $this->assertSame(PaymentStatus::PAYMENT_SUBMITTED, $payment->status);
         $this->assertNotNull($payment->submissions()->first()?->proof_file_id);
         $this->assertNotSame(PaymentStatus::PAID, $payment->status);
+
+        $intruder = $this->makeCustomer('intruder@customer.test', 'Intruder');
+        $admin = $this->makeAdmin();
+        $proofUrl = "/orders/{$order->id}/payments/{$payment->id}/proof";
+
+        $this->actingAs($user)->get($proofUrl)->assertOk();
+        $this->actingAs($admin)->get($proofUrl)->assertOk();
+        $this->actingAs($intruder)->get($proofUrl)->assertNotFound();
     }
 }

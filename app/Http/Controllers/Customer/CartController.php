@@ -30,7 +30,7 @@ class CartController extends Controller
 
     public function index(Request $request): Response|JsonResponse
     {
-        $cart = $this->cartService->getOrCreateCart($request->user(), $this->resolveSessionId($request));
+        $cart = $this->cartService->resolveRequestCart($request);
         $payload = $this->cartService->summarize($cart);
 
         if ($request->wantsJson()) {
@@ -39,6 +39,11 @@ class CartController extends Controller
 
         return Inertia::render('Cart/Index', [
             'cart' => $payload,
+            'seo' => [
+                'title' => 'Cart',
+                'description' => 'Review your basket.',
+                'robots' => 'noindex,nofollow',
+            ],
         ]);
     }
 
@@ -47,7 +52,7 @@ class CartController extends Controller
         $validated = $request->validated();
         $user = $request->user();
         $sessionId = $this->resolveSessionId($request);
-        $cart = $this->cartService->getOrCreateCart($user, $sessionId);
+        $cart = $this->cartService->resolveRequestCart($request);
 
         $product = Product::query()->findOrFail($validated['product_id']);
         $variant = ! empty($validated['product_variant_id'])
@@ -77,6 +82,7 @@ class CartController extends Controller
 
     public function updateQuantity(UpdateCartItemRequest $request, string $itemId): RedirectResponse|JsonResponse
     {
+        $this->cartService->resolveRequestCart($request);
         $validated = $request->validated();
         $item = CartItem::query()->with('cart')->findOrFail($itemId);
         $user = $request->user();
@@ -109,6 +115,7 @@ class CartController extends Controller
 
     public function removeItem(Request $request, string $itemId): RedirectResponse|JsonResponse
     {
+        $this->cartService->resolveRequestCart($request);
         $item = CartItem::query()->with('cart')->findOrFail($itemId);
         $user = $request->user();
         $sessionId = $this->resolveSessionId($request);
@@ -128,7 +135,7 @@ class CartController extends Controller
 
     public function clear(Request $request): RedirectResponse|JsonResponse
     {
-        $cart = $this->cartService->getOrCreateCart($request->user(), $this->resolveSessionId($request));
+        $cart = $this->cartService->resolveRequestCart($request);
         $this->cartService->clearCart($cart, $request->user(), $this->resolveSessionId($request));
         $payload = $this->cartService->summarize($cart->fresh('items'));
 

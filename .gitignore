@@ -9,10 +9,12 @@ coverage/
 .env.production
 .env.local
 *.env
+.env.*
 !.env.example
 !.env.production.example
+!.env.qa.example
 vendor/
-/public/hot
+/public/hot*
 /public/storage
 /public/build
 .phpunit.result.cache
@@ -21,6 +23,7 @@ vendor/
 /database/*.sqlite
 /database/*.sqlite-journal
 /storage/framework/testing
+/storage/framework/cache/*.php
 storage/*.key
 storage/oauth-*.key
 /storage/framework/sessions/*
@@ -29,5 +32,8 @@ storage/oauth-*.key
 !storage/framework/sessions/.gitignore
 !storage/framework/views/.gitignore
 !storage/framework/cache/data/.gitignore
+/storage/app/private/*
+/storage/app/testing/*
 .vercel
+
 

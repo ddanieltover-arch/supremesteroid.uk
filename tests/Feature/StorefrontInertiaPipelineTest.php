@@ -72,11 +72,13 @@ class StorefrontInertiaPipelineTest extends TestCase
         ])->assertSessionHasErrors('unit_price');
     }
 
-    public function test_checkout_and_account_require_authentication(): void
+    public function test_account_pages_are_not_public_while_checkout_is(): void
     {
-        $this->get('/checkout')->assertRedirect('/login');
-        $this->get('/account')->assertRedirect('/login');
-        $this->get('/orders')->assertRedirect('/login');
+        $this->get('/checkout')->assertRedirect('/cart');
+        $this->get('/account')->assertRedirect('/');
+        $this->get('/orders')->assertRedirect('/');
+        $this->get('/login')->assertOk()->assertInertia(fn (Assert $page) => $page->component('Auth/Login'));
+        $this->get('/register')->assertOk()->assertInertia(fn (Assert $page) => $page->component('Auth/Register'));
     }
 
     public function test_authenticated_customer_can_open_account_and_checkout(): void

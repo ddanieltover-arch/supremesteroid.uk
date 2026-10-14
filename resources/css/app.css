@@ -3,18 +3,23 @@
 @theme {
   --color-background: #020617;
   --color-accent: #f59e0b;
+  --color-brand: #f59e0b;
+  --color-brand-dark: #d97706;
+  --color-sale: #f59e0b;
   --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
 }
 
 html {
   background-color: #020617;
+  overflow-x: clip;
 }
 
 body {
   min-height: 100%;
   background-color: #020617;
   color: #f1f5f9;
+  overflow-x: clip;
 }
 
 :focus-visible {
@@ -55,4 +60,19 @@ body {
   overflow: visible;
   clip: auto;
   white-space: normal;
+}
+
+.field {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #1e293b;
+  background-color: #0f172a;
+  padding: 0.5rem 0.75rem;
+  color: #f8fafc;
+}
+
+.field:focus {
+  border-color: #f59e0b;
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(245 158 11 / 0.25);
 }

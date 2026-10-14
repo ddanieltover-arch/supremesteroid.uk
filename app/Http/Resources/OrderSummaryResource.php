@@ -35,22 +35,45 @@ class OrderSummaryResource extends JsonResource
                 'id' => $payment->id,
                 'method' => $payment->method?->value,
                 'status' => $payment->status?->value,
+                'status_label' => $this->paymentStatusLabel($payment->status?->value),
                 'amount_due' => $payment->amount,
                 'currency' => $payment->currency,
                 'reference' => $payment->reference,
             ] : null,
-            'items' => $order->items?->map(fn ($item) => [
-                'product_id' => $item->product_id,
-                'variant_id' => $item->product_variant_id,
-                'product_name_snapshot' => $item->product_name,
-                'sku_snapshot' => $item->product_sku,
-                'unit_price' => $item->unit_price,
-                'quantity' => $item->quantity,
-                'line_subtotal' => $item->line_subtotal,
-                'discount' => $item->discount_amount,
-                'tax' => $item->tax_amount,
-                'line_total' => $item->line_total,
-            ])->values(),
+            'items' => $order->items?->map(function ($item) {
+                $image = $item->product?->relationLoaded('images')
+                    ? ($item->product->images->firstWhere('is_primary', true) ?? $item->product->images->first())
+                    : null;
+
+                return [
+                    'product_id' => $item->product_id,
+                    'variant_id' => $item->product_variant_id,
+                    'product_name_snapshot' => $item->product_name,
+                    'sku_snapshot' => $item->product_sku,
+                    'variant_name' => $item->variant_name_snapshot,
+                    'unit_price' => $item->unit_price,
+                    'quantity' => $item->quantity,
+                    'line_subtotal' => $item->line_subtotal,
+                    'discount' => $item->discount_amount,
+                    'tax' => $item->tax_amount,
+                    'line_total' => $item->line_total,
+                    'image_url' => $image?->publicUrl() ?? $image?->url,
+                ];
+            })->values(),
         ];
+    }
+
+    protected function paymentStatusLabel(?string $status): string
+    {
+        return match ($status) {
+            'PENDING' => 'Payment pending',
+            'PAYMENT_SUBMITTED' => 'Payment submitted',
+            'UNDER_REVIEW' => 'Payment under review',
+            'PAID' => 'Payment approved',
+            'REJECTED' => 'Payment rejected',
+            'EXPIRED' => 'Payment expired',
+            'REFUNDED' => 'Refunded',
+            default => 'Payment pending',
+        };
     }
 }

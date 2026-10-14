@@ -11,6 +11,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, helperText, className = '', id, ...props }, ref) => {
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
     const errorId = error && inputId ? `${inputId}-error` : undefined;
+    const helperId = !error && helperText && inputId ? `${inputId}-help` : undefined;
 
     return (
       <div className="w-full">
@@ -23,10 +24,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           aria-invalid={error ? true : undefined}
-          aria-describedby={errorId}
+          aria-describedby={errorId ?? helperId}
           className={clsx(
-            'w-full rounded-lg border bg-slate-900/90 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/50',
+            'w-full scroll-mb-28 rounded-lg border bg-slate-900/90 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/50',
             error ? 'border-rose-500/80 focus:border-rose-500' : 'border-slate-800 focus:border-amber-500/80',
+            props.disabled ? 'cursor-not-allowed opacity-60' : '',
             className,
           )}
           {...props}
@@ -36,7 +38,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {error}
           </p>
         ) : helperText ? (
-          <p className="mt-1.5 text-xs text-slate-500">{helperText}</p>
+          <p id={helperId} className="mt-1.5 text-xs text-slate-400">
+            {helperText}
+          </p>
         ) : null}
       </div>
     );

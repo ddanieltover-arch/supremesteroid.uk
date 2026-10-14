@@ -1,4 +1,4 @@
-import StorefrontLayout from '../../Layouts/StorefrontLayout';
+import { AuthCard } from '@/components/auth/AuthCard';
 import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -12,10 +12,9 @@ export default function Register() {
   });
 
   return (
-    <StorefrontLayout seo={{ title: 'Create account', description: 'Create a Supreme Steroids account.', robots: 'noindex,nofollow' }}>
-      <h1 className="text-3xl font-semibold text-white">Create account</h1>
+    <AuthCard title="Create account" seo={{ title: 'Create account', description: 'Create a Supreme Steroids account.', robots: 'noindex,nofollow' }}>
       <form
-        className="mt-8 grid max-w-md gap-3"
+        className="grid gap-3"
         onSubmit={(event) => {
           event.preventDefault();
           form.post('/register');
@@ -29,6 +28,6 @@ export default function Register() {
           Register
         </Button>
       </form>
-    </StorefrontLayout>
+    </AuthCard>
   );
 }

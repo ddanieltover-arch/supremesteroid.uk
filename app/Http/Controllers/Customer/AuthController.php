@@ -20,7 +20,13 @@ class AuthController extends Controller
 {
     public function showLogin(): Response
     {
-        return Inertia::render('Auth/Login');
+        return Inertia::render('Auth/Login', [
+            'seo' => [
+                'title' => 'Sign in',
+                'description' => 'Sign in to your account.',
+                'robots' => 'noindex,nofollow',
+            ],
+        ]);
     }
 
     public function login(Request $request): RedirectResponse
@@ -46,7 +52,13 @@ class AuthController extends Controller
 
     public function showRegister(): Response
     {
-        return Inertia::render('Auth/Register');
+        return Inertia::render('Auth/Register', [
+            'seo' => [
+                'title' => 'Create account',
+                'description' => 'Create a Supreme Steroids account.',
+                'robots' => 'noindex,nofollow',
+            ],
+        ]);
     }
 
     public function register(Request $request): RedirectResponse

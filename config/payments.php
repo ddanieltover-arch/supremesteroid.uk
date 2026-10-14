@@ -7,6 +7,18 @@ return [
     | Customer-visible settlement instructions. Values come from environment
     | configuration — never hard-code production account numbers in React.
     */
+    'methods' => [
+        [
+            'code' => 'BANK_TRANSFER',
+            'name' => 'Manual Bank Transfer',
+            'description' => 'Pay by bank transfer using the account details shown after you place the order. Staff verify the payment before the order is marked paid.',
+        ],
+        [
+            'code' => 'CRYPTOCURRENCY',
+            'name' => 'Manual Cryptocurrency',
+            'description' => 'Pay using a supported cryptocurrency network. Settlement is reviewed before the order is marked paid.',
+        ],
+    ],
     'bank_transfer' => [
         'account_name' => env('BANK_ACCOUNT_NAME'),
         'sort_code' => env('BANK_SORT_CODE'),

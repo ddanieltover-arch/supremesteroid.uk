@@ -75,7 +75,7 @@ class InventoryResource extends Resource
                     ->sortable(),
             ])
             ->actions([
-                Tables\Actions\Action::make('adjustStock')
+                \Filament\Actions\Action::make('adjustStock')
                     ->label('Adjust Stock')
                     ->icon('heroicon-o-adjustments-horizontal')
                     ->authorize(fn (Inventory $record) => auth()->user()?->can('adjust', $record))
@@ -124,7 +124,7 @@ class InventoryResource extends Resource
                             );
                         });
                     }),
-                Tables\Actions\EditAction::make(),
+                \Filament\Actions\EditAction::make(),
             ]);
     }
 

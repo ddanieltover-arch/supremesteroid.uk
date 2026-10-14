@@ -1,55 +1,116 @@
 import StorefrontLayout from '../Layouts/StorefrontLayout';
-import { Link } from '@inertiajs/react';
-import { ShieldCheck, Sparkles, Truck } from 'lucide-react';
-import { ProductCard } from '@/components/ProductCard';
-import type { ProductCard as ProductCardType, SeoProps } from '@/types';
+import { Head } from '@inertiajs/react';
+import { ApprovedReviews } from '@/components/home/ApprovedReviews';
+import { BrandShowcase } from '@/components/home/BrandShowcase';
+import { CategoryShowcase } from '@/components/home/CategoryShowcase';
+import { EditorialFeature } from '@/components/home/EditorialFeature';
+import { FaqSection } from '@/components/home/FaqSection';
+import { HeroSection } from '@/components/home/HeroSection';
+import { IntentDiscovery } from '@/components/home/IntentDiscovery';
+import { NewsletterSignup } from '@/components/home/NewsletterSignup';
+import { ProductRail } from '@/components/home/ProductRail';
+import { ShippingInformation } from '@/components/home/ShippingInformation';
+import { TrustGrid } from '@/components/home/TrustGrid';
+import type { HomepagePayload, ProductCard as ProductCardType, SeoProps } from '@/types';
+
+const DEFAULT_SECTIONS = [
+  { key: 'hero', enabled: true, position: 10 },
+  { key: 'categories', enabled: true, position: 20 },
+  { key: 'featured', enabled: true, position: 30 },
+  { key: 'new', enabled: true, position: 40 },
+  { key: 'offers', enabled: true, position: 50 },
+  { key: 'intent', enabled: true, position: 60 },
+  { key: 'brands', enabled: true, position: 70 },
+  { key: 'editorial', enabled: true, position: 80 },
+  { key: 'trust', enabled: true, position: 90 },
+  { key: 'shipping', enabled: true, position: 100 },
+  { key: 'faq', enabled: true, position: 110 },
+  { key: 'newsletter', enabled: true, position: 120 },
+];
 
 export default function Home({
+  homepage,
   featuredProducts = [],
+  structured_data = [],
   seo,
 }: {
+  homepage?: HomepagePayload;
   featuredProducts?: ProductCardType[];
+  structured_data?: Array<Record<string, unknown>>;
   seo?: SeoProps;
 }) {
+  const data = homepage ?? {
+    hero: {
+      eyebrow: 'UK catalogue',
+      headline: 'Precision in product. Clarity in information.',
+      description: 'Browse published, compliance-approved products.',
+      primary_cta: { label: 'Explore Collection', url: '/shop' },
+      secondary_cta: { label: 'Shop Categories', url: '/#categories' },
+      products: featuredProducts.slice(0, 3),
+    },
+    categories: [],
+    featuredProducts,
+    newProducts: [],
+    saleProducts: [],
+    brands: [],
+    intent: [],
+    editorial: null,
+    trustItems: [],
+    shipping: { currency: 'GBP', free_shipping_threshold: '300.00', methods: [] },
+    faqs: [],
+    newsletter: null,
+    sections: DEFAULT_SECTIONS,
+  };
+
+  const sections = (data.sections?.length ? data.sections : DEFAULT_SECTIONS)
+    .filter((section) => section.enabled)
+    .sort((a, b) => a.position - b.position);
+
   return (
     <StorefrontLayout seo={seo}>
-      <section className="relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-900/90 to-slate-950 p-8 sm:p-12">
-        <div className="relative z-10 max-w-3xl">
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 font-mono text-xs font-semibold text-amber-300">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            UK storefront
-          </p>
-          <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-slate-100 sm:text-5xl">
-            Lawful sports nutrition & <span className="text-amber-400">certified research</span> formulations
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base">
-            Server-priced catalogue with compliance-gated products, reserved inventory, and audited checkout.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <Link
-              href="/shop"
-              className="inline-flex rounded-full bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-950 hover:bg-amber-300"
-            >
-              Shop the catalogue
-            </Link>
-            <span className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs text-emerald-400">
-              <ShieldCheck className="h-4 w-4" aria-hidden="true" /> UK regulated formulations
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 font-mono text-xs text-amber-400">
-              <Truck className="h-4 w-4" aria-hidden="true" /> Free UK delivery when eligible
-            </span>
-          </div>
-        </div>
-      </section>
+      <Head>
+        {structured_data.map((schema, index) => (
+          <script key={index} type="application/ld+json">
+            {JSON.stringify(schema)}
+          </script>
+        ))}
+      </Head>
 
-      <section className="mt-12">
-        <h2 className="mb-6 text-xl font-semibold text-white">Featured products</h2>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {(featuredProducts ?? []).map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </section>
+      {sections.map((section) => {
+        switch (section.key) {
+          case 'hero':
+            return <HeroSection key={section.key} hero={data.hero} />;
+          case 'categories':
+            return <CategoryShowcase key={section.key} categories={data.categories} />;
+          case 'featured':
+            return <ProductRail key={section.key} id="featured" eyebrow="Selected" title="Featured collection" products={data.featuredProducts} />;
+          case 'new':
+            return <ProductRail key={section.key} id="new" eyebrow="Just published" title="New arrivals" products={data.newProducts} />;
+          case 'offers':
+            return <ProductRail key={section.key} id="offers" eyebrow="Current prices" title="Selected offers" products={data.saleProducts} />;
+          case 'intent':
+            return <IntentDiscovery key={section.key} groups={data.intent} />;
+          case 'brands':
+            return <BrandShowcase key={section.key} brands={data.brands} />;
+          case 'editorial':
+            return data.editorial ? <EditorialFeature key={section.key} editorial={data.editorial} /> : null;
+          case 'trust':
+            return (
+              <div key={section.key}>
+                <TrustGrid items={data.trustItems} />
+                <ApprovedReviews reviews={data.reviews} />
+              </div>
+            );
+          case 'shipping':
+            return <ShippingInformation key={section.key} shipping={data.shipping} />;
+          case 'faq':
+            return <FaqSection key={section.key} faqs={data.faqs} />;
+          case 'newsletter':
+            return data.newsletter ? <NewsletterSignup key={section.key} newsletter={data.newsletter} /> : null;
+          default:
+            return null;
+        }
+      })}
     </StorefrontLayout>
   );
 }

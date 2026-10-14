@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ProductVariant extends Model
@@ -22,6 +23,7 @@ class ProductVariant extends Model
         'compare_at_price_amount',
         'barcode',
         'is_active',
+        'weight_grams',
     ];
 
     protected function casts(): array
@@ -30,6 +32,7 @@ class ProductVariant extends Model
             'price_amount' => 'decimal:2',
             'compare_at_price_amount' => 'decimal:2',
             'is_active' => 'boolean',
+            'weight_grams' => 'integer',
         ];
     }
 
@@ -41,5 +44,10 @@ class ProductVariant extends Model
     public function inventory(): HasOne
     {
         return $this->hasOne(Inventory::class);
+    }
+
+    public function attributes(): HasMany
+    {
+        return $this->hasMany(VariantAttribute::class);
     }
 }

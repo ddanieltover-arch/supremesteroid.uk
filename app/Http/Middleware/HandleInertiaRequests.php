@@ -6,7 +6,8 @@ namespace App\Http\Middleware;
 
 use App\Services\Account\WishlistService;
 use App\Services\Cart\CartService;
-use App\Services\Shipping\ShippingEngine;
+use App\Services\Catalogue\CatalogueDiscoveryService;
+use App\Services\Storefront\HomepageService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -26,6 +27,17 @@ class HandleInertiaRequests extends Middleware
     {
         $cartService = app(CartService::class);
         $sessionId = $request->hasSession() ? $request->session()->getId() : null;
+        $wishlistIds = $request->user()
+            ? app(WishlistService::class)->productIds($request->user())
+            : [];
+        $chrome = app(HomepageService::class)->chrome();
+        $announcement = $chrome['announcement'] ?? null;
+        if (is_array($announcement) && $request->hasSession()) {
+            $dismissed = $request->session()->get('announcement_dismissed');
+            if (is_string($dismissed) && ($announcement['signature'] ?? null) === $dismissed) {
+                $chrome['announcement'] = null;
+            }
+        }
 
         return [
             ...parent::share($request),
@@ -34,7 +46,6 @@ class HandleInertiaRequests extends Middleware
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
-                    'role_label' => $request->user()->role?->label(),
                     'email_verified' => $request->user()->hasVerifiedEmail(),
                 ] : null,
             ],
@@ -42,14 +53,20 @@ class HandleInertiaRequests extends Middleware
                 'name' => config('store.name', 'Supreme Steroids'),
                 'legal_name' => config('store.legal_name', 'Supreme Steroids'),
                 'support_email' => config('store.support_email', 'info@supremesteroid.uk'),
-                'logo_url' => config('store.logo_url', '/assets/branding/supreme-steroids-logo.svg'),
+                'logo_url' => config('store.logo_url', '/assets/branding/supreme-steroids-logo.png'),
                 'domain' => config('store.domain'),
+                'address' => config('store.business_address'),
+                'support_phone' => config('store.support_phone'),
             ],
-            'cart' => $cartService->summarize($cartService->findCart($request->user(), $sessionId)),
-            'shippingOverview' => app(ShippingEngine::class)->publicOverview(),
-            'wishlistProductIds' => $request->user()
-                ? app(WishlistService::class)->productIds($request->user())
-                : [],
+            'chrome' => $chrome,
+            'cart' => $cartService->summarize(
+                $request->hasSession()
+                    ? $cartService->resolveRequestCart($request)
+                    : $cartService->findCart($request->user(), $sessionId)
+            ),
+            'wishlistProductIds' => $wishlistIds,
+            'wishlistCount' => count($wishlistIds),
+            'catalogueNav' => app(CatalogueDiscoveryService::class)->navigation(),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

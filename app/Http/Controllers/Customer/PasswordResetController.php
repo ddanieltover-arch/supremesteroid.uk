@@ -16,7 +16,13 @@ class PasswordResetController extends Controller
 {
     public function request(): Response
     {
-        return Inertia::render('Auth/ForgotPassword');
+        return Inertia::render('Auth/ForgotPassword', [
+            'seo' => [
+                'title' => 'Reset password',
+                'description' => 'Request a password reset.',
+                'robots' => 'noindex,nofollow',
+            ],
+        ]);
     }
 
     public function email(Request $request): RedirectResponse
@@ -39,6 +45,11 @@ class PasswordResetController extends Controller
         return Inertia::render('Auth/ResetPassword', [
             'email' => $request->query('email'),
             'token' => $token,
+            'seo' => [
+                'title' => 'Set new password',
+                'description' => 'Choose a new password.',
+                'robots' => 'noindex,nofollow',
+            ],
         ]);
     }
 

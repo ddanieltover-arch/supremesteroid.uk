@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Customer;
 
+use App\Http\Resources\OrderSummaryResource;
 use App\Models\Address;
+use App\Models\Order;
+use App\Services\Account\WishlistService;
 use App\Support\IsoCountry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,12 +21,40 @@ class AccountController extends Controller
 {
     public function profile(Request $request): Response
     {
+        $user = $request->user();
+        $recentOrders = Order::query()
+            ->where('user_id', $user->id)
+            ->with(['latestPayment'])
+            ->orderByDesc('created_at')
+            ->limit(3)
+            ->get()
+            ->map(fn (Order $order) => [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'placed_at' => $order->created_at?->toIso8601String(),
+                'status_label' => $order->status?->label(),
+                'payment_status_label' => (new OrderSummaryResource($order))->toArray($request)['payment']['status_label'] ?? null,
+                'total_amount' => $order->total_amount,
+                'currency' => $order->currency,
+            ]);
+
         return Inertia::render('Account/Profile', [
             'profile' => [
-                'name' => $request->user()->name,
-                'email' => $request->user()->email,
-                'phone' => $request->user()->phone,
-                'email_verified' => $request->user()->hasVerifiedEmail(),
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'email_verified' => $user->hasVerifiedEmail(),
+            ],
+            'dashboard' => [
+                'wishlist_count' => count(app(WishlistService::class)->productIds($user)),
+                'address_count' => Address::query()->where('user_id', $user->id)->count(),
+                'order_count' => Order::query()->where('user_id', $user->id)->count(),
+                'recent_orders' => $recentOrders,
+            ],
+            'seo' => [
+                'title' => 'Account',
+                'description' => 'Manage your account.',
+                'robots' => 'noindex,nofollow',
             ],
         ]);
     }
@@ -48,6 +79,11 @@ class AccountController extends Controller
             ->get();
 
         return Inertia::render('Account/Addresses', [
+            'seo' => [
+                'title' => 'Addresses',
+                'description' => 'Manage saved addresses.',
+                'robots' => 'noindex,nofollow',
+            ],
             'addresses' => $addresses->map(fn (Address $address) => [
                 'id' => $address->id,
                 'type' => $address->type,

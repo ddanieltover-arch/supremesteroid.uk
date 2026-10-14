@@ -36,6 +36,10 @@ class ProductPurchaseEligibilityService
     ): array {
         $reasons = [];
 
+        if ($product->is_demo) {
+            $reasons[] = 'Demo catalogue items cannot be purchased.';
+        }
+
         if ($product->status !== ProductStatus::ACTIVE) {
             $reasons[] = "Product status '{$product->status->value}' is not active for retail purchase.";
         }
