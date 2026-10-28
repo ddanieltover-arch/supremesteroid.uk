@@ -1,6 +1,8 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, ChevronRight, Mail, MessageCircle, ShieldCheck, type LucideIcon } from 'lucide-react';
 import type { PropsWithChildren, ReactNode } from 'react';
+
+const SUPPORT_EMAIL = 'info@supremesteroid.uk';
 
 export type InfoNavLink = {
   href: string;
@@ -57,6 +59,9 @@ export function InfoPageChrome({
   links = DEFAULT_LINKS,
   children,
 }: InfoPageChromeProps) {
+  const page = usePage<{ store?: { support_email?: string } }>();
+  const supportEmail = page.props.store?.support_email?.trim() || SUPPORT_EMAIL;
+
   return (
     <div className="mx-auto max-w-5xl">
       <nav className="mb-6 flex items-center gap-2 text-xs text-slate-500" aria-label="Breadcrumb">
@@ -136,11 +141,11 @@ export function InfoPageChrome({
             </p>
             <div className="mt-4">
               <a
-                href="mailto:info@supremesteroid.uk"
+                href={`mailto:${supportEmail}`}
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
               >
                 <Mail className="h-3.5 w-3.5 text-slate-500" aria-hidden />
-                Email Support
+                {supportEmail}
               </a>
             </div>
           </div>

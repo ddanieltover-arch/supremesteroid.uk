@@ -150,7 +150,7 @@ $pages = [
 <p>We are here to help. Get in touch with our team for any questions, order enquiries, or support.</p>
 
 <h3>Email</h3>
-<p><a href="mailto:help@supremesteroids.co.uk">help@supremesteroids.co.uk</a></p>
+<p><a href="mailto:info@supremesteroid.uk">info@supremesteroid.uk</a></p>
 
 <h3>Response Times</h3>
 <ul>
@@ -244,7 +244,7 @@ $pages = [
 <p>We implement appropriate security measures to protect your personal data against unauthorized access, alteration, or destruction. We do not sell or share your data with third parties for marketing purposes.</p>
 
 <h3>Your Rights</h3>
-<p>Under GDPR, you have the right to access, correct, or delete your personal data. Contact us at help@supremesteroids.co.uk to exercise your rights.</p>
+<p>Under GDPR, you have the right to access, correct, or delete your personal data. Contact us at info@supremesteroid.uk to exercise your rights.</p>
 
 <h3>Cookies</h3>
 <p>We use cookies to improve your browsing experience and analyse website traffic. You can manage cookie preferences through your browser settings.</p>
@@ -254,13 +254,21 @@ $pages = [
 ];
 
 $created = 0;
+$updated = 0;
 $skipped = 0;
 
 foreach ($pages as $pageData) {
-    $exists = App\Models\Page::where('slug', $pageData['slug'])->exists();
-    if ($exists) {
-        echo "SKIP: /{$pageData['slug']} already exists\n";
-        $skipped++;
+    $page = App\Models\Page::query()->where('slug', $pageData['slug'])->first();
+    if ($page) {
+        $page->fill($pageData);
+        if ($page->isDirty()) {
+            $page->save();
+            echo "UPDATED: /{$pageData['slug']} – {$pageData['title']}\n";
+            $updated++;
+        } else {
+            echo "SKIP: /{$pageData['slug']} already up to date\n";
+            $skipped++;
+        }
         continue;
     }
 
@@ -269,7 +277,24 @@ foreach ($pages as $pageData) {
     $created++;
 }
 
-echo "\nDone. Created: $created, Skipped: $skipped\n";
+// Normalize any leftover reference emails in published page HTML.
+$normalized = App\Models\Page::query()
+    ->where('content', 'like', '%help@supremesteroids.co.uk%')
+    ->orWhere('content', 'like', '%hello@example.com%')
+    ->get();
+
+foreach ($normalized as $page) {
+    $page->content = str_replace(
+        ['help@supremesteroids.co.uk', 'hello@example.com'],
+        ['info@supremesteroid.uk', 'info@supremesteroid.uk'],
+        (string) $page->content,
+    );
+    $page->save();
+    echo "NORMALIZED EMAIL: /{$page->slug}\n";
+    $updated++;
+}
+
+echo "\nDone. Created: $created, Updated: $updated, Skipped: $skipped\n";
 
 // List all pages
 echo "\n=== All Content Pages ===\n";

@@ -27,7 +27,7 @@ return [
         'country_code' => 'GB',
     ],
 
-    'support_email' => env('STORE_SUPPORT_EMAIL', 'info@supremesteroid.uk'),
+    'support_email' => filled(env('STORE_SUPPORT_EMAIL')) ? env('STORE_SUPPORT_EMAIL') : 'info@supremesteroid.uk',
     'support_phone' => env('STORE_SUPPORT_PHONE', null), // To be added later
 
     /*

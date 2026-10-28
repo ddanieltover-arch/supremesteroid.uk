@@ -26,7 +26,7 @@ class StructuredDataService
             'name' => config('store.legal_name', config('store.name')),
             'url' => config('store.domain'),
             'logo' => config('store.logo_url'),
-            'email' => config('store.support_email'),
+            'email' => filled(config('store.support_email')) ? config('store.support_email') : 'info@supremesteroid.uk',
         ];
     }
 

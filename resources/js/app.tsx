@@ -102,10 +102,7 @@ createInertiaApp({
     }
     return /supreme\s*steroids/i.test(title) ? title : `${title} | Supreme Steroids`;
   },
-  progress: {
-    color: '#1e6fd9',
-    delay: 120,
-  },
+  progress: false,
   resolve: (name) => {
     const pages = import.meta.glob('./Pages/**/*.tsx');
     const page = pages[`./Pages/${name}.tsx`];
