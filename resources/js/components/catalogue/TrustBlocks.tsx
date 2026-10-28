@@ -11,14 +11,16 @@ const blocks = [
 
 export function TrustBlocks() {
   return (
-    <section aria-label="Store information" className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <section aria-label="Store information" className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {blocks.map((block) => (
-        <article key={block.title} className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-          <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
-            <block.icon className="h-4 w-4 text-amber-400" aria-hidden="true" />
+        <article key={block.title} className="hover-lift group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-brand transition-transform duration-300 group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
+              <block.icon className="h-4 w-4" aria-hidden="true" />
+            </span>
             {block.title}
           </h3>
-          <p className="mt-2 text-xs leading-relaxed text-slate-400">{block.body}</p>
+          <p className="mt-3 text-xs leading-relaxed text-slate-500">{block.body}</p>
         </article>
       ))}
     </section>

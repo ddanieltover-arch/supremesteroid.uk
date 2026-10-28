@@ -2,7 +2,7 @@
 
 ## Project profile
 
-Supreme Steroids is a Laravel 13 + Inertia + React + Filament commerce application. The customer storefront is a single Laravel/Inertia application. No loyalty, referrals, PWA, or branding redesign in this phase.
+Supreme Steroids is a Laravel 13 + Inertia + React + Filament commerce application. The customer storefront is a single Laravel/Inertia application. Storefront branding matches the light clinical reference look (blue accent, crest logo, product-first home). No loyalty, referrals, or PWA in this phase.
 
 ## Technology profile
 
@@ -26,7 +26,7 @@ Frontend: `resources/js/app.tsx` is the only customer entry. Mock SPA under `src
 
 ## Active work
 
-Production hardening: pooled Neon config, readiness endpoint, persistent Filament/product image disk, secret-gated cron, canonical host. Production deploy not executed in this phase.
+Storefront visual rebrand to reference light/blue product-first UI completed in storefront React layer. Production hardening: pooled Neon config, readiness endpoint, persistent Filament/product image disk, secret-gated cron, canonical host. Production deploy not executed in this phase.
 
 ## Risks
 

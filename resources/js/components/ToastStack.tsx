@@ -43,7 +43,7 @@ export function ToastStack() {
             toast.type === 'success'
               ? 'border-emerald-800/70 bg-emerald-950/90 text-emerald-100'
               : toast.type === 'warning'
-                ? 'border-amber-800/70 bg-amber-950/90 text-amber-100'
+                ? 'border-amber-300 bg-amber-50 text-amber-900'
                 : 'border-rose-800/70 bg-rose-950/90 text-rose-100'
           }`}
           role="status"

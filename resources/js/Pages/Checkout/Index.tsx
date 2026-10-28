@@ -94,7 +94,7 @@ export default function CheckoutIndex({
   return (
     <StorefrontLayout chrome="checkout" seo={{ title: 'Checkout details', description: 'Secure checkout details.', robots: 'noindex,nofollow' }}>
       <CheckoutProgress current={checkout_step} steps={checkout_steps} />
-      <h1 className="text-3xl font-semibold text-white">Your details</h1>
+      <h1 className="text-3xl font-semibold text-slate-900">Your details</h1>
       <CheckoutAlerts warnings={warnings} errors={errors} affectedItems={affected_items} requiresAcknowledgement={requires_acknowledgement} />
 
       <form
@@ -141,8 +141,8 @@ export default function CheckoutIndex({
           />
 
           {addresses.length > 0 ? (
-            <fieldset className="rounded-xl border border-slate-800 p-4">
-              <legend className="px-1 text-sm font-semibold text-white">Delivery address</legend>
+            <fieldset className="rounded-xl border border-slate-200 p-4">
+              <legend className="px-1 text-sm font-semibold text-slate-900">Delivery address</legend>
               <div className="mt-2 flex flex-wrap gap-4 text-sm">
                 <label className="flex items-center gap-2">
                   <input
@@ -174,7 +174,7 @@ export default function CheckoutIndex({
               {mode === 'saved' ? (
                 <div className="mt-3 space-y-2">
                   {addresses.map((address) => (
-                    <label key={address.id} className="block cursor-pointer rounded-lg border border-slate-800 p-3 text-sm has-[:checked]:border-amber-400">
+                    <label key={address.id} className="block cursor-pointer rounded-lg border border-slate-200 p-3 text-sm has-[:checked]:border-blue-500">
                       <input
                         type="radio"
                         name="saved_address"
@@ -216,12 +216,12 @@ export default function CheckoutIndex({
                 onChange={(event) => form.setData('shipping_destination', { ...form.data.shipping_destination, postal_code: event.target.value })}
               />
               <div>
-                <label htmlFor="country-code" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400">
+                <label htmlFor="country-code" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
                   Country
                 </label>
                 <select
                   id="country-code"
-                  className="w-full rounded-lg border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-sm text-slate-100"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900"
                   value={form.data.shipping_destination.country_code}
                   onChange={(event) => form.setData('shipping_destination', { ...form.data.shipping_destination, country_code: event.target.value })}
                 >
@@ -239,8 +239,12 @@ export default function CheckoutIndex({
               </div>
               <Input
                 label="Phone"
+                type="tel"
+                autoComplete="tel"
+                required
                 value={form.data.shipping_destination.phone ?? ''}
-                helperText="Optional unless required for delivery."
+                error={errors['shipping_destination.phone']}
+                helperText="Required for delivery contact."
                 onChange={(event) => form.setData('shipping_destination', { ...form.data.shipping_destination, phone: event.target.value })}
               />
             </>

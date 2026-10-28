@@ -20,6 +20,23 @@ class ListCatalogueImports extends ListRecords
         return 'Catalogue import review';
     }
 
+    public function getHeading(): string
+    {
+        $summary = app(CatalogueReviewDashboardService::class)->bulkIngestSummary();
+        $run = $summary['latest_bulk_run_key']
+            ? 'Latest bulk run '.$summary['latest_bulk_run_key'].' ('.$summary['latest_bulk_run_status'].'). '
+            : 'No bulk ingest run yet. ';
+
+        return $run
+            .'Records '.$summary['import_records']
+            .' · Excluded '.$summary['restricted_excluded_records']
+            .' · Holds '.$summary['compliance_holds']
+            .' · Awaiting review '.$summary['awaiting_human_approval']
+            .' · Ready '.$summary['ready_for_approval']
+            .' · Published records '.$summary['published_import_records']
+            .' · Active products '.$summary['products_active'];
+    }
+
     public function getTabs(): array
     {
         $counts = app(CatalogueReviewDashboardService::class)->workflowCounts();

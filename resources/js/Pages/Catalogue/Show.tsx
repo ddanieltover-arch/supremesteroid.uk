@@ -65,7 +65,7 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
       </Head>
 
       {isPreview ? (
-        <div className="mb-6 border border-amber-700/60 bg-amber-950/40 px-4 py-3 text-sm text-amber-100" role="status">
+        <div className="mb-6 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="status">
           Draft / unpublished admin preview — cart, wishlist, and inventory are disabled. Source import provenance is never shown publicly.
         </div>
       ) : null}
@@ -86,14 +86,14 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
               ))}
           </div>
           {product.brand ? (
-            <p className="mt-3 text-sm text-amber-400">
+            <p className="mt-3 text-sm text-blue-600">
               <Link href={`/brand/${product.brand.slug}`}>{product.brand.name}</Link>
             </p>
           ) : null}
-          <h1 className="mt-2 text-3xl font-semibold text-white">{product.name}</h1>
+          <h1 className="mt-2 text-3xl font-semibold text-slate-900">{product.name}</h1>
           <p className="mt-2 font-mono text-xs text-slate-500">SKU {selectedVariant?.sku ?? product.sku}</p>
           {product.reviews?.count ? (
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-slate-500">
               {product.reviews.average?.toFixed(1)} / 5 from {product.reviews.count} approved reviews
             </p>
           ) : (
@@ -102,19 +102,19 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
           <div className="mt-6">
             <PriceDisplay pricing={selectedPricing} size="lg" />
           </div>
-          <p className="mt-2 text-sm text-emerald-400">{stock?.label ?? 'Availability confirmed at checkout'}</p>
-          <p className="mt-4 text-slate-300">{product.short_description}</p>
+          <p className="mt-2 text-sm text-emerald-600">{stock?.label ?? 'Availability confirmed at checkout'}</p>
+          <p className="mt-4 text-slate-600">{product.short_description}</p>
 
           {product.variants?.length ? (
             <div className="mt-6">
-              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">Choose option</p>
+              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Choose option</p>
               {useButtons ? (
                 <div className="flex flex-wrap gap-2">
                   {product.variants.map((variant) => (
                     <button
                       key={variant.id}
                       type="button"
-                      className={`min-h-11 rounded-lg border px-3 py-2 text-sm ${form.data.product_variant_id === variant.id ? 'border-amber-400 text-amber-300' : 'border-slate-800 text-slate-200'}`}
+                      className={`min-h-11 rounded-lg border px-3 py-2 text-sm ${form.data.product_variant_id === variant.id ? 'border-blue-500 text-blue-600' : 'border-slate-200 text-slate-800'}`}
                       onClick={() => {
                         form.setData('product_variant_id', variant.id);
                         notify.setData('product_variant_id', variant.id);
@@ -129,7 +129,7 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
                 </div>
               ) : (
                 <select
-                  className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2"
+                  className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
                   value={form.data.product_variant_id}
                   onChange={(event) => {
                     form.setData('product_variant_id', event.target.value);
@@ -148,7 +148,7 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
 
           {canBuy ? (
             <div className="mt-6 space-y-3">
-              <label htmlFor="qty" className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <label htmlFor="qty" className="block text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Quantity
               </label>
               <input
@@ -158,11 +158,23 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
                 max={99}
                 value={form.data.quantity}
                 onChange={(event) => form.setData('quantity', Number(event.target.value))}
-                className="w-32 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2"
+                className="w-32 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
               />
               <div className="flex flex-wrap gap-2">
-                <Button variant="gold" className="min-h-12" isLoading={form.processing} onClick={() => form.post('/cart/items')}>
+                <Button variant="secondary" className="min-h-12" isLoading={form.processing} onClick={() => form.post('/cart/items')}>
                   Add to cart
+                </Button>
+                <Button
+                  variant="primary"
+                  className="min-h-12"
+                  isLoading={form.processing}
+                  onClick={() =>
+                    form.post('/cart/items', {
+                      onSuccess: () => router.visit('/checkout'),
+                    })
+                  }
+                >
+                  Buy now
                 </Button>
                 {page.props.auth?.user ? (
                   <Button
@@ -172,20 +184,16 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
                   >
                     {saved ? 'Remove from wishlist' : 'Add to wishlist'}
                   </Button>
-                ) : (
-                  <Link href="/login" className="inline-flex min-h-12 items-center text-sm text-amber-300">
-                    Sign in to save
-                  </Link>
-                )}
+                ) : null}
               </div>
             </div>
           ) : (
             <div className="mt-6">
               {isPreview ? (
-                <p className="text-sm text-amber-200">Preview only — purchasing is disabled.</p>
+                <p className="text-sm text-blue-700">Preview only — purchasing is disabled.</p>
               ) : (
                 <>
-                  <p className="text-sm text-rose-300">Out of Stock</p>
+                  <p className="text-sm text-rose-600">Out of Stock</p>
                   {product.allow_stock_notification ? (
                     <form
                       className="mt-3 flex flex-col gap-2 sm:flex-row"
@@ -200,7 +208,7 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
                         placeholder="Email for restock notice"
                         value={notify.data.email}
                         onChange={(event) => notify.setData('email', event.target.value)}
-                        className="flex-1 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2"
+                        className="flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
                       />
                       <Button type="submit" variant="secondary" isLoading={notify.processing}>
                         Notify me
@@ -213,7 +221,7 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
           )}
 
           {product.highlights && product.highlights.length > 0 ? (
-            <ul className="mt-8 list-disc space-y-1 pl-5 text-slate-300">
+            <ul className="mt-8 list-disc space-y-1 pl-5 text-slate-600">
               {product.highlights.map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -226,7 +234,7 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
 
       {page.props.auth?.user ? (
         <section className="mt-8 max-w-xl">
-          <h2 className="text-xl font-semibold text-white">Write a review</h2>
+          <h2 className="text-xl font-semibold text-slate-900">Write a review</h2>
           <form
             className="mt-3 space-y-3"
             onSubmit={(event) => {
@@ -234,9 +242,9 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
               review.post(`/product/${product.slug}/reviews`);
             }}
           >
-            <input type="number" min={1} max={5} value={review.data.rating} onChange={(event) => review.setData('rating', Number(event.target.value))} className="w-24 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2" />
-            <input value={review.data.title} onChange={(event) => review.setData('title', event.target.value)} placeholder="Title" className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2" />
-            <textarea value={review.data.body} onChange={(event) => review.setData('body', event.target.value)} placeholder="Your review" className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2" />
+            <input type="number" min={1} max={5} value={review.data.rating} onChange={(event) => review.setData('rating', Number(event.target.value))} className="w-24 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2" />
+            <input value={review.data.title} onChange={(event) => review.setData('title', event.target.value)} placeholder="Title" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2" />
+            <textarea value={review.data.body} onChange={(event) => review.setData('body', event.target.value)} placeholder="Your review" className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2" />
             <Button type="submit" variant="secondary" isLoading={review.processing}>
               Submit for moderation
             </Button>
@@ -251,7 +259,7 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
       ].map((group) =>
         group.items.length > 0 ? (
           <section key={group.title} className="mt-12">
-            <h2 className="mb-6 text-xl font-semibold text-white">{group.title}</h2>
+            <h2 className="mb-6 text-xl font-semibold text-slate-900">{group.title}</h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {group.items.map((related) => (
                 <ProductCard key={related.id} product={related} />
@@ -265,7 +273,7 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
       product.related_products &&
       product.related_products.length > 0 ? (
         <section className="mt-12">
-          <h2 className="mb-6 text-xl font-semibold text-white">Related products</h2>
+          <h2 className="mb-6 text-xl font-semibold text-slate-900">Related products</h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {product.related_products.map((related) => (
               <ProductCard key={related.id} product={related} />

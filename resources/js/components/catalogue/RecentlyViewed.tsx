@@ -34,7 +34,7 @@ export function RecentlyViewed({ excludeSlug }: { excludeSlug?: string }) {
 
   return (
     <section className="mt-12" aria-label="Recently viewed">
-      <h2 className="mb-6 text-xl font-semibold text-white">Recently viewed</h2>
+      <h2 className="mb-6 text-xl font-semibold text-slate-900">Recently viewed</h2>
       {loading ? <ProductGridSkeleton count={4} /> : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (

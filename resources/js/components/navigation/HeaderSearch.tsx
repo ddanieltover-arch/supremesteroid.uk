@@ -103,12 +103,12 @@ export function HeaderSearch() {
         }}
         placeholder="Search catalogue"
         autoComplete="off"
-        className="w-72 rounded-lg border border-slate-800 bg-slate-900 py-2 pl-9 pr-3 text-sm text-slate-100 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+        className="w-72 rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
       />
-      {open && loading ? <p className="absolute z-50 mt-1 w-full rounded-xl border border-slate-800 bg-[#020617] p-3 text-sm text-slate-400">Searching…</p> : null}
-      {open && failed ? <p className="absolute z-50 mt-1 w-full rounded-xl border border-slate-800 bg-[#020617] p-3 text-sm text-rose-300">Search is unavailable right now.</p> : null}
+      {open && loading ? <p className="absolute z-50 mt-1 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-500">Searching…</p> : null}
+      {open && failed ? <p className="absolute z-50 mt-1 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-rose-600">Search is unavailable right now.</p> : null}
       {open && !loading && suggestions && items.length === 0 && searchForm.data.q.trim().length >= 2 ? (
-        <p className="absolute z-50 mt-1 w-full rounded-xl border border-slate-800 bg-[#020617] p-3 text-sm text-slate-400">No matching products, brands, or categories.</p>
+        <p className="absolute z-50 mt-1 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-500">No matching products, brands, or categories.</p>
       ) : null}
       {open && !loading && suggestions && items.length > 0 ? (
         <div className="absolute left-0 right-0">

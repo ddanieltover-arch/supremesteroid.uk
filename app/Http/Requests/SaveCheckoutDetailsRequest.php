@@ -40,7 +40,7 @@ class SaveCheckoutDetailsRequest extends FormRequest
             'shipping_destination.city' => ['required_without:address_id', 'string', 'max:100'],
             'shipping_destination.state_county' => ['nullable', 'string', 'max:100'],
             'shipping_destination.postal_code' => ['required_without:address_id', 'string', 'max:20'],
-            'shipping_destination.phone' => ['nullable', 'string', 'max:30'],
+            'shipping_destination.phone' => ['required_without:address_id', 'string', 'max:30'],
             'shipping_method_code' => ['nullable', 'string', 'max:50'],
             'customer_notes' => ['nullable', 'string', 'max:500'],
         ];
@@ -57,6 +57,7 @@ class SaveCheckoutDetailsRequest extends FormRequest
             'shipping_destination.address_line_1.required_without' => 'Please enter the first line of the delivery address.',
             'shipping_destination.city.required_without' => 'Please enter the delivery city.',
             'shipping_destination.postal_code.required_without' => 'Please enter the delivery postcode.',
+            'shipping_destination.phone.required_without' => 'Please enter a phone number for delivery.',
         ];
     }
 }

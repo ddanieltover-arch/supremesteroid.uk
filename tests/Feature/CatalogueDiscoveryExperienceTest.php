@@ -18,6 +18,39 @@ class CatalogueDiscoveryExperienceTest extends TestCase
     use RefreshDatabase;
     use CreatesCatalogueFixtures;
 
+    public function test_out_of_stock_products_sort_after_in_stock_on_shop(): void
+    {
+        $inStock = $this->makeProduct([
+            'name' => 'AAA In Stock Product',
+            'sku' => 'SORT-IN-1',
+            'is_featured' => true,
+            'sort_order' => 99,
+        ], 12);
+        \App\Models\ProductImage::query()->create([
+            'product_id' => $inStock->id,
+            'url' => 'https://cdn.example.test/in-stock.webp',
+            'alt_text' => 'In stock',
+            'display_order' => 1,
+            'is_primary' => true,
+        ]);
+
+        // Zero stock and no usable image — still ACTIVE so it remains on the catalogue.
+        $outOfStock = $this->makeProduct([
+            'name' => 'Should Appear Last Out Of Stock',
+            'sku' => 'SORT-OUT-1',
+            'is_featured' => true,
+            'sort_order' => 1,
+        ], 0);
+
+        $this->get('/shop?sort=featured')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Catalogue/Index')
+                ->where('products.data.0.id', $inStock->id)
+                ->where('products.data.1.id', $outOfStock->id)
+            );
+    }
+
     public function test_shop_category_brand_and_search_pages_expose_discovery_state(): void
     {
         $product = $this->makeProduct(['name' => 'Discovery Capsules', 'is_featured' => true]);

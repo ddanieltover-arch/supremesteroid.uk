@@ -20,7 +20,8 @@ class ProductPurchaseEligibilityService
     public function __construct(
         protected ProductComplianceService $complianceService,
         protected PricingService $pricingService,
-        protected InventoryReservationService $reservations
+        protected InventoryReservationService $reservations,
+        protected CataloguePresentation $presentation,
     ) {}
 
     /**
@@ -56,6 +57,10 @@ class ProductPurchaseEligibilityService
         }
         if (empty(trim((string) $product->slug))) {
             $reasons[] = 'Product slug identifier is missing.';
+        }
+
+        if (! $this->presentation->hasCatalogueImage($product)) {
+            $reasons[] = 'Product has no catalogue image and is treated as out of stock.';
         }
 
         try {

@@ -11,14 +11,17 @@ import { NewsletterSignup } from '@/components/home/NewsletterSignup';
 import { ProductRail } from '@/components/home/ProductRail';
 import { ShippingInformation } from '@/components/home/ShippingInformation';
 import { TrustGrid } from '@/components/home/TrustGrid';
+import { HomeEditorialContent } from '@/components/home/HomeEditorialContent';
+import { Reveal } from '@/components/ui/Reveal';
 import type { HomepagePayload, ProductCard as ProductCardType, SeoProps } from '@/types';
+import type { ReactNode } from 'react';
 
 const DEFAULT_SECTIONS = [
   { key: 'hero', enabled: true, position: 10 },
-  { key: 'categories', enabled: true, position: 20 },
-  { key: 'featured', enabled: true, position: 30 },
-  { key: 'new', enabled: true, position: 40 },
-  { key: 'offers', enabled: true, position: 50 },
+  { key: 'featured', enabled: true, position: 20 },
+  { key: 'new', enabled: true, position: 30 },
+  { key: 'offers', enabled: true, position: 40 },
+  { key: 'categories', enabled: true, position: 50 },
   { key: 'intent', enabled: true, position: 60 },
   { key: 'brands', enabled: true, position: 70 },
   { key: 'editorial', enabled: true, position: 80 },
@@ -27,6 +30,10 @@ const DEFAULT_SECTIONS = [
   { key: 'faq', enabled: true, position: 110 },
   { key: 'newsletter', enabled: true, position: 120 },
 ];
+
+function SectionReveal({ children }: { children: ReactNode }) {
+  return <Reveal className="mt-0">{children}</Reveal>;
+}
 
 export default function Home({
   homepage,
@@ -41,11 +48,11 @@ export default function Home({
 }) {
   const data = homepage ?? {
     hero: {
-      eyebrow: 'UK catalogue',
-      headline: 'Precision in product. Clarity in information.',
-      description: 'Browse published, compliance-approved products.',
-      primary_cta: { label: 'Explore Collection', url: '/shop' },
-      secondary_cta: { label: 'Shop Categories', url: '/#categories' },
+      eyebrow: 'Official store',
+      headline: 'Buy oral and injectable products online',
+      description: 'Lab-tested products with next-day UK delivery options and clear product information before you check out.',
+      primary_cta: { label: 'Shop now', url: '/shop' },
+      secondary_cta: { label: 'Browse categories', url: '/#categories' },
       products: featuredProducts.slice(0, 3),
     },
     categories: [],
@@ -81,36 +88,80 @@ export default function Home({
           case 'hero':
             return <HeroSection key={section.key} hero={data.hero} />;
           case 'categories':
-            return <CategoryShowcase key={section.key} categories={data.categories} />;
+            return (
+              <SectionReveal key={section.key}>
+                <CategoryShowcase categories={data.categories} />
+              </SectionReveal>
+            );
           case 'featured':
-            return <ProductRail key={section.key} id="featured" eyebrow="Selected" title="Featured collection" products={data.featuredProducts} />;
+            return (
+              <SectionReveal key={section.key}>
+                <ProductRail id="featured" eyebrow="Selected" title="Featured collection" products={data.featuredProducts} />
+              </SectionReveal>
+            );
           case 'new':
-            return <ProductRail key={section.key} id="new" eyebrow="Just published" title="New arrivals" products={data.newProducts} />;
+            return (
+              <SectionReveal key={section.key}>
+                <ProductRail id="new" eyebrow="Just published" title="New arrivals" products={data.newProducts} />
+              </SectionReveal>
+            );
           case 'offers':
-            return <ProductRail key={section.key} id="offers" eyebrow="Current prices" title="Selected offers" products={data.saleProducts} />;
+            return (
+              <SectionReveal key={section.key}>
+                <ProductRail id="offers" eyebrow="Current prices" title="Selected offers" products={data.saleProducts} />
+              </SectionReveal>
+            );
           case 'intent':
-            return <IntentDiscovery key={section.key} groups={data.intent} />;
+            return (
+              <SectionReveal key={section.key}>
+                <IntentDiscovery groups={data.intent} />
+              </SectionReveal>
+            );
           case 'brands':
-            return <BrandShowcase key={section.key} brands={data.brands} />;
+            return (
+              <SectionReveal key={section.key}>
+                <BrandShowcase brands={data.brands} />
+              </SectionReveal>
+            );
           case 'editorial':
-            return data.editorial ? <EditorialFeature key={section.key} editorial={data.editorial} /> : null;
+            return data.editorial ? (
+              <SectionReveal key={section.key}>
+                <EditorialFeature editorial={data.editorial} />
+              </SectionReveal>
+            ) : null;
           case 'trust':
             return (
-              <div key={section.key}>
+              <SectionReveal key={section.key}>
                 <TrustGrid items={data.trustItems} />
                 <ApprovedReviews reviews={data.reviews} />
-              </div>
+              </SectionReveal>
             );
           case 'shipping':
-            return <ShippingInformation key={section.key} shipping={data.shipping} />;
+            return (
+              <SectionReveal key={section.key}>
+                <ShippingInformation shipping={data.shipping} />
+              </SectionReveal>
+            );
           case 'faq':
-            return <FaqSection key={section.key} faqs={data.faqs} />;
+            return (
+              <SectionReveal key={section.key}>
+                <FaqSection faqs={data.faqs} />
+              </SectionReveal>
+            );
           case 'newsletter':
-            return data.newsletter ? <NewsletterSignup key={section.key} newsletter={data.newsletter} /> : null;
+            return data.newsletter ? (
+              <SectionReveal key={section.key}>
+                <NewsletterSignup newsletter={data.newsletter} />
+              </SectionReveal>
+            ) : null;
           default:
             return null;
         }
       })}
+
+      <SectionReveal>
+        <HomeEditorialContent />
+      </SectionReveal>
     </StorefrontLayout>
   );
 }

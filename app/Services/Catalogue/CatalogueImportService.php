@@ -35,19 +35,38 @@ class CatalogueImportService
      * Stage a source record. Never marks the product ACTIVE or purchasable.
      *
      * @param  array<string, mixed>  $source
-     * @param  array{dry_run?: bool, batch_uuid?: ?string, create_product?: bool}  $options
+     * @param  array{
+     *     dry_run?: bool,
+     *     batch_uuid?: ?string,
+     *     create_product?: bool,
+     *     force_workflow?: ImportWorkflowStatus|null
+     * }  $options
      */
     public function stage(array $source, string $batchId, string $sourceName = 'manual', array $options = []): CatalogueImportRecord
     {
         $dryRun = (bool) ($options['dry_run'] ?? false);
         $createProduct = (bool) ($options['create_product'] ?? true);
         $batchUuid = $options['batch_uuid'] ?? null;
+        $forceWorkflow = $options['force_workflow'] ?? null;
 
         $normalized = $this->normalize($source, $sourceName);
         $match = $this->detectMatch($normalized);
         $restriction = $this->restrictedDetector->evaluate($normalized);
+        if (($source['bulk_commerce_exclusion'] ?? false) === true) {
+            $restriction = [
+                'requires_review' => true,
+                'reasons' => array_values(array_unique(array_merge(
+                    $restriction['reasons'],
+                    array_map('strval', (array) ($source['bulk_exclusion_reasons'] ?? ['Excluded from retail onboarding.']))
+                ))),
+            ];
+            $createProduct = false;
+            $forceWorkflow ??= ImportWorkflowStatus::REJECTED;
+        }
         $issues = $this->collectIssues($normalized, $match, $restriction);
-        $workflow = $this->resolveWorkflow($match['status'], $restriction['requires_review'], $issues);
+        $workflow = $forceWorkflow instanceof ImportWorkflowStatus
+            ? $forceWorkflow
+            : $this->resolveWorkflow($match['status'], $restriction['requires_review'], $issues);
 
         $attributes = [
             'import_batch_id' => $batchId,
@@ -67,10 +86,10 @@ class CatalogueImportService
             'imported_at' => now(),
             'issues' => $issues,
             'review_checklist' => $this->emptyChecklist(),
-            'classification_status' => $restriction['requires_review']
+            'classification_status' => ($forceWorkflow === ImportWorkflowStatus::REJECTED || $restriction['requires_review'])
                 ? null
                 : ($normalized['classification'] ?? ProductClassification::OTHER_LAWFUL_PRODUCT->value),
-            'classification_notes' => $restriction['requires_review']
+            'classification_notes' => $restriction['requires_review'] || $forceWorkflow === ImportWorkflowStatus::REJECTED
                 ? implode(' ', $restriction['reasons'])
                 : null,
             'source_price_amount' => is_numeric($normalized['price_amount']) ? $normalized['price_amount'] : null,
@@ -78,7 +97,7 @@ class CatalogueImportService
                 ? $normalized['compare_at_price_amount']
                 : null,
             'source_currency' => $normalized['currency'] ?? 'GBP',
-            'requires_compliance_review' => $restriction['requires_review'],
+            'requires_compliance_review' => $restriction['requires_review'] && $forceWorkflow !== ImportWorkflowStatus::REJECTED,
         ];
 
         if ($dryRun) {
@@ -89,7 +108,7 @@ class CatalogueImportService
             return $record;
         }
 
-        return DB::transaction(function () use ($attributes, $match, $normalized, $createProduct, $restriction, $source) {
+        return DB::transaction(function () use ($attributes, $match, $normalized, $createProduct, $restriction, $source, $forceWorkflow) {
             if (filled($normalized['source_category'] ?? null)) {
                 $categoryMapping = $this->mappings->resolveCategoryMapping((string) $normalized['source_category']);
                 $attributes['target_category_id'] = $categoryMapping->status === ImportMappingStatus::APPROVED
@@ -106,7 +125,9 @@ class CatalogueImportService
 
             $record = CatalogueImportRecord::query()->create($attributes);
 
-            $this->stageImages($record, $source);
+            if ($forceWorkflow !== ImportWorkflowStatus::REJECTED) {
+                $this->stageImages($record, $source);
+            }
 
             if ($match['status'] === ImportMatchStatus::EXACT_MATCH) {
                 $record->workflow_status = ImportWorkflowStatus::DUPLICATE;
@@ -120,6 +141,31 @@ class CatalogueImportService
                 );
 
                 return $record->fresh(['images']);
+            }
+
+            // Idempotent re-run for the same source_product_reference only.
+            if (
+                $match['status'] === ImportMatchStatus::POSSIBLE_DUPLICATE
+                && $match['product'] !== null
+                && $this->isSameSourceReferenceMatch($normalized, $match['product'])
+            ) {
+                $record->product_id = $match['product']->id;
+                if ($forceWorkflow === null) {
+                    $record->workflow_status = ImportWorkflowStatus::DUPLICATE;
+                }
+                $record->save();
+
+                $this->auditLogger->log(
+                    eventType: 'catalogue_import.duplicate',
+                    auditable: $record,
+                    newValues: [
+                        'match_status' => ImportMatchStatus::POSSIBLE_DUPLICATE->value,
+                        'product_id' => $match['product']->id,
+                    ],
+                    reason: 'Existing source reference match — no additional draft created.'
+                );
+
+                return $record->fresh(['product', 'images']);
             }
 
             if ($createProduct && $match['status'] !== ImportMatchStatus::EXACT_MATCH) {
@@ -279,6 +325,22 @@ class CatalogueImportService
         }
 
         return ['status' => ImportMatchStatus::NEW, 'product' => null];
+    }
+
+    /**
+     * @param  array<string, mixed>  $normalized
+     */
+    protected function isSameSourceReferenceMatch(array $normalized, Product $product): bool
+    {
+        $reference = (string) ($normalized['source_product_reference'] ?? '');
+        if ($reference === '') {
+            return false;
+        }
+
+        return CatalogueImportRecord::query()
+            ->where('source_product_reference', $reference)
+            ->where('product_id', $product->id)
+            ->exists();
     }
 
     /**

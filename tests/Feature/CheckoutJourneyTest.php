@@ -162,8 +162,10 @@ class CheckoutJourneyTest extends TestCase
                 ->where('checkout_step', 'payment')
                 ->where('checkout_steps.2.state', 'current')
                 ->where('checkout_steps.3.state', 'upcoming')
-                ->where('paymentMethods.0.code', PaymentMethodType::BANK_TRANSFER->value)
-                ->missing('paymentMethods.2')
+                // £70 order is below the £100 bank-transfer minimum — crypto only.
+                ->where('paymentMethods.0.code', PaymentMethodType::CRYPTOCURRENCY->value)
+                ->missing('paymentMethods.1')
+                ->where('payment_method_notice', fn ($notice) => is_string($notice) && str_contains($notice, 'cryptocurrency only'))
             );
 
         $this->actingAs($user)
@@ -171,9 +173,13 @@ class CheckoutJourneyTest extends TestCase
             ->assertRedirect();
 
         $this->actingAs($user)
+            ->post('/checkout/payment', ['payment_method' => PaymentMethodType::BANK_TRANSFER->value])
+            ->assertSessionHasErrors('payment_method');
+
+        $this->actingAs($user)
             ->post('/checkout', [
                 'checkout_token' => session('checkout_token'),
-                'payment_method' => PaymentMethodType::BANK_TRANSFER->value,
+                'payment_method' => PaymentMethodType::CRYPTOCURRENCY->value,
                 'idempotency_key' => 'journey-order-1',
             ])
             ->assertRedirect('/checkout/confirmation');

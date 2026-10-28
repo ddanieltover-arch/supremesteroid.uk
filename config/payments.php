@@ -6,7 +6,12 @@ return [
     /*
     | Customer-visible settlement instructions. Values come from environment
     | configuration — never hard-code production account numbers in React.
+    |
+    | Bank transfer is offered only when the checkout grand total is at or above
+    | bank_transfer_minimum_total (GBP). Below that threshold, cryptocurrency only.
     */
+    'bank_transfer_minimum_total' => (float) env('BANK_TRANSFER_MINIMUM_TOTAL', 100),
+
     'methods' => [
         [
             'code' => 'BANK_TRANSFER',

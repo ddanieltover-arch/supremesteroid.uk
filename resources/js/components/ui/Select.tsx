@@ -14,7 +14,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="w-full">
         {label ? (
-          <label htmlFor={selectId} className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <label htmlFor={selectId} className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">
             {label}
           </label>
         ) : null}
@@ -23,14 +23,14 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           id={selectId}
           aria-invalid={error ? true : undefined}
           className={clsx(
-            'w-full rounded-lg border bg-slate-900/90 px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50',
-            error ? 'border-rose-500/80' : 'border-slate-800 focus:border-amber-500/80',
+            'w-full rounded-lg border bg-white px-3 py-2 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600/40',
+            error ? 'border-rose-500/80' : 'border-slate-200 focus:border-blue-600',
             className,
           )}
           {...props}
         >
           {options.map((opt) => (
-            <option key={opt.value} value={opt.value} className="bg-slate-900 text-slate-100">
+            <option key={opt.value} value={opt.value} className="bg-slate-50 text-slate-900">
               {opt.label}
             </option>
           ))}

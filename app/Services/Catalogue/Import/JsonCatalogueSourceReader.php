@@ -36,6 +36,7 @@ class JsonCatalogueSourceReader implements CatalogueSourceReader
             throw new RuntimeException('Unable to read JSON catalogue source: '.$this->path);
         }
 
+        $raw = preg_replace('/^\xEF\xBB\xBF/', '', $raw) ?? $raw;
         $decoded = json_decode($raw, true);
         if (! is_array($decoded)) {
             throw new InvalidArgumentException('JSON catalogue source must decode to an array.');

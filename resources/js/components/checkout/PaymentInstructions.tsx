@@ -25,23 +25,23 @@ export function PaymentInstructions({
     ].filter((row): row is [string, string] => Boolean(row[1]));
 
     return (
-      <section className="rounded-2xl border border-slate-800 p-5">
-        <h2 className="text-lg font-semibold text-white">Bank transfer</h2>
-        <p className="mt-2 text-sm text-slate-400">
+      <section className="rounded-2xl border border-slate-200 p-5">
+        <h2 className="text-lg font-semibold text-slate-900">Bank transfer</h2>
+        <p className="mt-2 text-sm text-slate-500">
           {bank?.reference_hint || 'Use your order number as the payment reference unless the store provides another reference.'}
         </p>
         {orderNumber ? (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-800 px-3 py-2 text-sm">
-            <span className="text-slate-400">Reference</span>
-            <span className="font-mono text-white">{orderNumber}</span>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 px-3 py-2 text-sm">
+            <span className="text-slate-500">Reference</span>
+            <span className="font-mono text-slate-900">{orderNumber}</span>
             <CopyButton value={orderNumber} label="Copy reference" />
           </div>
         ) : null}
         <ul className="mt-4 space-y-3">
           {rows.map(([label, value]) => (
             <li key={label} className="flex flex-wrap items-center justify-between gap-3 text-sm">
-              <span className="text-slate-400">{label}</span>
-              <span className="font-mono text-slate-100">{value}</span>
+              <span className="text-slate-500">{label}</span>
+              <span className="font-mono text-slate-900">{value}</span>
               <CopyButton value={value} label={`Copy ${label}`} />
             </li>
           ))}
@@ -54,16 +54,16 @@ export function PaymentInstructions({
   if (method === 'CRYPTOCURRENCY') {
     const networks = crypto?.networks ?? [];
     return (
-      <section className="rounded-2xl border border-slate-800 p-5">
-        <h2 className="text-lg font-semibold text-white">Cryptocurrency</h2>
-        <p className="mt-2 text-sm text-slate-400">
+      <section className="rounded-2xl border border-slate-200 p-5">
+        <h2 className="text-lg font-semibold text-slate-900">Cryptocurrency</h2>
+        <p className="mt-2 text-sm text-slate-500">
           {crypto?.reference_hint || 'Submit the transaction hash after sending the exact order total. Payment is not confirmed until staff approve it.'}
         </p>
         <ul className="mt-4 space-y-4">
           {networks.map((network) => (
-            <li key={network.code} className="rounded-lg border border-slate-800 p-3 text-sm">
-              <p className="font-semibold text-white">{network.label}</p>
-              <p className="mt-1 break-all font-mono text-xs text-slate-300">{network.address}</p>
+            <li key={network.code} className="rounded-lg border border-slate-200 p-3 text-sm">
+              <p className="font-semibold text-slate-900">{network.label}</p>
+              <p className="mt-1 break-all font-mono text-xs text-slate-600">{network.address}</p>
               <div className="mt-3">
                 <CopyButton value={network.address} label="Copy address" />
               </div>

@@ -35,7 +35,7 @@ export function CheckoutAlerts({
               ))}
             </ul>
           ) : null}
-          <Link href="/cart" className="mt-3 inline-block font-semibold text-amber-300">
+          <Link href="/cart" className="mt-3 inline-block font-semibold text-blue-600">
             Review basket
           </Link>
         </Alert>
@@ -43,7 +43,7 @@ export function CheckoutAlerts({
       {expired ? (
         <Alert type="error">
           Your checkout session has expired.
-          <Link href="/cart" className="mt-3 inline-block font-semibold text-amber-300">
+          <Link href="/cart" className="mt-3 inline-block font-semibold text-blue-600">
             Return to basket
           </Link>
         </Alert>

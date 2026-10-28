@@ -22,15 +22,15 @@ export function Button({
     <button
       type={type}
       className={clsx(
-        'inline-flex items-center justify-center rounded-md font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.98] motion-reduce:active:scale-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100',
         {
           'min-h-9 px-3 py-1.5 text-xs': size === 'sm',
           'min-h-10 px-4 py-2 text-sm': size === 'md',
           'min-h-12 px-6 py-3 text-base': size === 'lg',
-          'bg-amber-400 font-semibold text-slate-950 hover:bg-amber-300': variant === 'primary' || variant === 'gold',
-          'border border-slate-700 bg-slate-900 text-slate-100 hover:border-amber-400 hover:text-amber-300': variant === 'secondary',
-          'border border-rose-500/40 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20': variant === 'danger',
-          'text-slate-300 hover:bg-slate-800 hover:text-white': variant === 'ghost',
+          'bg-brand font-semibold text-white hover:bg-brand-dark': variant === 'primary' || variant === 'gold',
+          'border border-slate-300 bg-white text-slate-800 hover:border-brand hover:text-brand': variant === 'secondary',
+          'border border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100': variant === 'danger',
+          'text-slate-600 hover:bg-slate-100 hover:text-slate-900': variant === 'ghost',
         },
         className,
       )}

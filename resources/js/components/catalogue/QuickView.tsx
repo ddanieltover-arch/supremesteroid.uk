@@ -63,11 +63,11 @@ export function QuickView({ slug, open, onClose }: { slug: string | null; open: 
         </div>
       ) : null}
 
-      {error ? <p className="text-sm text-rose-300">{error}</p> : null}
+      {error ? <p className="text-sm text-rose-600">{error}</p> : null}
 
       {product ? (
         <div className="grid gap-6 sm:grid-cols-2">
-          <div className="aspect-square overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
+          <div className="aspect-square overflow-hidden rounded-xl border border-slate-200 bg-white">
             {product.images?.[0]?.url ? (
               <img
                 src={product.images[0].url}
@@ -79,23 +79,23 @@ export function QuickView({ slug, open, onClose }: { slug: string | null; open: 
             )}
           </div>
           <div>
-            {product.brand ? <p className="text-sm text-amber-400">{product.brand.name}</p> : null}
-            <h3 className="mt-1 text-2xl font-semibold text-white">{product.name}</h3>
+            {product.brand ? <p className="text-sm text-blue-600">{product.brand.name}</p> : null}
+            <h3 className="mt-1 text-2xl font-semibold text-slate-900">{product.name}</h3>
             <div className="mt-4">
               <PriceDisplay pricing={pricing} />
             </div>
-            <p className="mt-2 text-sm text-emerald-400">{selectedVariant?.stock?.label ?? product.stock?.label}</p>
-            <p className="mt-4 text-sm text-slate-300">{product.short_description}</p>
+            <p className="mt-2 text-sm text-emerald-600">{selectedVariant?.stock?.label ?? product.stock?.label}</p>
+            <p className="mt-4 text-sm text-slate-600">{product.short_description}</p>
 
             {product.variants?.length ? (
               <div className="mt-4">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Choose option</p>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Choose option</p>
                 <div className="flex flex-wrap gap-2">
                   {product.variants.map((variant) => (
                     <button
                       key={variant.id}
                       type="button"
-                      className={`min-h-11 rounded-lg border px-3 py-2 text-left text-sm ${variantId === variant.id ? 'border-amber-400 text-amber-300' : 'border-slate-800 text-slate-200'}`}
+                      className={`min-h-11 rounded-lg border px-3 py-2 text-left text-sm ${variantId === variant.id ? 'border-blue-500 text-blue-600' : 'border-slate-200 text-slate-800'}`}
                       onClick={() => setVariantId(variant.id)}
                     >
                       {variant.name}
@@ -132,7 +132,7 @@ export function QuickView({ slug, open, onClose }: { slug: string | null; open: 
               >
                 {canBuy ? 'Add to cart' : 'Unavailable'}
               </Button>
-              <Link href={`/product/${product.slug}`} className="inline-flex min-h-12 items-center text-sm text-amber-300">
+              <Link href={`/product/${product.slug}`} className="inline-flex min-h-12 items-center text-sm text-blue-600">
                 View full details
               </Link>
             </div>

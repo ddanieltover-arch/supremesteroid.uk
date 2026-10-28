@@ -53,7 +53,7 @@ class HandleInertiaRequests extends Middleware
                 'name' => config('store.name', 'Supreme Steroids'),
                 'legal_name' => config('store.legal_name', 'Supreme Steroids'),
                 'support_email' => config('store.support_email', 'info@supremesteroid.uk'),
-                'logo_url' => config('store.logo_url', '/assets/branding/supreme-steroids-logo.png'),
+                'logo_url' => config('store.logo_url', '/assets/branding/supreme-steroids-logo.jpg'),
                 'domain' => config('store.domain'),
                 'address' => config('store.business_address'),
                 'support_phone' => config('store.support_phone'),

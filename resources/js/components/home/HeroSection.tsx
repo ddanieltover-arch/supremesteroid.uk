@@ -1,61 +1,74 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
+import clsx from 'clsx';
 import type { HomepagePayload } from '@/types';
-import { formatMoney } from '@/lib/money';
 
 export function HeroSection({ hero }: { hero: HomepagePayload['hero'] }) {
-  const featured = hero.products[0];
-  const supporting = hero.products.slice(1, 3);
+  const page = usePage<{ store?: { name?: string; logo_url?: string } }>();
+  const logoUrl = page.props.store?.logo_url ?? '/assets/branding/supreme-steroids-logo.jpg';
+  const storeName = page.props.store?.name ?? 'Supreme Steroids';
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-950 via-[#07111f] to-[#020617] px-6 py-10 sm:px-10 sm:py-14">
-      <div className="pointer-events-none absolute -right-16 top-0 h-64 w-64 rounded-full bg-amber-400/5 blur-3xl" aria-hidden="true" />
-      <div className="pointer-events-none absolute bottom-0 left-10 h-40 w-40 rotate-12 border border-slate-800/80" aria-hidden="true" />
+    <section
+      aria-labelledby="hero-heading"
+      className="relative left-1/2 w-screen -translate-x-1/2 -mt-8 mb-4 overflow-hidden sm:-mt-10 sm:mb-8"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-[#eef5ff] via-[#f7fafc] to-[#f9f9f9]" aria-hidden="true" />
+      <div
+        className="absolute inset-0 opacity-[0.45]"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            'radial-gradient(ellipse 70% 50% at 15% 20%, rgb(30 111 217 / 0.14), transparent 55%), radial-gradient(ellipse 50% 40% at 90% 70%, rgb(30 111 217 / 0.08), transparent 50%)',
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#f9f9f9] to-transparent"
+        aria-hidden="true"
+      />
 
-      <div className="relative grid items-center gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-400/90">{hero.eyebrow}</p>
-          <h1 className="mt-4 max-w-xl text-4xl font-semibold leading-tight text-white sm:text-5xl">{hero.headline}</h1>
-          <p className="mt-5 max-w-xl text-sm leading-relaxed text-slate-400 sm:text-base">{hero.description}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={hero.primary_cta.url} className="inline-flex min-h-12 items-center rounded-full bg-amber-400 px-6 text-sm font-semibold text-slate-950 hover:bg-amber-300">
-              {hero.primary_cta.label}
-            </Link>
-            <Link href={hero.secondary_cta.url} className="inline-flex min-h-12 items-center rounded-full border border-slate-700 px-6 text-sm font-semibold text-slate-100 hover:border-amber-400 hover:text-amber-300">
-              {hero.secondary_cta.label}
-            </Link>
-          </div>
-        </div>
+      <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 py-14 text-center sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <img
+          src={logoUrl}
+          alt={storeName}
+          className="motion-fade-in h-20 w-auto max-w-[220px] object-contain sm:h-24 sm:max-w-[280px]"
+        />
 
-        <div className="relative min-h-72">
-          {featured ? (
-            <Link href={`/product/${featured.slug}`} className="block overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/80 p-6">
-              <div className="aspect-square overflow-hidden rounded-2xl bg-slate-900/80">
-                {featured.image_url ? (
-                  <img src={featured.image_url} alt={featured.image_alt || featured.name} className="h-full w-full object-contain" />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-sm text-slate-500">No image</div>
-                )}
-              </div>
-              <p className="mt-4 text-xs uppercase tracking-wider text-amber-400">{featured.brand}</p>
-              <p className="mt-1 text-lg font-semibold text-white">{featured.name}</p>
-              {featured.pricing ? (
-                <p className="mt-2 text-sm text-slate-300">{formatMoney(featured.pricing.effective_price, featured.pricing.currency)}</p>
-              ) : null}
-            </Link>
-          ) : null}
+        <p className="motion-fade-in-up mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-brand [animation-delay:60ms]">
+          {hero.eyebrow}
+        </p>
 
-          {supporting.map((product, index) => (
-            <Link
-              key={product.id}
-              href={`/product/${product.slug}`}
-              className={`absolute hidden w-44 rounded-2xl border border-slate-800 bg-slate-950/90 p-3 shadow-2xl lg:block ${index === 0 ? '-left-8 top-8' : '-right-4 bottom-6'}`}
-            >
-              <div className="aspect-square overflow-hidden rounded-xl bg-slate-900">
-                {product.image_url ? <img src={product.image_url} alt={product.image_alt || product.name} className="h-full w-full object-contain" /> : null}
-              </div>
-              <p className="mt-2 truncate text-xs text-white">{product.name}</p>
-            </Link>
-          ))}
+        <h1
+          id="hero-heading"
+          className="motion-fade-in-up mt-3 max-w-3xl text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl [animation-delay:120ms]"
+        >
+          {hero.headline}
+        </h1>
+
+        <p className="motion-fade-in-up mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg [animation-delay:180ms]">
+          {hero.description}
+        </p>
+
+        <div className="motion-fade-in-up mt-8 flex flex-wrap items-center justify-center gap-3 [animation-delay:240ms]">
+          <Link
+            href={hero.primary_cta.url}
+            className={clsx(
+              'inline-flex min-h-12 items-center justify-center rounded-md bg-brand px-6 text-base font-semibold text-white',
+              'transition-all duration-200 hover:bg-brand-dark active:scale-[0.98]',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
+            )}
+          >
+            {hero.primary_cta.label}
+          </Link>
+          <Link
+            href={hero.secondary_cta.url}
+            className={clsx(
+              'inline-flex min-h-12 items-center justify-center rounded-md border border-slate-300 bg-white px-6 text-base font-semibold text-slate-800',
+              'transition-all duration-200 hover:border-brand hover:text-brand active:scale-[0.98]',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
+            )}
+          >
+            {hero.secondary_cta.label}
+          </Link>
         </div>
       </div>
     </section>

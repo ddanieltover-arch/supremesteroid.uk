@@ -13,6 +13,7 @@ type PaymentMethod = { code: string; name: string; description?: string };
 
 export default function CheckoutPayment({
   paymentMethods = [],
+  payment_method_notice = null,
   paymentInstructions,
   selectedShippingMethod,
   checkoutPreview,
@@ -27,6 +28,7 @@ export default function CheckoutPayment({
   requires_acknowledgement = false,
 }: {
   paymentMethods?: PaymentMethod[];
+  payment_method_notice?: string | null;
   paymentInstructions?: {
     bank_transfer?: Record<string, string>;
     crypto?: { networks?: Array<{ code: string; label: string; address: string }>; reference_hint?: string };
@@ -50,7 +52,10 @@ export default function CheckoutPayment({
 }) {
   const page = usePage<{ errors: Record<string, string> }>();
   const errors = page.props.errors ?? {};
-  const [method, setMethod] = useState(checkout?.payment_method ?? paymentMethods[0]?.code ?? '');
+  const initialMethod = paymentMethods.some((item) => item.code === checkout?.payment_method)
+    ? (checkout?.payment_method ?? '')
+    : (paymentMethods[0]?.code ?? '');
+  const [method, setMethod] = useState(initialMethod);
   const [submitting, setSubmitting] = useState(false);
   const idempotencyKey = useMemo(() => idempotency_key || crypto.randomUUID(), [idempotency_key]);
   const items = checkout?.items ?? cart?.items ?? [];
@@ -69,40 +74,45 @@ export default function CheckoutPayment({
   return (
     <StorefrontLayout chrome="checkout" seo={{ title: 'Payment', description: 'Review and place your order.', robots: 'noindex,nofollow' }}>
       <CheckoutProgress current={checkout_step} steps={checkout_steps} />
-      <h1 className="text-3xl font-semibold text-white">Payment</h1>
+      <h1 className="text-3xl font-semibold text-slate-900">Payment</h1>
       <CheckoutAlerts warnings={warnings} errors={errors} affectedItems={affected_items} requiresAcknowledgement={requires_acknowledgement} />
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
         <div className="space-y-6">
-          <section className="rounded-2xl border border-slate-800 p-5">
-            <h2 className="text-lg font-semibold text-white">Review</h2>
-            <div className="mt-4 grid gap-4 text-sm text-slate-300 md:grid-cols-2">
+          <section className="rounded-2xl border border-slate-200 p-5">
+            <h2 className="text-lg font-semibold text-slate-900">Review</h2>
+            <div className="mt-4 grid gap-4 text-sm text-slate-600 md:grid-cols-2">
               <div>
-                <h3 className="font-semibold text-white">Delivery</h3>
+                <h3 className="font-semibold text-slate-900">Delivery</h3>
                 <p className="mt-2">{shipping?.name}</p>
                 {address ? (
-                  <p className="mt-2 text-slate-400">
+                  <p className="mt-2 text-slate-500">
                     {address.full_name}, {address.address_line_1}, {address.city} {address.postal_code}
                   </p>
                 ) : null}
-                <Link href="/checkout/delivery" className="mt-2 inline-block text-amber-300">
+                <Link href="/checkout/delivery" className="mt-2 inline-block text-blue-600">
                   Change delivery
                 </Link>
               </div>
               <div>
-                <h3 className="font-semibold text-white">Payment method</h3>
+                <h3 className="font-semibold text-slate-900">Payment method</h3>
                 <p className="mt-2">{selectedMethod?.name ?? 'Choose a method'}</p>
               </div>
             </div>
           </section>
 
           <fieldset>
-            <legend className="text-lg font-semibold text-white">How would you like to pay?</legend>
+            <legend className="text-lg font-semibold text-slate-900">How would you like to pay?</legend>
+            {payment_method_notice ? (
+              <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                {payment_method_notice}
+              </p>
+            ) : null}
             <div className="mt-4 space-y-3">
               {paymentMethods.map((option) => (
                 <label
                   key={option.code}
-                  className={`block cursor-pointer rounded-2xl border p-4 ${method === option.code ? 'border-amber-400 bg-amber-400/5' : 'border-slate-800'}`}
+                  className={`block cursor-pointer rounded-2xl border p-4 ${method === option.code ? 'border-blue-500 bg-blue-600/5' : 'border-slate-200'}`}
                 >
                   <input
                     type="radio"
@@ -114,8 +124,8 @@ export default function CheckoutPayment({
                       router.post('/checkout/payment', { payment_method: option.code }, { preserveScroll: true });
                     }}
                   />
-                  <span className="font-semibold text-white">{option.name}</span>
-                  {option.description ? <span className="mt-1 block text-sm text-slate-400">{option.description}</span> : null}
+                  <span className="font-semibold text-slate-900">{option.name}</span>
+                  {option.description ? <span className="mt-1 block text-sm text-slate-500">{option.description}</span> : null}
                 </label>
               ))}
             </div>

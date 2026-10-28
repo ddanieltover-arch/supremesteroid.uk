@@ -67,15 +67,15 @@ export default function CheckoutDelivery({
   return (
     <StorefrontLayout chrome="checkout" seo={{ title: 'Delivery', description: 'Choose delivery.', robots: 'noindex,nofollow' }}>
       <CheckoutProgress current={checkout_step} steps={checkout_steps} />
-      <h1 className="text-3xl font-semibold text-white">Delivery</h1>
+      <h1 className="text-3xl font-semibold text-slate-900">Delivery</h1>
       <CheckoutAlerts warnings={warnings} errors={errors} affectedItems={affected_items} requiresAcknowledgement={requires_acknowledgement} />
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
         <div className="space-y-6">
-          <section className="rounded-2xl border border-slate-800 p-5">
-            <h2 className="text-lg font-semibold text-white">Delivering to</h2>
+          <section className="rounded-2xl border border-slate-200 p-5">
+            <h2 className="text-lg font-semibold text-slate-900">Delivering to</h2>
             {address ? (
-              <p className="mt-3 text-sm leading-relaxed text-slate-300">
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 {address.full_name}
                 <br />
                 {address.address_line_1}
@@ -85,20 +85,20 @@ export default function CheckoutDelivery({
                 {address.country_code}
               </p>
             ) : null}
-            <Link href="/checkout" className="mt-3 inline-block text-sm text-amber-300">
+            <Link href="/checkout" className="mt-3 inline-block text-sm text-blue-600">
               Change address
             </Link>
           </section>
 
           <fieldset>
-            <legend className="text-lg font-semibold text-white">Shipping method</legend>
+            <legend className="text-lg font-semibold text-slate-900">Shipping method</legend>
             <div className="mt-4 space-y-3">
               {availableShippingMethods.map((option) => {
                 const selected = method === option.code;
                 return (
                   <label
                     key={option.code}
-                    className={`block cursor-pointer rounded-2xl border p-4 ${selected ? 'border-amber-400 bg-amber-400/5' : 'border-slate-800'}`}
+                    className={`block cursor-pointer rounded-2xl border p-4 ${selected ? 'border-blue-500 bg-blue-600/5' : 'border-slate-200'}`}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <span className="flex items-start gap-3">
@@ -110,11 +110,11 @@ export default function CheckoutDelivery({
                           onChange={() => refreshMethod(option.code)}
                         />
                         <span>
-                          <span className="block font-semibold text-white">{option.name}</span>
-                          {option.description ? <span className="mt-1 block text-sm text-slate-400">{option.description}</span> : null}
+                          <span className="block font-semibold text-slate-900">{option.name}</span>
+                          {option.description ? <span className="mt-1 block text-sm text-slate-500">{option.description}</span> : null}
                         </span>
                       </span>
-                      <span className="shrink-0 font-mono text-amber-300">
+                      <span className="shrink-0 font-mono text-blue-600">
                         {option.is_free ? 'Free' : formatMoney(option.rate_amount ?? String(option.rate ?? 0), option.currency)}
                       </span>
                     </div>

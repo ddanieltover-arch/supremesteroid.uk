@@ -42,7 +42,7 @@ class PrepareCheckoutRequest extends FormRequest
             'shipping_destination.city' => ['required', 'string', 'max:100'],
             'shipping_destination.state_county' => ['nullable', 'string', 'max:100'],
             'shipping_destination.postal_code' => ['required', 'string', 'max:20'],
-            'shipping_destination.phone' => ['nullable', 'string', 'max:30'],
+            'shipping_destination.phone' => ['required', 'string', 'max:30'],
             'shipping_method_code' => ['nullable', 'string', 'max:50'],
             'billing_destination' => ['nullable', 'array'],
             'billing_destination.country_code' => ['nullable', 'string', 'size:2', 'regex:/^[A-Za-z]{2}$/'],

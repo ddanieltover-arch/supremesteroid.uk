@@ -96,9 +96,9 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
             <Skeleton className="h-10 w-2/3" />
           </div>
         ) : null}
-        {failed ? <p className="text-sm text-rose-300">Search is unavailable right now. Try again shortly.</p> : null}
+        {failed ? <p className="text-sm text-rose-600">Search is unavailable right now. Try again shortly.</p> : null}
         {!loading && suggestions && items.length === 0 && searchForm.data.q.trim().length >= 2 ? (
-          <p className="text-sm text-slate-400">No matching products, brands, or categories.</p>
+          <p className="text-sm text-slate-500">No matching products, brands, or categories.</p>
         ) : null}
         {!loading && suggestions && items.length > 0 ? (
           <SearchSuggestions suggestions={suggestions} query={searchForm.data.q} activeId={activeId} listId={listId} onSelect={onClose} />

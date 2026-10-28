@@ -15,12 +15,12 @@ export function Badge({
       className={clsx(
         'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider',
         {
-          'border border-slate-700 bg-slate-900 text-slate-200': variant === 'default',
-          'bg-amber-400 text-slate-950': variant === 'gold',
-          'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300': variant === 'emerald',
-          'border border-amber-500/30 bg-amber-500/10 text-amber-300': variant === 'amber',
-          'border border-rose-500/30 bg-rose-500/10 text-rose-300': variant === 'rose',
-          'border border-slate-700 bg-slate-950 text-slate-300': variant === 'neutral',
+          'border border-slate-200 bg-slate-100 text-slate-700': variant === 'default',
+          'bg-blue-600 text-white': variant === 'gold',
+          'border border-emerald-200 bg-emerald-50 text-emerald-700': variant === 'emerald',
+          'border border-blue-200 bg-blue-50 text-blue-700': variant === 'amber',
+          'border border-rose-200 bg-rose-50 text-rose-700': variant === 'rose',
+          'border border-slate-200 bg-white text-slate-600': variant === 'neutral',
         },
         className,
       )}

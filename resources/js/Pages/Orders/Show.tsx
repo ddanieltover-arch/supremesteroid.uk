@@ -49,16 +49,16 @@ export default function OrdersShow({ order, paymentInstructions }: { order: Orde
 
   return (
     <AccountLayout title={order.order_number} seo={{ title: order.order_number, description: 'Order details.', robots: 'noindex,nofollow' }}>
-      <p className="text-slate-400">
+      <p className="text-slate-500">
         {order.placed_at ? new Date(order.placed_at).toLocaleDateString('en-GB') : ''}
         {order.status_label ? ` · ${order.status_label}` : ''}
       </p>
 
       {order.timeline && order.timeline.length > 0 ? (
-        <ol className="mt-8 space-y-3 border-l border-slate-800 pl-4">
+        <ol className="mt-8 space-y-3 border-l border-slate-200 pl-4">
           {order.timeline.map((step) => (
             <li key={step.key}>
-              <p className="text-sm font-semibold text-white">{step.label}</p>
+              <p className="text-sm font-semibold text-slate-900">{step.label}</p>
               {step.at ? <p className="text-xs text-slate-500">{new Date(step.at).toLocaleString('en-GB')}</p> : null}
             </li>
           ))}
@@ -86,11 +86,11 @@ export default function OrdersShow({ order, paymentInstructions }: { order: Orde
             statusLabel={payment?.status_label}
             reference={payment?.reference ?? order.order_number}
           />
-          <section className="rounded-xl border border-slate-800 p-4">
-            <h2 className="text-sm font-semibold text-white">Delivery</h2>
-            <p className="mt-2 text-sm text-slate-400">{order.shipping_method || 'Shipping method confirmed at checkout'}</p>
+          <section className="rounded-xl border border-slate-200 p-4">
+            <h2 className="text-sm font-semibold text-slate-900">Delivery</h2>
+            <p className="mt-2 text-sm text-slate-500">{order.shipping_method || 'Shipping method confirmed at checkout'}</p>
             {address ? (
-              <p className="mt-3 text-sm leading-relaxed text-slate-300">
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 {address.full_name}
                 <br />
                 {address.address_line_1}
@@ -101,20 +101,20 @@ export default function OrdersShow({ order, paymentInstructions }: { order: Orde
               </p>
             ) : null}
           </section>
-          <section className="rounded-xl border border-slate-800 p-4">
-            <h2 className="text-sm font-semibold text-white">Tracking</h2>
+          <section className="rounded-xl border border-slate-200 p-4">
+            <h2 className="text-sm font-semibold text-slate-900">Tracking</h2>
             {order.tracking?.available ? (
-              <p className="mt-2 text-sm text-slate-300">
+              <p className="mt-2 text-sm text-slate-600">
                 {order.tracking.carrier ? `${order.tracking.carrier}: ` : ''}
                 {order.tracking.number}
                 {order.tracking.url ? (
-                  <a href={order.tracking.url} className="mt-2 block text-amber-300" rel="noreferrer">
+                  <a href={order.tracking.url} className="mt-2 block text-blue-600" rel="noreferrer">
                     Track shipment
                   </a>
                 ) : null}
               </p>
             ) : (
-              <p className="mt-2 text-sm text-slate-400">{order.tracking?.message}</p>
+              <p className="mt-2 text-sm text-slate-500">{order.tracking?.message}</p>
             )}
           </section>
         </div>

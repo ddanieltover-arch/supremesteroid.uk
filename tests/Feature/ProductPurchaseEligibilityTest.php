@@ -11,6 +11,8 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Inventory;
 use App\Models\Product;
+use App\Models\ProductImage;
+use App\Services\Catalogue\CataloguePresentation;
 use App\Services\Catalogue\ProductPurchaseEligibilityService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -66,7 +68,15 @@ class ProductPurchaseEligibilityTest extends TestCase
             'safety_stock_threshold' => 5,
         ]);
 
-        return $product;
+        ProductImage::query()->create([
+            'product_id' => $product->id,
+            'url' => '/storage/product_images/'.$product->id.'/primary.jpg',
+            'alt_text' => $product->name,
+            'display_order' => 0,
+            'is_primary' => true,
+        ]);
+
+        return $product->fresh(['images', 'inventory']);
     }
 
     public function test_eligible_active_product_passes_verification(): void
@@ -144,5 +154,42 @@ class ProductPurchaseEligibilityTest extends TestCase
 
         $this->expectException(ProductNotPurchasableException::class);
         $this->service->assertPurchasable($product, null, 1, true);
+    }
+
+    public function test_product_without_image_is_not_purchasable_and_marked_out_of_stock(): void
+    {
+        $product = $this->createProduct();
+        ProductImage::query()->where('product_id', $product->id)->delete();
+        $product->unsetRelation('images');
+
+        $check = $this->service->checkEligibility($product->fresh(), null, 1, false);
+
+        $this->assertFalse($check['is_eligible']);
+        $this->assertTrue(collect($check['reasons'])->contains(
+            fn (string $reason): bool => str_contains($reason, 'no catalogue image')
+        ));
+
+        $stock = app(CataloguePresentation::class)->stock($product->fresh(['images']));
+        $this->assertSame('OUT_OF_STOCK', $stock['code']);
+        $this->assertSame('Out of stock', $stock['label']);
+    }
+
+    public function test_product_with_broken_cdn_image_is_treated_as_out_of_stock(): void
+    {
+        $product = $this->createProduct();
+        ProductImage::query()->where('product_id', $product->id)->update([
+            'url' => 'https://supremestd.b-cdn.net/wp-content/uploads/missing-product.jpeg',
+        ]);
+        $product->unsetRelation('images');
+
+        $check = $this->service->checkEligibility($product->fresh(['images']), null, 1, false);
+
+        $this->assertFalse($check['is_eligible']);
+        $this->assertTrue(collect($check['reasons'])->contains(
+            fn (string $reason): bool => str_contains($reason, 'no catalogue image')
+        ));
+
+        $stock = app(CataloguePresentation::class)->stock($product->fresh(['images']));
+        $this->assertSame('OUT_OF_STOCK', $stock['code']);
     }
 }

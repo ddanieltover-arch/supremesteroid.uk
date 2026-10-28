@@ -54,7 +54,7 @@ export function ProductGallery({ images, variantId }: { images: GalleryImage[]; 
   return (
     <div>
       <div
-        className="relative aspect-square overflow-hidden rounded-2xl border border-slate-800 bg-slate-950"
+        className="relative aspect-square overflow-hidden rounded-2xl border border-slate-200 bg-white"
         tabIndex={0}
         role="region"
         aria-label="Product images"
@@ -109,7 +109,7 @@ export function ProductGallery({ images, variantId }: { images: GalleryImage[]; 
                 setFailed(false);
                 setActive(index);
               }}
-              className={`h-16 w-16 overflow-hidden rounded-lg border ${index === active ? 'border-amber-400' : 'border-slate-800'}`}
+              className={`h-16 w-16 overflow-hidden rounded-lg border ${index === active ? 'border-blue-500' : 'border-slate-200'}`}
             >
               <img src={image.thumbnail_url || image.url} alt="" className="h-full w-full object-contain" loading="lazy" />
             </button>

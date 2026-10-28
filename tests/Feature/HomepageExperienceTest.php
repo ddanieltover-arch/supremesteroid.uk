@@ -8,6 +8,7 @@ use App\Enums\ProductStatus;
 use App\Enums\ReviewStatus;
 use App\Models\HomepageFaq;
 use App\Models\NewsletterSubscriber;
+use App\Models\ProductImage;
 use App\Models\Review;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -21,7 +22,7 @@ class HomepageExperienceTest extends TestCase
 
     public function test_homepage_renders_without_authentication_and_exposes_contract(): void
     {
-        $featured = $this->makeProduct(['name' => 'Homepage Featured', 'is_featured' => true]);
+        $featured = $this->makeHomepageProduct(['name' => 'Homepage Featured', 'is_featured' => true]);
 
         $this->get('/')
             ->assertOk()
@@ -52,7 +53,7 @@ class HomepageExperienceTest extends TestCase
 
     public function test_homepage_includes_sale_products_with_server_prices(): void
     {
-        $this->makeProduct([
+        $this->makeHomepageProduct([
             'name' => 'Offer Capsules',
             'price_amount' => 40.00,
             'compare_at_price_amount' => 55.00,
@@ -84,9 +85,57 @@ class HomepageExperienceTest extends TestCase
             );
     }
 
+    public function test_category_cards_use_a_product_image_when_category_has_none(): void
+    {
+        $product = $this->makeProduct(['name' => 'Category Thumbnail Product']);
+        ProductImage::query()->create([
+            'product_id' => $product->id,
+            'url' => '/storage/product_images/'.$product->id.'/primary.jpg',
+            'alt_text' => $product->name,
+            'display_order' => 0,
+            'is_primary' => true,
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where(
+                    'homepage.categories',
+                    fn ($categories) => collect($categories)->contains(
+                        fn ($category) => ($category['id'] ?? null) === $product->category_id
+                            && ($category['image_url'] ?? null) === '/storage/product_images/'.$product->id.'/primary.jpg'
+                    )
+                )
+            );
+    }
+
+    public function test_category_cards_fall_back_to_cdn_product_image_when_no_local_image_exists(): void
+    {
+        $product = $this->makeProduct(['name' => 'Cdn Category Thumbnail']);
+        ProductImage::query()->create([
+            'product_id' => $product->id,
+            'url' => 'https://supremestd.b-cdn.net/files/Proper Labs Bulking Stack - Classic-1.png',
+            'alt_text' => $product->name,
+            'display_order' => 0,
+            'is_primary' => true,
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where(
+                    'homepage.categories',
+                    fn ($categories) => collect($categories)->contains(
+                        fn ($category) => ($category['id'] ?? null) === $product->category_id
+                            && ($category['image_url'] ?? null) === 'https://supremestd.b-cdn.net/files/Proper%20Labs%20Bulking%20Stack%20-%20Classic-1.png'
+                    )
+                )
+            );
+    }
+
     public function test_new_arrivals_use_published_eligible_products(): void
     {
-        $this->makeProduct([
+        $this->makeHomepageProduct([
             'name' => 'Just Published',
             'published_at' => now()->subDay(),
         ]);
@@ -164,6 +213,41 @@ class HomepageExperienceTest extends TestCase
             );
     }
 
+    public function test_products_without_a_usable_image_are_hidden_on_the_homepage(): void
+    {
+        $this->makeProduct([
+            'name' => 'No Image Featured',
+            'is_featured' => true,
+            'sku' => 'NO-IMG-HOME',
+            'slug' => 'no-image-featured',
+        ]);
+
+        $broken = $this->makeHomepageProduct([
+            'name' => 'Broken Cdn Featured',
+            'is_featured' => true,
+            'sku' => 'CDN-HOME',
+            'slug' => 'broken-cdn-featured',
+        ]);
+        ProductImage::query()->where('product_id', $broken->id)->update([
+            'url' => 'https://supremestd.b-cdn.net/wp-content/uploads/missing.jpeg',
+        ]);
+
+        $visible = $this->makeHomepageProduct([
+            'name' => 'Visible Featured',
+            'is_featured' => true,
+            'sku' => 'VIS-HOME',
+            'slug' => 'visible-featured',
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('homepage.featuredProducts', 1)
+                ->where('homepage.featuredProducts.0.sku', $visible->sku)
+                ->where('homepage.hero.products.0.sku', $visible->sku)
+            );
+    }
+
     public function test_draft_products_do_not_appear_on_the_homepage(): void
     {
         $this->makeProduct([
@@ -199,5 +283,23 @@ class HomepageExperienceTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page
                 ->where('homepage.reviews', [])
             );
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    protected function makeHomepageProduct(array $attributes = []): \App\Models\Product
+    {
+        $product = $this->makeProduct($attributes);
+
+        ProductImage::query()->create([
+            'product_id' => $product->id,
+            'url' => '/storage/product_images/'.$product->id.'/primary.jpg',
+            'alt_text' => $product->name,
+            'display_order' => 0,
+            'is_primary' => true,
+        ]);
+
+        return $product->fresh(['images']);
     }
 }

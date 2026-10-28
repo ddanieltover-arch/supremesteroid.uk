@@ -34,14 +34,14 @@ export default function Addresses({ addresses }: { addresses: Address[] }) {
   return (
     <AccountLayout title="Addresses" seo={{ title: 'Addresses', description: 'Delivery addresses.', robots: 'noindex,nofollow' }}>
       <div className="space-y-3">
-        {addresses.length === 0 ? <p className="text-sm text-slate-400">No saved addresses yet.</p> : null}
+        {addresses.length === 0 ? <p className="text-sm text-slate-500">No saved addresses yet.</p> : null}
         {addresses.map((address) => (
-          <article key={address.id} className="rounded-xl border border-slate-800 p-4 text-sm text-slate-400">
-            <p className="text-white">{address.full_name}</p>
+          <article key={address.id} className="rounded-xl border border-slate-200 p-4 text-sm text-slate-500">
+            <p className="text-slate-900">{address.full_name}</p>
             <p>
               {address.address_line_1}, {address.city} {address.postal_code}, {address.country_code}
             </p>
-            {address.is_default ? <p className="mt-1 text-xs text-amber-300">Default</p> : null}
+            {address.is_default ? <p className="mt-1 text-xs text-blue-600">Default</p> : null}
             <div className="mt-2 flex gap-2">
               <Button
                 size="sm"
@@ -83,7 +83,7 @@ export default function Addresses({ addresses }: { addresses: Address[] }) {
           }
         }}
       >
-        <h2 className="text-lg text-white">{editingId ? 'Edit address' : 'Add address'}</h2>
+        <h2 className="text-lg text-slate-900">{editingId ? 'Edit address' : 'Add address'}</h2>
         <Input label="Name" value={form.data.full_name} error={form.errors.full_name} onChange={(event) => form.setData('full_name', event.target.value)} required />
         <Input label="Address line 1" value={form.data.address_line_1} error={form.errors.address_line_1} onChange={(event) => form.setData('address_line_1', event.target.value)} required />
         <Input label="City" value={form.data.city} error={form.errors.city} onChange={(event) => form.setData('city', event.target.value)} required />

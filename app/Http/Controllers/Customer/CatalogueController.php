@@ -452,6 +452,9 @@ class CatalogueController extends Controller
             }
         }
 
+        // Always keep out-of-stock / unavailable cards after in-stock ones.
+        $query->orderAvailableFirst();
+
         match ($sort) {
             'price_asc' => $query->orderBy('price_amount'),
             'price_desc' => $query->orderByDesc('price_amount'),
@@ -471,7 +474,8 @@ class CatalogueController extends Controller
         $visibleCategoryIds = (clone $facetQuery)->distinct()->pluck('category_id')->filter();
         $visibleBrandIds = (clone $facetQuery)->distinct()->pluck('brand_id')->filter();
 
-        $products = $query->paginate(12)->withQueryString()
+        $perPage = (int) config('store.catalogue.products_per_page', 30);
+        $products = $query->paginate($perPage)->withQueryString()
             ->through(fn (Product $product) => (new ProductCardResource($product))->resolve());
 
         $allCategories = collect(Cache::remember('catalogue.categories.visible.v2', 300, fn () => Category::query()
@@ -505,7 +509,9 @@ class CatalogueController extends Controller
 
         $description = is_object($context) && isset($context->description) && $context->description
             ? (string) $context->description
-            : 'Lawful sports nutrition, wellness, and certified research formulations.';
+            : ($listingKind === 'shop'
+                ? 'Shop premium steroids, SARMs, peptides, and PCT products at Supreme Steroids. High-quality brands, discreet UK shipping, and trusted service you can rely on.'
+                : 'Lawful sports nutrition, wellness, and certified research formulations.');
 
         $relatedSearches = [];
         if ($products->total() === 0 && is_string($search) && $search !== '') {
@@ -573,7 +579,9 @@ class CatalogueController extends Controller
             ],
             'seo' => $this->seoService->forPage(
                 $request,
-                $heading.' | '.config('store.name', 'Supreme Steroids'),
+                $listingKind === 'shop'
+                    ? 'Shop Premium Steroids, SARMs & PCT – '.config('store.name', 'Supreme Steroids')
+                    : $heading.' | '.config('store.name', 'Supreme Steroids'),
                 (string) $description,
                 [
                     'canonical' => $canonical,

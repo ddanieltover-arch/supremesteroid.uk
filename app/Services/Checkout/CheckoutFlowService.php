@@ -224,7 +224,12 @@ class CheckoutFlowService
                 'currency' => $totals['currency'] ?? $cartData['totals']['currency'] ?? 'GBP',
             ],
             'addresses' => $addresses,
-            'paymentMethods' => $this->configuredPaymentMethods(),
+            'paymentMethods' => $this->configuredPaymentMethods(
+                (string) ($totals['grand_total_amount'] ?? $snapshot['grand_total'] ?? $cartData['totals']['grand_total_amount'] ?? '0.00')
+            ),
+            'payment_method_notice' => $this->paymentMethodNotice(
+                (string) ($totals['grand_total_amount'] ?? $snapshot['grand_total'] ?? $cartData['totals']['grand_total_amount'] ?? '0.00')
+            ),
             'paymentInstructions' => $this->customerPaymentInstructions(),
             'countries' => $this->countryOptions(),
             'checkout_step' => $step,
@@ -329,6 +334,14 @@ class CheckoutFlowService
         }
 
         $method = PaymentMethodType::from($validated['payment_method'])->value;
+        $grandTotal = $this->resolveCheckoutGrandTotal($session->snapshot ?? []);
+        $allowed = $this->allowedPaymentMethodCodes($grandTotal);
+        if (! in_array($method, $allowed, true)) {
+            throw new InvalidCheckoutException(
+                'Payment method not available for this order total.',
+                $this->paymentMethodNotice($grandTotal) ?? 'Please choose an available payment method.'
+            );
+        }
 
         $snapshot = $this->checkoutSessionService->refreshOpenSnapshot($session, $this->requireActor($request), [
             'payment_method' => $method,
@@ -413,11 +426,11 @@ class CheckoutFlowService
     /**
      * @return list<array{code: string, name: string, description: string}>
      */
-    public function configuredPaymentMethods(): array
+    public function configuredPaymentMethods(?string $grandTotal = null): array
     {
         $configured = config('payments.methods', []);
 
-        return array_values(array_filter(array_map(function (array $method): ?array {
+        $methods = array_values(array_filter(array_map(function (array $method): ?array {
             try {
                 $type = PaymentMethodType::from((string) $method['code']);
             } catch (\ValueError) {
@@ -430,6 +443,59 @@ class CheckoutFlowService
                 'description' => $method['description'] ?? '',
             ];
         }, $configured)));
+
+        if ($grandTotal === null) {
+            return $methods;
+        }
+
+        $threshold = (float) config('payments.bank_transfer_minimum_total', 100);
+        if ((float) $grandTotal >= $threshold) {
+            return $methods;
+        }
+
+        return array_values(array_filter(
+            $methods,
+            static fn (array $method): bool => $method['code'] === PaymentMethodType::CRYPTOCURRENCY->value
+        ));
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function allowedPaymentMethodCodes(?string $grandTotal = null): array
+    {
+        return array_values(array_map(
+            static fn (array $method): string => $method['code'],
+            $this->configuredPaymentMethods($grandTotal)
+        ));
+    }
+
+    public function resolveCheckoutGrandTotal(?array $snapshot = null, ?array $cartData = null): string
+    {
+        $totals = $snapshot['totals'] ?? $snapshot['prices'] ?? [];
+
+        return (string) ($totals['grand_total_amount']
+            ?? $snapshot['grand_total']
+            ?? $cartData['totals']['grand_total_amount']
+            ?? '0.00');
+    }
+
+    public function paymentMethodNotice(?string $grandTotal = null): ?string
+    {
+        if ($grandTotal === null) {
+            return null;
+        }
+
+        $threshold = (float) config('payments.bank_transfer_minimum_total', 100);
+        if ((float) $grandTotal >= $threshold) {
+            return null;
+        }
+
+        return sprintf(
+            'Orders under £%s can be paid by cryptocurrency only. Bank transfer is available for orders of £%s or more.',
+            number_format($threshold, 0),
+            number_format($threshold, 0)
+        );
     }
 
     /**

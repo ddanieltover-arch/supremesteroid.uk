@@ -30,6 +30,10 @@ function compactFilters(filters: FilterState): FilterQuery {
   return next;
 }
 
+function FilterLegend({ children }: { children: string }) {
+  return <legend className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500">{children}</legend>;
+}
+
 export function CatalogueFilters({
   listingPath,
   filters,
@@ -63,7 +67,7 @@ export function CatalogueFilters({
 
   return (
     <form
-      className="space-y-6"
+      className="space-y-7"
       onSubmit={(event) => {
         event.preventDefault();
         const form = new FormData(event.currentTarget);
@@ -75,85 +79,99 @@ export function CatalogueFilters({
     >
       {!hideCategory && categories.length > 0 ? (
         <fieldset>
-          <legend className="text-xs font-semibold uppercase tracking-wider text-slate-400">Category</legend>
-          <ul className="mt-2 space-y-1">
-            {categories.map((item) => (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  className={`min-h-10 w-full rounded-lg px-3 text-left text-sm ${filters.category === item.slug ? 'bg-amber-400/10 text-amber-300' : 'text-slate-300 hover:bg-slate-900'}`}
-                  onClick={() => apply({ category: filters.category === item.slug ? null : item.slug })}
-                  aria-pressed={filters.category === item.slug}
-                >
-                  {item.name}
-                </button>
-              </li>
-            ))}
+          <FilterLegend>Category</FilterLegend>
+          <ul className="mt-3 max-h-64 space-y-0.5 overflow-y-auto pr-1 [scrollbar-width:thin]">
+            {categories.map((item) => {
+              const active = filters.category === item.slug;
+              return (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    className={`flex min-h-10 w-full items-center rounded-lg px-3 text-left text-sm transition ${
+                      active ? 'bg-blue-600 font-semibold text-white' : 'text-slate-700 hover:bg-slate-50'
+                    }`}
+                    onClick={() => apply({ category: active ? null : item.slug })}
+                    aria-pressed={active}
+                  >
+                    {item.name}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </fieldset>
       ) : null}
 
       {!hideBrand && brands.length > 0 ? (
         <fieldset>
-          <legend className="text-xs font-semibold uppercase tracking-wider text-slate-400">Brand</legend>
-          <ul className="mt-2 space-y-1">
-            {brands.map((item) => (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  className={`min-h-10 w-full rounded-lg px-3 text-left text-sm ${filters.brand === item.slug ? 'bg-amber-400/10 text-amber-300' : 'text-slate-300 hover:bg-slate-900'}`}
-                  onClick={() => apply({ brand: filters.brand === item.slug ? null : item.slug })}
-                  aria-pressed={filters.brand === item.slug}
-                >
-                  {item.name}
-                </button>
-              </li>
-            ))}
+          <FilterLegend>Brand</FilterLegend>
+          <ul className="mt-3 max-h-48 space-y-0.5 overflow-y-auto pr-1 [scrollbar-width:thin]">
+            {brands.map((item) => {
+              const active = filters.brand === item.slug;
+              return (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    className={`flex min-h-10 w-full items-center rounded-lg px-3 text-left text-sm transition ${
+                      active ? 'bg-blue-600 font-semibold text-white' : 'text-slate-700 hover:bg-slate-50'
+                    }`}
+                    onClick={() => apply({ brand: active ? null : item.slug })}
+                    aria-pressed={active}
+                  >
+                    {item.name}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </fieldset>
       ) : null}
 
       <fieldset>
-        <legend className="text-xs font-semibold uppercase tracking-wider text-slate-400">Price</legend>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          <label className="text-xs text-slate-400">
+        <FilterLegend>Price</FilterLegend>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <label className="text-xs font-medium text-slate-500">
             Min
-            <input name="min_price" type="number" min={0} step="0.01" defaultValue={filters.min_price ?? ''} className="field mt-1" />
+            <input name="min_price" type="number" min={0} step="0.01" defaultValue={filters.min_price ?? ''} className="field mt-1.5" />
           </label>
-          <label className="text-xs text-slate-400">
+          <label className="text-xs font-medium text-slate-500">
             Max
-            <input name="max_price" type="number" min={0} step="0.01" defaultValue={filters.max_price ?? ''} className="field mt-1" />
+            <input name="max_price" type="number" min={0} step="0.01" defaultValue={filters.max_price ?? ''} className="field mt-1.5" />
           </label>
         </div>
-        <Button type="submit" variant="secondary" size="sm" className="mt-2 w-full">
+        <Button type="submit" variant="secondary" size="sm" className="mt-3 w-full">
           Apply price
         </Button>
       </fieldset>
 
       <fieldset>
-        <legend className="text-xs font-semibold uppercase tracking-wider text-slate-400">Availability</legend>
+        <FilterLegend>Availability</FilterLegend>
         <button
           type="button"
-          className={`mt-2 min-h-10 w-full rounded-lg px-3 text-left text-sm ${filters.availability === 'in_stock' ? 'bg-emerald-500/10 text-emerald-300' : 'text-slate-300 hover:bg-slate-900'}`}
+          className={`mt-3 flex min-h-10 w-full items-center rounded-lg px-3 text-left text-sm transition ${
+            filters.availability === 'in_stock' ? 'bg-emerald-600 font-semibold text-white' : 'text-slate-700 hover:bg-slate-50'
+          }`}
           onClick={() => apply({ availability: filters.availability === 'in_stock' ? null : 'in_stock' })}
           aria-pressed={filters.availability === 'in_stock'}
         >
-          In stock
+          In stock only
         </button>
       </fieldset>
 
       {attributes.map((attribute) =>
         attribute.values.length > 0 ? (
           <fieldset key={attribute.name}>
-            <legend className="text-xs font-semibold uppercase tracking-wider text-slate-400">{attribute.name.replaceAll('_', ' ')}</legend>
-            <ul className="mt-2 space-y-1">
+            <FilterLegend>{attribute.name.replaceAll('_', ' ')}</FilterLegend>
+            <ul className="mt-3 space-y-0.5">
               {attribute.values.map((value) => {
                 const selected = filters.attributes?.[attribute.name] === value;
                 return (
                   <li key={value}>
                     <button
                       type="button"
-                      className={`min-h-10 w-full rounded-lg px-3 text-left text-sm ${selected ? 'bg-amber-400/10 text-amber-300' : 'text-slate-300 hover:bg-slate-900'}`}
+                      className={`flex min-h-10 w-full items-center rounded-lg px-3 text-left text-sm transition ${
+                        selected ? 'bg-blue-600 font-semibold text-white' : 'text-slate-700 hover:bg-slate-50'
+                      }`}
                       onClick={() => {
                         const nextAttributes = { ...(filters.attributes ?? {}) };
                         if (selected) {

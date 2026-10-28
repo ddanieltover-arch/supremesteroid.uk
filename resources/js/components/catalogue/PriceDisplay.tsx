@@ -10,9 +10,9 @@ export function PriceDisplay({ pricing, size = 'md' }: { pricing?: MoneyPricing 
 
   return (
     <div>
-      <p className={`${priceClass} font-bold text-slate-100`}>{formatMoney(pricing.effective_price, pricing.currency)}</p>
+      <p className={`${priceClass} font-bold text-blue-600`}>{formatMoney(pricing.effective_price, pricing.currency)}</p>
       {pricing.is_on_sale ? <p className="text-sm text-slate-500 line-through">{formatMoney(pricing.base_price, pricing.currency)}</p> : null}
-      {pricing.discount_percent ? <p className="text-xs font-semibold text-amber-400">-{pricing.discount_percent}%</p> : null}
+      {pricing.discount_percent ? <p className="text-xs font-semibold text-blue-600">-{pricing.discount_percent}%</p> : null}
     </div>
   );
 }

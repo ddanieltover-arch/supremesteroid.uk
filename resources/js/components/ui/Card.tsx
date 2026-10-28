@@ -8,7 +8,7 @@ export function Card({
 }: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
   return (
     <div
-      className={clsx('rounded-xl border border-slate-800/80 bg-slate-900/70 p-5 text-slate-100 md:p-6', className)}
+      className={clsx('rounded-xl border border-slate-200 bg-slate-50/70 p-5 text-slate-900 md:p-6', className)}
       {...props}
     >
       {children}

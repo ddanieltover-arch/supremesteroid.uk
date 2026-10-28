@@ -108,6 +108,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 });
 
-Route::get('/{slug}', ContentPageController::class)
-    ->whereIn('slug', ['about', 'contact', 'shipping', 'returns', 'privacy', 'cookies', 'terms', 'faq'])
-    ->name('content.show');
+use App\Http\Controllers\Customer\BlogController;
+
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+Route::get('/{slug}', function (\Illuminate\Http\Request $request, string $slug) {
+    // If it's a blog post accessed at root URL (as per reference site structure), redirect/forward to /blog/{slug}
+    if (\App\Models\BlogPost::where('slug', $slug)->where('is_published', true)->exists()) {
+        return redirect()->route('blog.show', ['slug' => $slug]);
+    }
+
+    return app(\App\Http\Controllers\Customer\ContentPageController::class)($request, $slug, app(\App\Services\Catalogue\SeoService::class));
+})->where('slug', '[a-zA-Z0-9\-_]+')->name('content.show');
+

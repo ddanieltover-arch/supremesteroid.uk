@@ -60,10 +60,13 @@ export function BackToTop() {
       onClick={scrollToTop}
       aria-label="Back to top"
       className={clsx(
-        'fixed z-40 flex h-12 w-12 items-center justify-center rounded-full bg-amber-400 text-slate-950 shadow-lg shadow-amber-500/25 transition duration-200',
-        'right-[max(1rem,env(safe-area-inset-right))] hover:bg-amber-300',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
-        compareOpen ? 'bottom-24' : 'bottom-[max(1.25rem,env(safe-area-inset-bottom))]',
+        'fixed z-40 flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-500/25 transition duration-200',
+        'right-[max(1rem,env(safe-area-inset-right))] hover:bg-blue-500',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+        // Sit above the mobile bottom nav (and compare bar when open); desktop stays near the corner.
+        compareOpen
+          ? 'bottom-[calc(6.5rem+env(safe-area-inset-bottom))] lg:bottom-24'
+          : 'bottom-[calc(4.5rem+env(safe-area-inset-bottom))] lg:bottom-[max(1.25rem,env(safe-area-inset-bottom))]',
       )}
     >
       <ArrowUp className="h-5 w-5" aria-hidden="true" />

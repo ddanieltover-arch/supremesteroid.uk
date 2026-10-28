@@ -7,12 +7,12 @@ import { Input } from '@/components/ui/Input';
 export default function DesignSystem() {
   return (
     <StorefrontLayout seo={{ title: 'Design system', description: 'Supreme Steroids design primitives.', robots: 'noindex,follow' }}>
-      <h1 className="text-3xl font-semibold text-white">Design system</h1>
-      <p className="mt-3 max-w-2xl text-slate-400">
-        Dark luxury language used by the Laravel/Inertia storefront. Background #020617, accent #f59e0b, emerald for verified status.
+      <h1 className="text-3xl font-semibold text-slate-900">Design system</h1>
+      <p className="mt-3 max-w-2xl text-slate-500">
+        Light clinical storefront language. Background #f9f9f9, accent #1e6fd9, emerald for verified / lab-tested status.
       </p>
       <div className="mt-8 flex flex-wrap gap-3">
-        <Button variant="gold">Gold</Button>
+        <Button variant="gold">Brand</Button>
         <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="danger">Danger</Button>

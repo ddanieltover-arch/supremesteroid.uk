@@ -41,7 +41,7 @@ export function AccountMenu({
         <button
           ref={buttonRef}
           type="button"
-          className="rounded-lg border border-slate-800 p-2 text-slate-200 hover:text-amber-300 focus-visible:ring-2 focus-visible:ring-amber-400"
+          className="rounded-lg border border-slate-200 p-2 text-slate-800 hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-blue-600"
           aria-label="Account"
           aria-expanded={open}
           aria-haspopup="true"
@@ -51,11 +51,11 @@ export function AccountMenu({
           <UserRound className="h-5 w-5" />
         </button>
         {open ? (
-          <div id={menuId} role="menu" className="absolute right-0 z-50 mt-2 w-48 rounded-xl border border-slate-800 bg-[#020617] p-2 shadow-2xl">
-            <Link href="/login" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-200 hover:bg-slate-900" onClick={() => setOpen(false)}>
+          <div id={menuId} role="menu" className="absolute right-0 z-50 mt-2 w-48 rounded-xl border border-slate-200 bg-white p-2 shadow-2xl">
+            <Link href="/login" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-800 hover:bg-slate-50" onClick={() => setOpen(false)}>
               Sign in
             </Link>
-            <Link href="/register" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-200 hover:bg-slate-900" onClick={() => setOpen(false)}>
+            <Link href="/register" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-800 hover:bg-slate-50" onClick={() => setOpen(false)}>
               Create account
             </Link>
           </div>
@@ -69,7 +69,7 @@ export function AccountMenu({
       <button
         ref={buttonRef}
         type="button"
-        className="rounded-lg border border-slate-800 p-2 text-slate-200 hover:text-amber-300 focus-visible:ring-2 focus-visible:ring-amber-400"
+        className="rounded-lg border border-slate-200 p-2 text-slate-800 hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-blue-600"
         aria-label="Account menu"
         aria-expanded={open}
         aria-haspopup="true"
@@ -79,27 +79,27 @@ export function AccountMenu({
         <UserRound className="h-5 w-5" />
       </button>
       {open ? (
-        <div id={menuId} role="menu" className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-slate-800 bg-[#020617] p-2 shadow-2xl">
+        <div id={menuId} role="menu" className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-2xl">
           <p className="px-3 py-2 text-xs text-slate-500">{user.name}</p>
-          <Link href="/account" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-200 hover:bg-slate-900" onClick={() => setOpen(false)}>
+          <Link href="/account" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-800 hover:bg-slate-50" onClick={() => setOpen(false)}>
             My Account
           </Link>
-          <Link href="/account/orders" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-200 hover:bg-slate-900" onClick={() => setOpen(false)}>
+          <Link href="/account/orders" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-800 hover:bg-slate-50" onClick={() => setOpen(false)}>
             Orders
           </Link>
-          <Link href="/account/wishlist" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-200 hover:bg-slate-900" onClick={() => setOpen(false)}>
+          <Link href="/account/wishlist" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-800 hover:bg-slate-50" onClick={() => setOpen(false)}>
             Wishlist
           </Link>
-          <Link href="/account/addresses" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-200 hover:bg-slate-900" onClick={() => setOpen(false)}>
+          <Link href="/account/addresses" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-800 hover:bg-slate-50" onClick={() => setOpen(false)}>
             Addresses
           </Link>
-          <Link href="/account#profile" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-200 hover:bg-slate-900" onClick={() => setOpen(false)}>
+          <Link href="/account#profile" role="menuitem" className="block rounded-lg px-3 py-2 text-sm text-slate-800 hover:bg-slate-50" onClick={() => setOpen(false)}>
             Profile
           </Link>
           <button
             type="button"
             role="menuitem"
-            className="block w-full rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-900"
+            className="block w-full rounded-lg px-3 py-2 text-left text-sm text-slate-800 hover:bg-slate-50"
             onClick={() => {
               setOpen(false);
               router.post('/logout');

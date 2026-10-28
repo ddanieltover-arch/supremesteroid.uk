@@ -14,10 +14,10 @@ export function Alert({
   className?: string;
 }) {
   const icons = {
-    info: <Info className="mt-0.5 h-5 w-5 shrink-0 text-sky-400" aria-hidden="true" />,
-    warning: <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" aria-hidden="true" />,
-    error: <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-400" aria-hidden="true" />,
-    success: <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" aria-hidden="true" />,
+    info: <Info className="mt-0.5 h-5 w-5 shrink-0 text-sky-600" aria-hidden="true" />,
+    warning: <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" aria-hidden="true" />,
+    error: <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" aria-hidden="true" />,
+    success: <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" aria-hidden="true" />,
   };
 
   return (
@@ -25,10 +25,10 @@ export function Alert({
       className={clsx(
         'flex items-start gap-3 rounded-xl border p-4 text-sm',
         {
-          'border-sky-800/60 bg-sky-950/40 text-sky-200': type === 'info',
-          'border-amber-800/60 bg-amber-950/40 text-amber-200': type === 'warning',
-          'border-rose-800/60 bg-rose-950/40 text-rose-200': type === 'error',
-          'border-emerald-800/60 bg-emerald-950/40 text-emerald-200': type === 'success',
+          'border-sky-200 bg-sky-50 text-sky-900': type === 'info',
+          'border-amber-300 bg-amber-50 text-amber-900': type === 'warning',
+          'border-rose-200 bg-rose-50 text-rose-800': type === 'error',
+          'border-emerald-200 bg-emerald-50 text-emerald-900': type === 'success',
         },
         className,
       )}
@@ -36,7 +36,7 @@ export function Alert({
     >
       {icons[type]}
       <div>
-        {title ? <h4 className="mb-1 font-semibold text-slate-100">{title}</h4> : null}
+        {title ? <h4 className="mb-1 font-semibold text-slate-900">{title}</h4> : null}
         <div>{children}</div>
       </div>
     </div>

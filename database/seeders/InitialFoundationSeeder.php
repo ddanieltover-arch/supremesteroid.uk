@@ -4,29 +4,23 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Enums\ProductClassification;
-use App\Enums\ProductStatus;
 use App\Enums\ShippingZoneType;
 use App\Enums\UserRole;
 use App\Models\Brand;
 use App\Models\Category;
-use App\Models\Inventory;
-use App\Models\Product;
-use App\Models\ProductImage;
 use App\Models\ShippingMethod;
 use App\Models\ShippingRule;
 use App\Models\ShippingZone;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class InitialFoundationSeeder extends Seeder
 {
     public function run(): void
     {
         // 1. Core Administrative & Customer Accounts
-        $superAdmin = User::updateOrCreate(
+        User::updateOrCreate(
             ['email' => 'admin@supremesteroid.uk'],
             [
                 'name' => 'Supreme Super Admin',
@@ -50,7 +44,7 @@ class InitialFoundationSeeder extends Seeder
             ]
         );
 
-        $demoCustomer = User::updateOrCreate(
+        User::updateOrCreate(
             ['email' => 'customer@supremesteroid.uk'],
             [
                 'name' => 'Verified Retail Customer',
@@ -169,8 +163,8 @@ class InitialFoundationSeeder extends Seeder
             ]
         );
 
-        // 3. Brands & Categories
-        $brandSupreme = Brand::updateOrCreate(
+        // 3. Brands & Categories (taxonomy only; no seed products)
+        Brand::updateOrCreate(
             ['slug' => 'supreme-formulations'],
             [
                 'name' => 'Supreme Formulations',
@@ -181,7 +175,7 @@ class InitialFoundationSeeder extends Seeder
             ]
         );
 
-        $brandApex = Brand::updateOrCreate(
+        Brand::updateOrCreate(
             ['slug' => 'apex-laboratory'],
             [
                 'name' => 'Apex Analytical Laboratories',
@@ -192,7 +186,7 @@ class InitialFoundationSeeder extends Seeder
             ]
         );
 
-        $catWellness = Category::updateOrCreate(
+        Category::updateOrCreate(
             ['slug' => 'vitality-hormonal-support'],
             [
                 'name' => 'Vitality & Hormonal Support',
@@ -202,7 +196,7 @@ class InitialFoundationSeeder extends Seeder
             ]
         );
 
-        $catResearch = Category::updateOrCreate(
+        Category::updateOrCreate(
             ['slug' => 'certified-research-compounds'],
             [
                 'name' => 'Certified Research Reagents',
@@ -212,7 +206,7 @@ class InitialFoundationSeeder extends Seeder
             ]
         );
 
-        $catRecovery = Category::updateOrCreate(
+        Category::updateOrCreate(
             ['slug' => 'recovery-joint-protection'],
             [
                 'name' => 'Joint Protection & Recovery',
@@ -221,117 +215,5 @@ class InitialFoundationSeeder extends Seeder
                 'is_visible' => true,
             ]
         );
-
-        // 4. Initial Compliance-Approved Products
-        $products = [
-            [
-                'sku' => 'SUP-TEST-BOOST-01',
-                'name' => 'Supreme TestoMax Matrix (OTC)',
-                'slug' => 'supreme-testomax-matrix',
-                'status' => ProductStatus::ACTIVE,
-                'classification' => ProductClassification::OTC_CONSUMER,
-                'price_amount' => 54.99,
-                'compare_at_price_amount' => 69.99,
-                'currency' => 'GBP',
-                'short_description' => 'Premium natural testosterone enhancement formulation with Tongkat Ali, Fadogia Agrestis, and Zinc Bisglycinate.',
-                'description' => 'Engineered for athletes seeking optimal hormonal balance, stamina, and recovery support. Compliant natural OTC nutritional supplement.',
-                'ingredients' => 'Tongkat Ali Extract (200:1), Fadogia Agrestis, Zinc Bisglycinate, Boron Citrate, BioPerine.',
-                'safety_guidelines' => 'Store in a cool dry place. Keep out of reach of children. Consult a healthcare practitioner if taking prescription medication.',
-                'batch_number' => 'TM-2026-088',
-                'lab_verification_reference' => 'LAB-APEX-8841-PASS',
-                'compliance_verified_at' => now(),
-                'compliance_officer_id' => $superAdmin->id,
-                'brand_id' => $brandSupreme->id,
-                'category_id' => $catWellness->id,
-                'is_featured' => true,
-                'image_url' => 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=80',
-            ],
-            [
-                'sku' => 'APX-BPC157-RES-05',
-                'name' => 'Apex BPC-157 Lyophilized Peptide (5mg)',
-                'slug' => 'apex-bpc-157-5mg',
-                'status' => ProductStatus::ACTIVE,
-                'classification' => ProductClassification::RESEARCH_USE,
-                'price_amount' => 62.00,
-                'compare_at_price_amount' => 75.00,
-                'currency' => 'GBP',
-                'short_description' => 'Certified >= 99.4% purity analytical grade reagent for laboratory investigation.',
-                'description' => 'HPLC and Mass-Spectrometry verified synthetic pentadecapeptide sequence. Provided in vacuum-sealed amber glass vial.',
-                'ingredients' => 'Pure BPC-157 Acetate Salt (5mg lyophilized powder).',
-                'safety_guidelines' => 'Strictly for qualified laboratory, scientific research and educational reagent use. Not for human or veterinary ingestion.',
-                'batch_number' => 'BPC-2026-A12',
-                'lab_verification_reference' => 'LAB-SWISS-HPLC-9942',
-                'compliance_verified_at' => now(),
-                'compliance_officer_id' => $superAdmin->id,
-                'brand_id' => $brandApex->id,
-                'category_id' => $catResearch->id,
-                'is_featured' => true,
-                'image_url' => 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&auto=format&fit=crop&q=80',
-            ],
-            [
-                'sku' => 'SUP-JOINT-REP-02',
-                'name' => 'Supreme Arthrotech Joint & Ligament Complex',
-                'slug' => 'supreme-arthrotech-complex',
-                'status' => ProductStatus::ACTIVE,
-                'classification' => ProductClassification::OTC_CONSUMER,
-                'price_amount' => 42.50,
-                'compare_at_price_amount' => 52.00,
-                'currency' => 'GBP',
-                'short_description' => 'Heavy training joint lubrication, connective tissue reinforcement, and cartilage support.',
-                'description' => 'High-potency synergy of UC-II Undenatured Type II Collagen, Glucosamine Sulfate, MSM, and Curcumin C3 Complex.',
-                'ingredients' => 'Glucosamine Sulfate 2KCl, MSM (Methylsulfonylmethane), Chondroitin Sulfate, UC-II Collagen, Hyaluronic Acid.',
-                'safety_guidelines' => 'Take with meals. Contains shellfish derivative.',
-                'batch_number' => 'AR-2026-301',
-                'lab_verification_reference' => 'LAB-UK-CERT-3310',
-                'compliance_verified_at' => now(),
-                'compliance_officer_id' => $superAdmin->id,
-                'brand_id' => $brandSupreme->id,
-                'category_id' => $catRecovery->id,
-                'is_featured' => false,
-                'image_url' => 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=800&auto=format&fit=crop&q=80',
-            ],
-            [
-                'sku' => 'APX-TB500-RES-05',
-                'name' => 'Apex TB-500 Thymosin Beta-4 Reagent (10mg)',
-                'slug' => 'apex-tb-500-10mg',
-                'status' => ProductStatus::ACTIVE,
-                'classification' => ProductClassification::RESEARCH_USE,
-                'price_amount' => 84.00,
-                'compare_at_price_amount' => 98.00,
-                'currency' => 'GBP',
-                'short_description' => 'Laboratory research peptide with verified HPLC purity of >= 99.2%.',
-                'description' => 'Precision synthetic 43-amino acid peptide fragment for biochemical assay and structural analysis.',
-                'ingredients' => 'Thymosin Beta-4 acetate 10mg lyophilized cake.',
-                'safety_guidelines' => 'For analytical and laboratory in-vitro evaluation only. Refrigerate at 2-8C.',
-                'batch_number' => 'TB-2026-X88',
-                'lab_verification_reference' => 'LAB-SWISS-HPLC-9980',
-                'compliance_verified_at' => now(),
-                'compliance_officer_id' => $superAdmin->id,
-                'brand_id' => $brandApex->id,
-                'category_id' => $catResearch->id,
-                'is_featured' => true,
-                'image_url' => 'https://images.unsplash.com/photo-1579165466741-7f35e4755660?w=800&auto=format&fit=crop&q=80',
-            ],
-        ];
-
-        foreach ($products as $prodData) {
-            $imageUrl = $prodData['image_url'];
-            unset($prodData['image_url']);
-
-            $product = Product::updateOrCreate(
-                ['sku' => $prodData['sku']],
-                $prodData
-            );
-
-            ProductImage::updateOrCreate(
-                ['product_id' => $product->id, 'url' => $imageUrl],
-                ['alt_text' => $product->name, 'display_order' => 1, 'is_primary' => true]
-            );
-
-            Inventory::updateOrCreate(
-                ['product_id' => $product->id],
-                ['quantity_on_hand' => 150, 'quantity_reserved' => 0, 'safety_stock_threshold' => 10]
-            );
-        }
     }
 }

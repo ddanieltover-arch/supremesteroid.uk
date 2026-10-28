@@ -706,7 +706,7 @@ class MapReferenceFetcher implements ReferencePageFetcher
     /**
      * @param  array<string, string>  $map
      */
-    public function __construct(protected array $map) {}
+    public function __construct(public array $map) {}
 
     public function get(string $url): string
     {

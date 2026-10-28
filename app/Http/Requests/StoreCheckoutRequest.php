@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Enums\PaymentMethodType;
+use App\Models\CheckoutSession;
 use App\Services\Cart\CartService;
+use App\Services\Checkout\CheckoutFlowService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -59,7 +61,7 @@ class StoreCheckoutRequest extends FormRequest
             'shipping_destination.city' => ['required_without:checkout_token', 'string', 'max:100'],
             'shipping_destination.state_county' => ['nullable', 'string', 'max:100'],
             'shipping_destination.postal_code' => ['required_without:checkout_token', 'string', 'max:20'],
-            'shipping_destination.phone' => ['nullable', 'string', 'max:30'],
+            'shipping_destination.phone' => ['required_without:checkout_token', 'string', 'max:30'],
             'shipping_method_code' => ['nullable', 'string', 'max:50'],
             'payment_method' => ['required', 'string', Rule::in($this->allowedPaymentMethods())],
             'idempotency_key' => ['nullable', 'string', 'max:100'],
@@ -72,14 +74,19 @@ class StoreCheckoutRequest extends FormRequest
      */
     protected function allowedPaymentMethods(): array
     {
-        $allowed = array_values(array_filter(array_map(
-            static fn (array $method) => $method['code'] ?? null,
-            config('payments.methods', [])
-        )));
+        $flow = app(CheckoutFlowService::class);
+        $snapshot = null;
+        $token = $this->input('checkout_token') ?: $this->session()->get('checkout_token');
+
+        if (is_string($token) && $token !== '') {
+            $session = CheckoutSession::query()->where('token', $token)->first();
+            $snapshot = is_array($session?->snapshot) ? $session->snapshot : null;
+        }
+
+        $allowed = $flow->allowedPaymentMethodCodes($flow->resolveCheckoutGrandTotal($snapshot));
 
         if ($allowed === []) {
             return [
-                PaymentMethodType::BANK_TRANSFER->value,
                 PaymentMethodType::CRYPTOCURRENCY->value,
             ];
         }

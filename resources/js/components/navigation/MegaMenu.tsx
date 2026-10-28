@@ -47,7 +47,7 @@ export function MegaMenu({
       <button
         ref={buttonRef}
         type="button"
-        className="rounded-lg px-3 py-2 text-slate-300 hover:text-amber-300 focus-visible:ring-2 focus-visible:ring-amber-400"
+        className="rounded-lg px-3 py-2 text-sm font-semibold uppercase tracking-wide text-slate-800 hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-blue-600"
         aria-expanded={open}
         aria-controls={menuId}
         aria-haspopup="true"
@@ -65,7 +65,7 @@ export function MegaMenu({
         Shop
       </button>
       {open ? (
-        <div id={menuId} className="absolute left-0 top-full z-50 mt-2 w-[46rem] max-w-[min(46rem,calc(100vw-2rem))] rounded-2xl border border-slate-800 bg-[#020617] p-5 shadow-2xl" role="menu">
+        <div id={menuId} className="absolute left-0 top-full z-50 mt-2 w-[46rem] max-w-[min(46rem,calc(100vw-2rem))] rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl" role="menu">
           <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
             <div>
               <p className="text-[11px] uppercase tracking-wider text-slate-500">Categories</p>
@@ -74,11 +74,11 @@ export function MegaMenu({
                   const children = Array.isArray(category.children) ? category.children : [];
                   return (
                   <li key={category.id}>
-                    <Link href={`/category/${category.slug}`} className="block rounded px-2 py-1.5 text-slate-200 hover:text-amber-300 focus-visible:ring-2 focus-visible:ring-amber-400" role="menuitem" onClick={() => onOpenChange(false)}>
+                    <Link href={`/category/${category.slug}`} className="block rounded px-2 py-1.5 text-slate-800 hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-blue-600" role="menuitem" onClick={() => onOpenChange(false)}>
                       {category.name}
                     </Link>
                     {children.map((child) => (
-                      <Link key={child.id} href={`/category/${child.slug}`} className="ml-3 block rounded px-2 py-1 text-xs text-slate-400 hover:text-amber-300" role="menuitem" onClick={() => onOpenChange(false)}>
+                      <Link key={child.id} href={`/category/${child.slug}`} className="ml-3 block rounded px-2 py-1 text-xs text-slate-500 hover:text-blue-600" role="menuitem" onClick={() => onOpenChange(false)}>
                         {child.name}
                       </Link>
                     ))}
@@ -92,7 +92,7 @@ export function MegaMenu({
               <ul className="mt-2 space-y-1">
                 {brands.map((brand) => (
                   <li key={brand.id}>
-                    <Link href={`/brand/${brand.slug}`} className="block rounded px-2 py-1.5 text-slate-200 hover:text-amber-300 focus-visible:ring-2 focus-visible:ring-amber-400" role="menuitem" onClick={() => onOpenChange(false)}>
+                    <Link href={`/brand/${brand.slug}`} className="block rounded px-2 py-1.5 text-slate-800 hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-blue-600" role="menuitem" onClick={() => onOpenChange(false)}>
                       {brand.name}
                     </Link>
                   </li>
@@ -105,13 +105,13 @@ export function MegaMenu({
                 <ul className="mt-2 space-y-1">
                   {featured.map((item) => (
                     <li key={item.id}>
-                      <Link href={`/product/${item.slug}`} className="block rounded px-2 py-1.5 text-slate-200 hover:text-amber-300" role="menuitem" onClick={() => onOpenChange(false)}>
+                      <Link href={`/product/${item.slug}`} className="block rounded px-2 py-1.5 text-slate-800 hover:text-blue-600" role="menuitem" onClick={() => onOpenChange(false)}>
                         {item.name}
                       </Link>
                     </li>
                   ))}
                 </ul>
-                <Link href="/shop?collection=featured" className="mt-3 block text-xs text-amber-300" onClick={() => onOpenChange(false)}>
+                <Link href="/shop?collection=featured" className="mt-3 block text-xs text-blue-600" onClick={() => onOpenChange(false)}>
                   View featured
                 </Link>
               </div>
@@ -122,19 +122,19 @@ export function MegaMenu({
                 <ul className="mt-2 space-y-1">
                   {arrivals.map((item) => (
                     <li key={item.id}>
-                      <Link href={`/product/${item.slug}`} className="block rounded px-2 py-1.5 text-slate-200 hover:text-amber-300" role="menuitem" onClick={() => onOpenChange(false)}>
+                      <Link href={`/product/${item.slug}`} className="block rounded px-2 py-1.5 text-slate-800 hover:text-blue-600" role="menuitem" onClick={() => onOpenChange(false)}>
                         {item.name}
                       </Link>
                     </li>
                   ))}
                 </ul>
-                <Link href="/shop?collection=new" className="mt-3 block text-xs text-amber-300" onClick={() => onOpenChange(false)}>
+                <Link href="/shop?collection=new" className="mt-3 block text-xs text-blue-600" onClick={() => onOpenChange(false)}>
                   View new arrivals
                 </Link>
               </div>
             ) : null}
           </div>
-          <Link href="/shop" className="mt-5 inline-block text-sm text-slate-300 hover:text-white" onClick={() => onOpenChange(false)}>
+          <Link href="/shop" className="mt-5 inline-block text-sm text-slate-500 hover:text-slate-900" onClick={() => onOpenChange(false)}>
             View catalogue
           </Link>
         </div>

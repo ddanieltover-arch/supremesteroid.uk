@@ -34,9 +34,12 @@ class ProductCardResource extends JsonResource
         $eligibility = app(ProductPurchaseEligibilityService::class)
             ->checkEligibility($product, null, 1, true);
 
-        $primaryImage = $product->relationLoaded('images')
-            ? $product->images->firstWhere('is_primary', true) ?? $product->images->first()
-            : null;
+        $presentation = app(CataloguePresentation::class);
+        $primaryImage = null;
+        if ($product->relationLoaded('images')) {
+            $primaryImage = $product->images
+                ->first(fn ($image) => $presentation->isUsableCatalogueImageUrl($image->publicUrl() ?? $image->url ?? null));
+        }
 
         return [
             'id' => $product->id,
@@ -52,7 +55,7 @@ class ProductCardResource extends JsonResource
             'category' => $product->category?->name,
             'category_slug' => $product->category?->slug,
             'brand_slug' => $product->brand?->slug,
-            'image_url' => $primaryImage?->publicUrl(),
+            'image_url' => $presentation->usableImageUrl($primaryImage?->publicUrl()),
             'image_alt' => $primaryImage?->alt_text ?: $product->name,
             'batch_number' => $product->batch_number,
             'lab_verification_reference' => $product->lab_verification_reference,
@@ -69,8 +72,8 @@ class ProductCardResource extends JsonResource
             'is_featured' => (bool) $product->is_featured,
             'variant_count' => (int) ($product->variant_count ?? 0),
             'has_variants' => (int) ($product->variant_count ?? 0) > 0,
-            'badges' => app(CataloguePresentation::class)->badges($product),
-            'stock' => app(CataloguePresentation::class)->stock($product),
+            'badges' => $presentation->badges($product),
+            'stock' => $presentation->stock($product),
         ];
     }
 }

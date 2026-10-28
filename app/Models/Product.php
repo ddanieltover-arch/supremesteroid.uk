@@ -121,6 +121,47 @@ class Product extends Model
     }
 
     /**
+     * Push unavailable / out-of-stock catalogue cards after in-stock items,
+     * while preserving any subsequent sort clauses.
+     */
+    public function scopeOrderAvailableFirst(Builder $query): Builder
+    {
+        $hosts = app(\App\Services\Catalogue\CataloguePresentation::class)->unusableImageHosts();
+
+        $imageExists = \App\Models\ProductImage::query()
+            ->selectRaw('1')
+            ->whereColumn('product_images.product_id', 'products.id')
+            ->whereNotNull('url')
+            ->where('url', '!=', '');
+
+        foreach ($hosts as $host) {
+            $imageExists->where('url', 'not like', '%'.$host.'%');
+        }
+
+        $imageExists->limit(1);
+
+        $stockExists = \App\Models\Inventory::query()
+            ->selectRaw('1')
+            ->whereColumn('inventory.product_id', 'products.id')
+            ->whereRaw('quantity_on_hand - quantity_reserved > 0')
+            ->limit(1);
+
+        return $query->orderByRaw(
+            'CASE
+                WHEN products.status = ? THEN 1
+                WHEN NOT EXISTS ('.$imageExists->toSql().') THEN 1
+                WHEN NOT EXISTS ('.$stockExists->toSql().') THEN 1
+                ELSE 0
+            END ASC',
+            array_merge(
+                [ProductStatus::OUT_OF_STOCK->value],
+                $imageExists->getBindings(),
+                $stockExists->getBindings()
+            )
+        );
+    }
+
+    /**
      * Scope by category ID or slug.
      */
     public function scopeByCategory(Builder $query, string $category): Builder

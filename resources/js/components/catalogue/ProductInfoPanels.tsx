@@ -4,10 +4,10 @@ import type { ProductDetail } from '@/types';
 function PanelBody({ product, tab }: { product: ProductDetail; tab: string }) {
   if (tab === 'overview') {
     return (
-      <div className="prose-invert space-y-3 text-sm leading-relaxed text-slate-300">
+      <div className="prose space-y-3 text-sm leading-relaxed text-slate-600">
         <p>{product.description || product.short_description || 'No overview is published for this product yet.'}</p>
-        {product.ingredients ? <p><strong className="text-white">Composition.</strong> {product.ingredients}</p> : null}
-        {product.safety_guidelines ? <p><strong className="text-white">Safety.</strong> {product.safety_guidelines}</p> : null}
+        {product.ingredients ? <p><strong className="text-slate-900">Composition.</strong> {product.ingredients}</p> : null}
+        {product.safety_guidelines ? <p><strong className="text-slate-900">Safety.</strong> {product.safety_guidelines}</p> : null}
         {product.content?.overview ? <p>{product.content.overview}</p> : null}
         {product.content?.important_information ? <p>{product.content.important_information}</p> : null}
       </div>
@@ -18,9 +18,9 @@ function PanelBody({ product, tab }: { product: ProductDetail; tab: string }) {
     return (product.specifications ?? []).length > 0 ? (
       <dl className="grid gap-3 sm:grid-cols-2">
         {(product.specifications ?? []).map((row) => (
-          <div key={`${row.name}-${row.value}`} className="rounded-lg border border-slate-800 px-3 py-2">
+          <div key={`${row.name}-${row.value}`} className="rounded-lg border border-slate-200 px-3 py-2">
             <dt className="text-xs uppercase tracking-wider text-slate-500">{row.name}</dt>
-            <dd className="mt-1 text-sm text-slate-100">{row.value}</dd>
+            <dd className="mt-1 text-sm text-slate-900">{row.value}</dd>
           </div>
         ))}
       </dl>
@@ -32,7 +32,7 @@ function PanelBody({ product, tab }: { product: ProductDetail; tab: string }) {
   if (tab === 'documentation') {
     const docs = [product.content?.documentation, product.content?.manufacturer_information, product.content?.packaging_information, product.lab_verification_reference ? `Reference ${product.lab_verification_reference}` : null].filter(Boolean);
     return docs.length > 0 ? (
-      <div className="space-y-3 text-sm text-slate-300">
+      <div className="space-y-3 text-sm text-slate-600">
         {docs.map((item) => (
           <p key={String(item)}>{item}</p>
         ))}
@@ -44,7 +44,7 @@ function PanelBody({ product, tab }: { product: ProductDetail; tab: string }) {
 
   if (tab === 'shipping') {
     return (
-      <div className="space-y-3 text-sm text-slate-300">
+      <div className="space-y-3 text-sm text-slate-600">
         {product.content?.shipping_information ? <p>{product.content.shipping_information}</p> : <p>Shipping options and free-delivery eligibility are confirmed from the live basket.</p>}
         {(product.shipping_methods ?? []).map((method) => (
           <p key={method.code}>{method.name}{method.estimated_days ? ` · ${method.estimated_days}` : ''}</p>
@@ -58,9 +58,9 @@ function PanelBody({ product, tab }: { product: ProductDetail; tab: string }) {
     return (product.faqs ?? []).length > 0 ? (
       <dl className="space-y-3">
         {(product.faqs ?? []).map((item) => (
-          <div key={item.question} className="rounded-lg border border-slate-800 p-3">
-            <dt className="font-semibold text-white">{item.question}</dt>
-            <dd className="mt-1 text-sm text-slate-300">{item.answer}</dd>
+          <div key={item.question} className="rounded-lg border border-slate-200 p-3">
+            <dt className="font-semibold text-slate-900">{item.question}</dt>
+            <dd className="mt-1 text-sm text-slate-600">{item.answer}</dd>
           </div>
         ))}
       </dl>
@@ -77,13 +77,13 @@ function PanelBody({ product, tab }: { product: ProductDetail; tab: string }) {
   return (
     <ul className="space-y-4">
       {items.map((review) => (
-        <li key={review.id} className="rounded-xl border border-slate-800 p-4">
-          <p className="text-sm font-semibold text-white">{review.title || 'Customer review'}</p>
+        <li key={review.id} className="rounded-xl border border-slate-200 p-4">
+          <p className="text-sm font-semibold text-slate-900">{review.title || 'Customer review'}</p>
           <p className="mt-1 text-xs text-slate-500">
             {review.rating}/5 · {review.display_name || 'Customer'}
             {review.verified_purchase ? ' · Verified purchase' : ''}
           </p>
-          {review.body ? <p className="mt-2 text-sm text-slate-300">{review.body}</p> : null}
+          {review.body ? <p className="mt-2 text-sm text-slate-600">{review.body}</p> : null}
         </li>
       ))}
     </ul>
@@ -111,7 +111,7 @@ export function ProductInfoPanels({ product }: { product: ProductDetail }) {
 
   return (
     <section className="mt-12">
-      <div className="hidden border-b border-slate-800 md:block">
+      <div className="hidden border-b border-slate-200 md:block">
         <div role="tablist" aria-label="Product information" className="flex flex-wrap gap-2">
           {tabs.map((tab) => (
             <button
@@ -121,7 +121,7 @@ export function ProductInfoPanels({ product }: { product: ProductDetail }) {
               id={`tab-${tab.id}`}
               aria-selected={active === tab.id}
               aria-controls={`panel-${tab.id}`}
-              className={`min-h-11 px-4 text-sm ${active === tab.id ? 'border-b-2 border-amber-400 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+              className={`min-h-11 px-4 text-sm ${active === tab.id ? 'border-b-2 border-blue-500 text-slate-900' : 'text-slate-500 hover:text-slate-800'}`}
               onClick={() => setActive(tab.id)}
             >
               {tab.label}
@@ -135,9 +135,9 @@ export function ProductInfoPanels({ product }: { product: ProductDetail }) {
 
       <div className="space-y-3 md:hidden">
         {tabs.map((tab) => (
-          <details key={tab.id} open={tab.id === 'overview'} className="rounded-xl border border-slate-800">
-            <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-white">{tab.label}</summary>
-            <div className="border-t border-slate-800 px-4 py-4">
+          <details key={tab.id} open={tab.id === 'overview'} className="rounded-xl border border-slate-200">
+            <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-slate-900">{tab.label}</summary>
+            <div className="border-t border-slate-200 px-4 py-4">
               <PanelBody product={product} tab={tab.id} />
             </div>
           </details>

@@ -85,7 +85,7 @@ class QualityAssuranceFixtureService
                 'country_of_origin' => 'GB',
                 'is_verified' => true,
                 'is_active' => true,
-                'logo_url' => '/assets/branding/supreme-steroids-logo.png',
+                'logo_url' => '/assets/branding/supreme-steroids-logo.jpg',
                 'display_order' => 1,
             ]
         );

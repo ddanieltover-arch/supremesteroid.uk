@@ -43,10 +43,10 @@ export function PaymentProofForm({
 
   if (!payment || !canSubmit) {
     return payment?.proof ? (
-      <p className="mt-4 text-sm text-slate-400">
+      <p className="mt-4 text-sm text-slate-500">
         Proof uploaded: {payment.proof.filename}
         {payment.proof.download_url ? (
-          <a className="ml-2 text-amber-300" href={payment.proof.download_url}>
+          <a className="ml-2 text-blue-600" href={payment.proof.download_url}>
             View proof
           </a>
         ) : null}
@@ -66,7 +66,7 @@ export function PaymentProofForm({
           bankForm.post(`/orders/${orderId}/payments/${payment.id}/proof/bank`, { forceFormData: true });
         }}
       >
-        <h3 className="text-lg font-semibold text-white">Submit bank transfer proof</h3>
+        <h3 className="text-lg font-semibold text-slate-900">Submit bank transfer proof</h3>
         <Alert type="info">Submitting proof does not mark the order as paid. Staff review the payment first.</Alert>
         <Input label="Payment reference" value={bankForm.data.bank_payment_reference} onChange={(event) => bankForm.setData('bank_payment_reference', event.target.value)} />
         <Input label="Sender account name" value={bankForm.data.sender_account_name} onChange={(event) => bankForm.setData('sender_account_name', event.target.value)} />
@@ -97,7 +97,7 @@ export function PaymentProofForm({
         cryptoForm.post(`/orders/${orderId}/payments/${payment.id}/proof/crypto`, { forceFormData: true });
       }}
     >
-      <h3 className="text-lg font-semibold text-white">Submit crypto proof</h3>
+      <h3 className="text-lg font-semibold text-slate-900">Submit crypto proof</h3>
       <Alert type="info">A transaction hash is a submission for review. It does not confirm payment by itself.</Alert>
       <Input label="Network" value={cryptoForm.data.crypto_network} onChange={(event) => cryptoForm.setData('crypto_network', event.target.value)} />
       <Input label="Transaction hash" value={cryptoForm.data.crypto_transaction_hash} onChange={(event) => cryptoForm.setData('crypto_transaction_hash', event.target.value)} />
@@ -139,11 +139,11 @@ function ProofFileInput({
         accept="image/jpeg,image/png,image/webp,application/pdf"
         onChange={(event) => onChange(event.target.files?.[0] ?? null)}
       />
-      {filename ? <p className="mt-2 text-xs text-slate-400">Selected: {filename}</p> : null}
-      {processing ? <p className="mt-1 text-xs text-amber-300">Uploading…</p> : null}
-      {recentlySuccessful ? <p className="mt-1 text-xs text-emerald-300">Submission received.</p> : null}
+      {filename ? <p className="mt-2 text-xs text-slate-500">Selected: {filename}</p> : null}
+      {processing ? <p className="mt-1 text-xs text-blue-600">Uploading…</p> : null}
+      {recentlySuccessful ? <p className="mt-1 text-xs text-emerald-600">Submission received.</p> : null}
       {filename ? (
-        <button type="button" className="mt-2 text-xs text-slate-400 underline" onClick={onRemove}>
+        <button type="button" className="mt-2 text-xs text-slate-500 underline" onClick={onRemove}>
           Remove file
         </button>
       ) : null}

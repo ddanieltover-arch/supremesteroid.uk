@@ -66,15 +66,17 @@ class ProductDetailResource extends JsonResource
                 'name' => $product->category->name,
                 'slug' => $product->category->slug,
             ] : null,
-            'images' => $product->images->map(fn ($image) => [
-                'id' => $image->id,
-                'url' => $image->publicUrl(),
-                'alt_text' => $image->alt_text,
-                'caption' => $image->caption,
-                'thumbnail_url' => $image->thumbnail_url,
-                'is_primary' => (bool) $image->is_primary,
-                'variant_id' => $image->product_variant_id,
-            ])->values(),
+            'images' => $product->images
+                ->filter(fn ($image) => $presentation->isUsableCatalogueImageUrl($image->publicUrl() ?? $image->url ?? null))
+                ->map(fn ($image) => [
+                    'id' => $image->id,
+                    'url' => $image->publicUrl(),
+                    'alt_text' => $image->alt_text,
+                    'caption' => $image->caption,
+                    'thumbnail_url' => $image->thumbnail_url,
+                    'is_primary' => (bool) $image->is_primary,
+                    'variant_id' => $image->product_variant_id,
+                ])->values(),
             'variants' => $product->variants->map(function ($variant) use ($product, $presentation) {
                 $variantPricing = app(PricingService::class)->calculateProductPrice($product, $variant);
                 $variantEligibility = app(ProductPurchaseEligibilityService::class)

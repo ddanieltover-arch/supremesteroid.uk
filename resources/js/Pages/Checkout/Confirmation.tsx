@@ -68,19 +68,19 @@ export default function CheckoutConfirmation({
         data-qa-payment-id={payment?.id}
         data-qa-payment-status={payment?.status}
       >
-        <p className="text-emerald-300 print:text-black">✓ Order placed</p>
-        <h1 className="mt-2 text-3xl font-semibold text-white print:text-black">Thank you</h1>
-        <p className="mt-3 text-slate-400 print:text-neutral-700">
+        <p className="text-emerald-600 print:text-black">✓ Order placed</p>
+        <h1 className="mt-2 text-3xl font-semibold text-slate-900 print:text-black">Thank you</h1>
+        <p className="mt-3 text-slate-500 print:text-neutral-700">
           Order {order.order_number}
           {order.placed_at ? ` · ${new Date(order.placed_at).toLocaleDateString('en-GB')}` : ''}
         </p>
-        <p id="payment-status" className="mt-2 text-sm text-amber-300 print:text-black" role="status">
+        <p id="payment-status" className="mt-2 text-sm text-blue-600 print:text-black" role="status">
           {paymentStatusLabel}
         </p>
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">
-          <section className="rounded-2xl border border-slate-800 p-5 text-sm text-slate-300">
-            <h2 className="font-semibold text-white">Delivery</h2>
+          <section className="rounded-2xl border border-slate-200 p-5 text-sm text-slate-600">
+            <h2 className="font-semibold text-slate-900">Delivery</h2>
             <p className="mt-2">{order.shipping_method}</p>
             {order.shipping_address ? (
               <p className="mt-3 leading-relaxed">

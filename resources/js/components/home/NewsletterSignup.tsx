@@ -9,11 +9,11 @@ export function NewsletterSignup({ newsletter }: { newsletter: NonNullable<Homep
   });
 
   return (
-    <section aria-labelledby="newsletter-heading" className="mt-16 rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-950 to-slate-900 p-6 sm:p-8">
-      <h2 id="newsletter-heading" className="text-2xl font-semibold text-white">
+    <section aria-labelledby="newsletter-heading" className="mt-16 rounded-3xl border border-slate-200 bg-gradient-to-br from-blue-50 to-white p-6 sm:p-8">
+      <h2 id="newsletter-heading" className="text-2xl font-semibold text-slate-900">
         {newsletter.heading}
       </h2>
-      <p className="mt-2 max-w-2xl text-sm text-slate-400">{newsletter.body}</p>
+      <p className="mt-2 max-w-2xl text-sm text-slate-500">{newsletter.body}</p>
       <form
         className="mt-6 max-w-xl space-y-3"
         onSubmit={(event) => {
@@ -21,7 +21,7 @@ export function NewsletterSignup({ newsletter }: { newsletter: NonNullable<Homep
           form.post('/newsletter', { preserveScroll: true });
         }}
       >
-        <label className="block text-sm text-slate-300" htmlFor="newsletter-email">
+        <label className="block text-sm text-slate-600" htmlFor="newsletter-email">
           Email
           <input
             id="newsletter-email"
@@ -33,8 +33,8 @@ export function NewsletterSignup({ newsletter }: { newsletter: NonNullable<Homep
             className="field mt-1"
           />
         </label>
-        {form.errors.email ? <p className="text-xs text-rose-300">{form.errors.email}</p> : null}
-        <label className="flex items-start gap-3 text-sm text-slate-400">
+        {form.errors.email ? <p className="text-xs text-rose-600">{form.errors.email}</p> : null}
+        <label className="flex items-start gap-3 text-sm text-slate-500">
           <input
             type="checkbox"
             checked={form.data.consent}
@@ -43,9 +43,9 @@ export function NewsletterSignup({ newsletter }: { newsletter: NonNullable<Homep
           />
           <span>I consent to receive occasional catalogue emails. I can unsubscribe later.</span>
         </label>
-        {form.errors.consent ? <p className="text-xs text-rose-300">{form.errors.consent}</p> : null}
+        {form.errors.consent ? <p className="text-xs text-rose-600">{form.errors.consent}</p> : null}
         {form.recentlySuccessful ? (
-          <p role="status" className="text-sm text-emerald-300">
+          <p role="status" className="text-sm text-emerald-600">
             Thank you. Your consent has been recorded.
           </p>
         ) : null}

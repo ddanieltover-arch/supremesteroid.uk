@@ -21,16 +21,16 @@ export function CompareBar() {
   }
 
   return (
-    <div className="sticky bottom-0 z-30 border-t border-slate-800 bg-slate-950/95 px-4 py-3 backdrop-blur">
+    <div className="sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur lg:bottom-0">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-slate-300">{ids.length} selected for comparison</p>
+        <p className="text-sm text-slate-600">{ids.length} selected for comparison</p>
         <div className="flex gap-2">
           <Button variant="ghost" onClick={() => { clearCompareIds(); setIds([]); }}>
             Clear
           </Button>
           <Link
             href={`/compare?ids=${ids.join(',')}`}
-            className="inline-flex min-h-10 items-center rounded-md bg-amber-400 px-4 text-sm font-semibold text-slate-950"
+            className="inline-flex min-h-10 items-center rounded-md bg-blue-600 px-4 text-sm font-semibold text-white"
           >
             Compare
           </Link>

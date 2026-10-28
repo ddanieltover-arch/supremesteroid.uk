@@ -36,7 +36,7 @@ export function SearchSuggestions({
   const total = productCount + brandCount + categoryCount;
 
   return (
-    <div id={listId} role="listbox" aria-label="Search suggestions" className="z-50 mt-1 w-full rounded-xl border border-slate-800 bg-[#020617] p-3 text-sm shadow-2xl">
+    <div id={listId} role="listbox" aria-label="Search suggestions" className="z-50 mt-1 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm shadow-2xl">
       <p className="sr-only" aria-live="polite">
         {total} suggestions
       </p>
@@ -50,7 +50,7 @@ export function SearchSuggestions({
             href={item.url}
             role="option"
             aria-selected={activeId === optionId}
-            className={`mt-1 flex min-h-11 items-center gap-2 rounded-lg px-2 py-1.5 ${activeId === optionId ? 'bg-slate-800 text-white' : 'hover:bg-slate-900'}`}
+            className={`mt-1 flex min-h-11 items-center gap-2 rounded-lg px-2 py-1.5 ${activeId === optionId ? 'bg-blue-50 text-slate-900' : 'hover:bg-slate-50'}`}
             onClick={onSelect}
           >
             {item.image_url ? <img src={item.image_url} alt="" className="h-8 w-8 object-contain" /> : null}
@@ -74,7 +74,7 @@ export function SearchSuggestions({
             href={item.url}
             role="option"
             aria-selected={activeId === optionId}
-            className={`mt-1 block min-h-10 rounded-lg px-2 py-2 ${activeId === optionId ? 'bg-slate-800 text-white' : 'hover:bg-slate-900'}`}
+            className={`mt-1 block min-h-10 rounded-lg px-2 py-2 ${activeId === optionId ? 'bg-blue-50 text-slate-900' : 'hover:bg-slate-50'}`}
             onClick={onSelect}
           >
             {highlightMatch(item.name, query)}
@@ -91,7 +91,7 @@ export function SearchSuggestions({
             href={item.url}
             role="option"
             aria-selected={activeId === optionId}
-            className={`mt-1 block min-h-10 rounded-lg px-2 py-2 ${activeId === optionId ? 'bg-slate-800 text-white' : 'hover:bg-slate-900'}`}
+            className={`mt-1 block min-h-10 rounded-lg px-2 py-2 ${activeId === optionId ? 'bg-blue-50 text-slate-900' : 'hover:bg-slate-50'}`}
             onClick={onSelect}
           >
             {highlightMatch(item.name, query)}
@@ -104,7 +104,7 @@ export function SearchSuggestions({
           href={suggestions.view_all}
           role="option"
           aria-selected={activeId === 'all'}
-          className={`mt-2 block min-h-10 text-amber-300 ${activeId === 'all' ? 'underline' : ''}`}
+          className={`mt-2 block min-h-10 text-blue-600 ${activeId === 'all' ? 'underline' : ''}`}
           onClick={onSelect}
         >
           View all results

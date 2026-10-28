@@ -38,17 +38,17 @@ export function CheckoutProgress({
         return (
           <li
             key={step.key}
-            className={isCurrent ? 'text-amber-300' : isCompleted ? 'text-emerald-300' : 'text-slate-500'}
+            className={isCurrent ? 'text-blue-600' : isCompleted ? 'text-emerald-600' : 'text-slate-500'}
             aria-current={isCurrent ? 'step' : undefined}
           >
             <div className="flex items-center gap-2 sm:block sm:text-center">
               <span
                 className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${
                   isCurrent
-                    ? 'border-amber-400 bg-amber-400/10'
+                    ? 'border-blue-500 bg-blue-50'
                     : isCompleted
                       ? 'border-emerald-400 bg-emerald-400/10'
-                      : 'border-slate-700'
+                      : 'border-slate-300'
                 }`}
               >
                 {isCompleted ? <span aria-hidden="true">✓</span> : <span>{index + 1}</span>}

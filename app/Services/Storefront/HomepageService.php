@@ -13,6 +13,7 @@ use App\Models\HomepageFaq;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\Review;
+use App\Services\Catalogue\CataloguePresentation;
 use App\Services\Catalogue\SeoService;
 use App\Services\Catalogue\StructuredDataService;
 use App\Services\Shipping\ShippingEngine;
@@ -90,12 +91,18 @@ class HomepageService
                 ->get()
                 ->filter(fn (Category $category) => (int) $category->product_count > 0)
                 ->take(8)
+                ->values();
+
+            $categoryThumbnails = $this->categoryProductThumbnails($categories);
+
+            $categories = $categories
                 ->map(fn (Category $category) => [
                     'id' => $category->id,
                     'name' => $category->name,
                     'slug' => $category->slug,
                     'description' => $category->description,
-                    'image_url' => $category->image_url,
+                    'image_url' => $this->safeImageUrl($category->image_url)
+                        ?? ($categoryThumbnails[$category->id] ?? null),
                     'product_count' => (int) $category->product_count,
                     'url' => route('category.show', $category->slug),
                 ])
@@ -370,10 +377,105 @@ class HomepageService
 
     protected function productQuery()
     {
-        return Product::query()
-            ->purchasable()
+        return app(CataloguePresentation::class)
+            ->constrainToUsableImages(Product::query()->purchasable())
             ->with(['brand', 'category', 'images', 'inventory'])
             ->withCount(['variants as variant_count' => fn ($query) => $query->where('is_active', true)]);
+    }
+
+    /**
+     * Pick one catalogue product image per category for collection cards.
+     * Prefer durable local images, then fall back to any product image URL in the collection.
+     *
+     * @param  Collection<int, Category>  $categories
+     * @return array<string, string>
+     */
+    protected function categoryProductThumbnails(Collection $categories): array
+    {
+        $missing = $categories
+            ->filter(fn (Category $category) => $this->safeImageUrl($category->image_url) === null)
+            ->values();
+
+        if ($missing->isEmpty()) {
+            return [];
+        }
+
+        $categoryIds = $missing->pluck('id')->all();
+        $childIdsByParent = Category::query()
+            ->whereIn('parent_id', $categoryIds)
+            ->get(['id', 'parent_id'])
+            ->groupBy('parent_id')
+            ->map(fn (Collection $rows) => $rows->pluck('id')->all());
+
+        $lookupIds = collect($categoryIds)
+            ->merge($childIdsByParent->flatten())
+            ->unique()
+            ->values()
+            ->all();
+
+        $presentation = app(CataloguePresentation::class);
+        $products = Product::query()
+            ->purchasable()
+            ->where(function ($query) use ($lookupIds, $categoryIds): void {
+                $query->whereIn('category_id', $lookupIds)
+                    ->orWhereHas('categories', fn ($categories) => $categories->whereIn('categories.id', $categoryIds));
+            })
+            ->whereHas('images', fn ($query) => $query->whereNotNull('url')->where('url', '!=', ''))
+            ->with([
+                'images' => fn ($query) => $query
+                    ->whereNotNull('url')
+                    ->where('url', '!=', '')
+                    ->orderByDesc('is_primary')
+                    ->orderBy('display_order'),
+                'categories:id',
+            ])
+            ->orderByDesc('is_featured')
+            ->orderBy('sort_order')
+            ->orderByDesc('published_at')
+            ->get();
+
+        $parentByChild = [];
+        foreach ($childIdsByParent as $parentId => $childIds) {
+            foreach ($childIds as $childId) {
+                $parentByChild[(string) $childId] = (string) $parentId;
+            }
+        }
+
+        $thumbnails = [];
+        $fallback = [];
+
+        foreach ($products as $product) {
+            $candidateCategoryIds = collect([(string) $product->category_id])
+                ->merge($product->categories->pluck('id')->map(fn ($id) => (string) $id))
+                ->filter()
+                ->map(fn (string $id) => $parentByChild[$id] ?? $id)
+                ->filter(fn (string $id) => in_array($id, array_map('strval', $categoryIds), true))
+                ->unique()
+                ->values();
+
+            $image = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
+            $url = $this->safeImageUrl($image?->publicUrl() ?? $image?->url);
+            if ($url === null) {
+                continue;
+            }
+
+            $usable = $presentation->usableImageUrl($url);
+
+            foreach ($candidateCategoryIds as $categoryId) {
+                if ($usable !== null && ! isset($thumbnails[$categoryId])) {
+                    $thumbnails[$categoryId] = $usable;
+                }
+                if (! isset($fallback[$categoryId])) {
+                    $fallback[$categoryId] = $url;
+                }
+            }
+        }
+
+        foreach ($fallback as $categoryId => $url) {
+            $thumbnails[$categoryId] ??= $url;
+        }
+
+        return $thumbnails;
     }
 
     protected function safeText(?string $value, string $fallback, int $max = 180): string
@@ -406,8 +508,52 @@ class HomepageService
         if (! is_string($url) || trim($url) === '') {
             return null;
         }
-        $safe = $this->safeUrl($url, '');
+
+        $candidate = $this->encodeImageUrl(trim($url));
+        $safe = $this->safeUrl($candidate, '');
 
         return $safe !== '' ? $safe : null;
+    }
+
+    /**
+     * Product CDN paths often contain spaces; encode them so validation and browsers accept the URL.
+     */
+    protected function encodeImageUrl(string $url): string
+    {
+        if (str_starts_with($url, '/')) {
+            $parts = explode('?', $url, 2);
+            $path = implode('/', array_map(
+                static fn (string $segment): string => rawurlencode(rawurldecode($segment)),
+                explode('/', $parts[0])
+            ));
+
+            return $path.(isset($parts[1]) ? '?'.$parts[1] : '');
+        }
+
+        $parts = parse_url($url);
+        if (! is_array($parts) || empty($parts['scheme']) || empty($parts['host'])) {
+            return str_replace(' ', '%20', $url);
+        }
+
+        $path = isset($parts['path'])
+            ? implode('/', array_map(
+                static fn (string $segment): string => rawurlencode(rawurldecode($segment)),
+                explode('/', $parts['path'])
+            ))
+            : '';
+
+        $encoded = $parts['scheme'].'://'.$parts['host'];
+        if (isset($parts['port'])) {
+            $encoded .= ':'.$parts['port'];
+        }
+        $encoded .= $path;
+        if (isset($parts['query'])) {
+            $encoded .= '?'.$parts['query'];
+        }
+        if (isset($parts['fragment'])) {
+            $encoded .= '#'.$parts['fragment'];
+        }
+
+        return $encoded;
     }
 }
