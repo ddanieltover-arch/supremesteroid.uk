@@ -163,9 +163,6 @@ class CataloguePresentation
      */
     public function unusableImageHosts(): array
     {
-        return [
-            'supremestd.b-cdn.net',
-            'supremesteroids.co.uk',
-        ];
+        return [];
     }
 }
