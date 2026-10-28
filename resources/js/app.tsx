@@ -62,7 +62,40 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 }
 
+/**
+ * Inertia JS v3 reads only <script data-page type="application/json">.
+ * Laravel may still emit the legacy #app[data-page] attribute until
+ * inertia.use_script_element_for_initial_page is enabled — support both.
+ */
+function readInitialPage() {
+  if (typeof document === 'undefined') {
+    return undefined;
+  }
+
+  const script = document.querySelector('script[data-page="app"][type="application/json"]');
+  if (script?.textContent) {
+    try {
+      return JSON.parse(script.textContent);
+    } catch {
+      // fall through to legacy attribute
+    }
+  }
+
+  const el = document.getElementById('app');
+  const raw = el?.dataset?.page;
+  if (raw) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return undefined;
+    }
+  }
+
+  return undefined;
+}
+
 createInertiaApp({
+  page: readInitialPage(),
   title: (title) => {
     if (!title) {
       return 'Supreme Steroids';
@@ -86,6 +119,11 @@ createInertiaApp({
     });
   },
   setup({ el, App, props }) {
+    if (!el) {
+      console.error('Inertia root element #app was not found.');
+      return;
+    }
+
     createRoot(el).render(
       <ErrorBoundary>
         <App {...props} />
