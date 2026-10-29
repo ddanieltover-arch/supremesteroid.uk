@@ -20,8 +20,22 @@ class InitialFoundationSeeder extends Seeder
     public function run(): void
     {
         // 1. Core Administrative & Customer Accounts
+        $adminEmail = (string) env('ADMIN_DEFAULT_EMAIL', 'info@supremesteroid.uk');
+
+        // Migrate the legacy admin mailbox to the canonical store address.
+        if ($adminEmail !== 'admin@supremesteroid.uk') {
+            $legacyAdmin = User::query()->where('email', 'admin@supremesteroid.uk')->first();
+            $canonicalAdmin = User::query()->where('email', $adminEmail)->first();
+
+            if ($legacyAdmin && ! $canonicalAdmin) {
+                $legacyAdmin->forceFill(['email' => $adminEmail])->save();
+            } elseif ($legacyAdmin && $canonicalAdmin && $legacyAdmin->isNot($canonicalAdmin)) {
+                $legacyAdmin->delete();
+            }
+        }
+
         User::updateOrCreate(
-            ['email' => 'admin@supremesteroid.uk'],
+            ['email' => $adminEmail],
             [
                 'name' => 'Supreme Super Admin',
                 'password' => Hash::make('AdminPass123!'),

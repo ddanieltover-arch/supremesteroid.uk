@@ -278,15 +278,27 @@ foreach ($pages as $pageData) {
 }
 
 // Normalize any leftover reference emails in published page HTML.
+$emailReplacements = [
+    'help@supremesteroids.co.uk' => 'info@supremesteroid.uk',
+    'hello@example.com' => 'info@supremesteroid.uk',
+    'admin@supremesteroid.uk' => 'info@supremesteroid.uk',
+    'support@supremesteroid.uk' => 'info@supremesteroid.uk',
+    'contact@supremesteroid.uk' => 'info@supremesteroid.uk',
+    'hello@supremesteroid.uk' => 'info@supremesteroid.uk',
+];
+
 $normalized = App\Models\Page::query()
-    ->where('content', 'like', '%help@supremesteroids.co.uk%')
-    ->orWhere('content', 'like', '%hello@example.com%')
+    ->where(function ($query) use ($emailReplacements): void {
+        foreach (array_keys($emailReplacements) as $oldEmail) {
+            $query->orWhere('content', 'like', '%'.$oldEmail.'%');
+        }
+    })
     ->get();
 
 foreach ($normalized as $page) {
     $page->content = str_replace(
-        ['help@supremesteroids.co.uk', 'hello@example.com'],
-        ['info@supremesteroid.uk', 'info@supremesteroid.uk'],
+        array_keys($emailReplacements),
+        array_values($emailReplacements),
         (string) $page->content,
     );
     $page->save();
