@@ -24,7 +24,9 @@ RUN corepack enable && corepack prepare pnpm@12.4.2 --activate && pnpm run build
 # Stage 2: Production FrankenPHP Runtime
 # ------------------------------------------------------------------------------
 # Symfony 8.1 in composer.lock requires PHP >= 8.4.1.
-FROM dunglas/frankenphp:1-php8.4-alpine AS runner
+# Pin a concrete FrankenPHP release (+ digest) so Vercel builds do not depend on
+# Docker Hub resolving the floating `1-php8.4-alpine` tag (that lookup 500'd).
+FROM dunglas/frankenphp:1.13.4-php8.4-alpine@sha256:64607d4d22bc747e7e7183ffff11620decd23112b50cb7008c9b48547bd34e2d AS runner
 
 # Install system dependencies and required PHP extensions for PostgreSQL and caching
 RUN apk add --no-cache \

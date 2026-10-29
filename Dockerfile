@@ -14,7 +14,7 @@ RUN corepack enable \
 COPY . .
 RUN corepack enable && corepack prepare pnpm@12.4.2 --activate && pnpm run build
 
-FROM dunglas/frankenphp:1-php8.4-alpine AS runner
+FROM dunglas/frankenphp:1.13.4-php8.4-alpine@sha256:64607d4d22bc747e7e7183ffff11620decd23112b50cb7008c9b48547bd34e2d AS runner
 
 RUN apk add --no-cache \
     curl \
