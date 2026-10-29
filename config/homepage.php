@@ -15,7 +15,7 @@ return [
         'enabled' => true,
         'message' => 'Pay with Bitcoin to get 20% off (discount applies at checkout) | Fast & Discreet Next-Day UK Delivery',
         'use_shipping_threshold' => true,
-        'dismissible' => true,
+        'dismissible' => false,
     ],
 
     'hero' => [

@@ -38,8 +38,8 @@ export default function StorefrontLayout({
       <a href="#main-content" className="sr-only print:hidden focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-blue-600 focus:px-3 focus:py-2 focus:text-white">
         Skip to content
       </a>
-      {checkout ? null : <AnnouncementBar />}
       <div className="sticky top-0 z-40 print:hidden">
+        {checkout ? null : <AnnouncementBar />}
         <Header cartCount={cartCount} wishlistCount={page.props.wishlistCount} onOpenCart={openCart} compact={checkout} />
       </div>
       <ToastStack />
