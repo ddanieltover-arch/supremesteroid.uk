@@ -24,7 +24,7 @@ export function BrandShowcase({ brands }: { brands: HomepagePayload['brands'] })
                 <img
                   src={brand.logo_url}
                   alt={`${brand.name} logo`}
-                  className="max-h-14 object-contain transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                  className="max-h-14 object-contain"
                   loading="lazy"
                 />
               ) : (

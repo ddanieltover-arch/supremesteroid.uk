@@ -9,14 +9,14 @@ function CategoryCard({ category }: { category: HomepagePayload['categories'][nu
   return (
     <Link
       href={category.url}
-      className="group overflow-hidden rounded-2xl border border-slate-200 bg-white/70 transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+      className="group overflow-hidden rounded-2xl border border-slate-200 bg-white/70 transition-colors duration-200 hover:border-blue-200 hover:shadow-lg"
     >
       <div className="aspect-[16/10] bg-slate-50">
         {showImage ? (
           <img
             src={category.image_url!}
             alt=""
-            className="h-full w-full object-contain p-4 transition duration-200 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            className="h-full w-full object-contain p-4"
             loading="lazy"
             onError={() => setImageFailed(true)}
           />

@@ -38,26 +38,6 @@ body {
   }
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(1rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes drawer-in-right {
   from {
     opacity: 0;
@@ -80,14 +60,6 @@ body {
   }
 }
 
-.motion-fade-in {
-  animation: fade-in 0.45s ease-out both;
-}
-
-.motion-fade-in-up {
-  animation: fade-in-up 0.5s ease-out both;
-}
-
 .motion-drawer-panel {
   animation: drawer-in-right 0.28s ease-out both;
 }
@@ -98,14 +70,12 @@ body {
 
 .hover-lift {
   transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease,
-    border-color 0.3s ease,
-    background-color 0.3s ease;
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .hover-lift:hover {
-  transform: translateY(-0.25rem);
   border-color: rgb(191 219 254);
   background-color: #ffffff;
   box-shadow:
@@ -113,27 +83,7 @@ body {
     0 4px 8px -4px rgb(15 23 42 / 0.08);
 }
 
-.reveal {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 0.5s ease-out,
-    transform 0.5s ease-out;
-}
-
-.reveal[data-reveal='pending'] {
-  opacity: 0;
-  transform: translateY(1rem);
-}
-
-.reveal[data-reveal='visible'] {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .motion-fade-in,
-  .motion-fade-in-up,
   .motion-drawer-panel,
   .motion-dialog-panel {
     animation: none !important;
@@ -141,15 +91,6 @@ body {
 
   .hover-lift,
   .hover-lift:hover {
-    transform: none !important;
-    transition: none !important;
-  }
-
-  .reveal,
-  .reveal[data-reveal='pending'],
-  .reveal[data-reveal='visible'] {
-    opacity: 1 !important;
-    transform: none !important;
     transition: none !important;
   }
 }

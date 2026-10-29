@@ -30,30 +30,30 @@ export function HeroSection({ hero }: { hero: HomepagePayload['hero'] }) {
         <img
           src={logoUrl}
           alt={storeName}
-          className="motion-fade-in h-20 w-auto max-w-[220px] object-contain sm:h-24 sm:max-w-[280px]"
+          className="h-20 w-auto max-w-[220px] object-contain sm:h-24 sm:max-w-[280px]"
         />
 
-        <p className="motion-fade-in-up mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-brand [animation-delay:60ms]">
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-brand">
           {hero.eyebrow}
         </p>
 
         <h1
           id="hero-heading"
-          className="motion-fade-in-up mt-3 max-w-3xl text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl [animation-delay:120ms]"
+          className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl"
         >
           {hero.headline}
         </h1>
 
-        <p className="motion-fade-in-up mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg [animation-delay:180ms]">
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
           {hero.description}
         </p>
 
-        <div className="motion-fade-in-up mt-8 flex flex-wrap items-center justify-center gap-3 [animation-delay:240ms]">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
             href={hero.primary_cta.url}
             className={clsx(
               'inline-flex min-h-12 items-center justify-center rounded-md bg-brand px-6 text-base font-semibold text-white',
-              'transition-all duration-200 hover:bg-brand-dark active:scale-[0.98]',
+              'transition-colors duration-200 hover:bg-brand-dark',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
             )}
           >
@@ -63,7 +63,7 @@ export function HeroSection({ hero }: { hero: HomepagePayload['hero'] }) {
             href={hero.secondary_cta.url}
             className={clsx(
               'inline-flex min-h-12 items-center justify-center rounded-md border border-slate-300 bg-white px-6 text-base font-semibold text-slate-800',
-              'transition-all duration-200 hover:border-brand hover:text-brand active:scale-[0.98]',
+              'transition-colors duration-200 hover:border-brand hover:text-brand',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
             )}
           >

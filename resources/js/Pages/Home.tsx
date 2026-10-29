@@ -12,9 +12,7 @@ import { ProductRail } from '@/components/home/ProductRail';
 import { ShippingInformation } from '@/components/home/ShippingInformation';
 import { TrustGrid } from '@/components/home/TrustGrid';
 import { HomeEditorialContent } from '@/components/home/HomeEditorialContent';
-import { Reveal } from '@/components/ui/Reveal';
 import type { HomepagePayload, ProductCard as ProductCardType, SeoProps } from '@/types';
-import type { ReactNode } from 'react';
 
 const DEFAULT_SECTIONS = [
   { key: 'hero', enabled: true, position: 10 },
@@ -30,10 +28,6 @@ const DEFAULT_SECTIONS = [
   { key: 'faq', enabled: true, position: 110 },
   { key: 'newsletter', enabled: true, position: 120 },
 ];
-
-function SectionReveal({ children }: { children: ReactNode }) {
-  return <Reveal className="mt-0">{children}</Reveal>;
-}
 
 export default function Home({
   homepage,
@@ -88,80 +82,62 @@ export default function Home({
           case 'hero':
             return <HeroSection key={section.key} hero={data.hero} />;
           case 'categories':
-            return (
-              <SectionReveal key={section.key}>
-                <CategoryShowcase categories={data.categories} />
-              </SectionReveal>
-            );
+            return <CategoryShowcase key={section.key} categories={data.categories} />;
           case 'featured':
             return (
-              <SectionReveal key={section.key}>
-                <ProductRail id="featured" eyebrow="Selected" title="Featured collection" products={data.featuredProducts} />
-              </SectionReveal>
+              <ProductRail
+                key={section.key}
+                id="featured"
+                eyebrow="Selected"
+                title="Featured collection"
+                products={data.featuredProducts}
+              />
             );
           case 'new':
             return (
-              <SectionReveal key={section.key}>
-                <ProductRail id="new" eyebrow="Just published" title="New arrivals" products={data.newProducts} />
-              </SectionReveal>
+              <ProductRail
+                key={section.key}
+                id="new"
+                eyebrow="Just published"
+                title="New arrivals"
+                products={data.newProducts}
+              />
             );
           case 'offers':
             return (
-              <SectionReveal key={section.key}>
-                <ProductRail id="offers" eyebrow="Current prices" title="Selected offers" products={data.saleProducts} />
-              </SectionReveal>
+              <ProductRail
+                key={section.key}
+                id="offers"
+                eyebrow="Current prices"
+                title="Selected offers"
+                products={data.saleProducts}
+              />
             );
           case 'intent':
-            return (
-              <SectionReveal key={section.key}>
-                <IntentDiscovery groups={data.intent} />
-              </SectionReveal>
-            );
+            return <IntentDiscovery key={section.key} groups={data.intent} />;
           case 'brands':
-            return (
-              <SectionReveal key={section.key}>
-                <BrandShowcase brands={data.brands} />
-              </SectionReveal>
-            );
+            return <BrandShowcase key={section.key} brands={data.brands} />;
           case 'editorial':
-            return data.editorial ? (
-              <SectionReveal key={section.key}>
-                <EditorialFeature editorial={data.editorial} />
-              </SectionReveal>
-            ) : null;
+            return data.editorial ? <EditorialFeature key={section.key} editorial={data.editorial} /> : null;
           case 'trust':
             return (
-              <SectionReveal key={section.key}>
+              <div key={section.key}>
                 <TrustGrid items={data.trustItems} />
                 <ApprovedReviews reviews={data.reviews} />
-              </SectionReveal>
+              </div>
             );
           case 'shipping':
-            return (
-              <SectionReveal key={section.key}>
-                <ShippingInformation shipping={data.shipping} />
-              </SectionReveal>
-            );
+            return <ShippingInformation key={section.key} shipping={data.shipping} />;
           case 'faq':
-            return (
-              <SectionReveal key={section.key}>
-                <FaqSection faqs={data.faqs} />
-              </SectionReveal>
-            );
+            return <FaqSection key={section.key} faqs={data.faqs} />;
           case 'newsletter':
-            return data.newsletter ? (
-              <SectionReveal key={section.key}>
-                <NewsletterSignup newsletter={data.newsletter} />
-              </SectionReveal>
-            ) : null;
+            return data.newsletter ? <NewsletterSignup key={section.key} newsletter={data.newsletter} /> : null;
           default:
             return null;
         }
       })}
 
-      <SectionReveal>
-        <HomeEditorialContent />
-      </SectionReveal>
+      <HomeEditorialContent />
     </StorefrontLayout>
   );
 }

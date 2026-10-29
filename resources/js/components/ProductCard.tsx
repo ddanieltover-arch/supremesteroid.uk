@@ -174,14 +174,14 @@ export function ProductCard({ product }: { product: ProductCardType }) {
   };
 
   return (
-    <article className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+    <article className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-colors duration-200 hover:border-blue-200 hover:shadow-lg">
       <div className="relative shrink-0 overflow-hidden border-b border-slate-100 bg-white">
         <Link {...productShowLinkProps(product)} className="relative block aspect-square">
           {product.image_url && !imageFailed ? (
             <img
               src={product.image_url}
               alt={product.image_alt || product.name}
-              className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              className="h-full w-full object-contain"
               loading="lazy"
               decoding="async"
               onError={() => setImageFailed(true)}
@@ -275,7 +275,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
               type="button"
               onClick={addToCart}
               disabled={adding}
-              className="flex h-11 w-full items-center justify-center rounded-lg bg-brand px-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-brand-dark active:scale-[0.98] motion-reduce:active:scale-100 disabled:opacity-70 disabled:active:scale-100"
+              className="flex h-11 w-full items-center justify-center rounded-lg bg-brand px-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-brand-dark disabled:opacity-70"
             >
               {added ? 'Added' : adding ? 'Adding…' : product.has_variants ? 'Choose & add' : 'Add to cart'}
             </button>

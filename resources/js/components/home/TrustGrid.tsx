@@ -21,7 +21,7 @@ export function TrustGrid({ items }: { items: HomepagePayload['trustItems'] }) {
               key={item.title}
               className="hover-lift group rounded-2xl border border-slate-200 bg-white/80 p-5"
             >
-              <Icon className="h-5 w-5 text-brand transition-transform duration-300 group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100" aria-hidden="true" />
+              <Icon className="h-5 w-5 text-brand" aria-hidden="true" />
               <h3 className="mt-3 text-sm font-semibold text-slate-900">{item.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-slate-500">{item.body}</p>
             </article>

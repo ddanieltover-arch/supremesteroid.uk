@@ -15,7 +15,7 @@ export function TrustBlocks() {
       {blocks.map((block) => (
         <article key={block.title} className="hover-lift group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-brand transition-transform duration-300 group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-brand">
               <block.icon className="h-4 w-4" aria-hidden="true" />
             </span>
             {block.title}

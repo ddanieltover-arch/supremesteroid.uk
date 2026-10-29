@@ -17,7 +17,7 @@ export function IntentDiscovery({ groups }: { groups: HomepagePayload['intent'] 
           <Link
             key={group.key}
             href={group.url}
-            className="inline-flex min-h-11 items-center rounded-full border border-slate-200 bg-white px-4 text-sm text-slate-800 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand hover:text-brand hover:shadow-md motion-reduce:hover:translate-y-0"
+            className="inline-flex min-h-11 items-center rounded-full border border-slate-200 bg-white px-4 text-sm text-slate-800 transition-colors duration-200 hover:border-brand hover:text-brand hover:shadow-md"
           >
             {group.label}
           </Link>
