@@ -3,6 +3,44 @@ import { createRoot } from 'react-dom/client';
 import type { ComponentType, ErrorInfo, ReactNode } from 'react';
 import React, { Component } from 'react';
 import '../css/app.css';
+// Eager product page so Instant Visits swap on click without waiting for a lazy chunk.
+import CatalogueShow from './Pages/Catalogue/Show';
+
+const eagerPages: Record<string, ComponentType> = {
+  'Catalogue/Show': CatalogueShow,
+};
+
+const pageModules = import.meta.glob('./Pages/**/*.tsx');
+const resolvedPages = new Map<string, ComponentType>(Object.entries(eagerPages));
+const resolvingPages = new Map<string, Promise<ComponentType>>();
+
+function resolvePage(name: string): ComponentType | Promise<ComponentType> {
+  const cached = resolvedPages.get(name);
+  if (cached) {
+    return cached;
+  }
+
+  const inflight = resolvingPages.get(name);
+  if (inflight) {
+    return inflight;
+  }
+
+  const loader = pageModules[`./Pages/${name}.tsx`];
+  if (!loader) {
+    throw new Error(`Inertia page not found: ${name}`);
+  }
+
+  const pending = loader().then((module) => {
+    const resolved = module as { default?: ComponentType } & ComponentType;
+    const component = resolved.default ?? resolved;
+    resolvedPages.set(name, component);
+    resolvingPages.delete(name);
+    return component;
+  });
+
+  resolvingPages.set(name, pending);
+  return pending;
+}
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -103,18 +141,7 @@ createInertiaApp({
     return /supreme\s*steroids/i.test(title) ? title : `${title} | Supreme Steroids`;
   },
   progress: false,
-  resolve: (name) => {
-    const pages = import.meta.glob('./Pages/**/*.tsx');
-    const page = pages[`./Pages/${name}.tsx`];
-    if (!page) {
-      throw new Error(`Inertia page not found: ${name}`);
-    }
-
-    return page().then((module) => {
-      const resolved = module as { default?: ComponentType } & ComponentType;
-      return resolved.default ?? resolved;
-    });
-  },
+  resolve: (name) => resolvePage(name),
   setup({ el, App, props }) {
     if (!el) {
       console.error('Inertia root element #app was not found.');

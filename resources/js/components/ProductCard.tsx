@@ -50,11 +50,8 @@ function ImagePlaceholder({ label = 'Image unavailable' }: { label?: string }) {
   );
 }
 
-function productShowLinkProps(product: ProductCardType) {
+function productInstantProps(product: ProductCardType) {
   return {
-    href: `/product/${product.slug}`,
-    prefetch: ['hover', 'click'] as Array<'hover' | 'click'>,
-    cacheFor: '60s',
     component: 'Catalogue/Show',
     pageProps: (_current: Record<string, unknown>, shared: Record<string, unknown>) => ({
       ...shared,
@@ -68,6 +65,7 @@ function productShowLinkProps(product: ProductCardType) {
         stock: product.stock,
         is_purchasable: product.is_purchasable,
         badges: product.badges,
+        short_description: product.short_description,
         images: product.image_url
           ? [{ id: 'preview', url: product.image_url, alt_text: product.image_alt || product.name, is_primary: true }]
           : [],
@@ -79,9 +77,17 @@ function productShowLinkProps(product: ProductCardType) {
       },
       preview: false,
     }),
-    onMouseEnter: () => {
-      void import('../Pages/Catalogue/Show');
-    },
+  };
+}
+
+function productShowLinkProps(product: ProductCardType) {
+  return {
+    href: `/product/${product.slug}`,
+    // Hover-prefetch the Inertia payload; Catalogue/Show is eager-loaded in app.tsx
+    // so Instant Visits can paint the product page on click without waiting on a chunk.
+    prefetch: true,
+    cacheFor: '60s',
+    ...productInstantProps(product),
   };
 }
 
@@ -163,6 +169,10 @@ export function ProductCard({ product }: { product: ProductCardType }) {
     }
   };
 
+  const openProduct = () => {
+    router.visit(`/product/${product.slug}`, productInstantProps(product));
+  };
+
   return (
     <article className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0">
       <div className="relative shrink-0 overflow-hidden border-b border-slate-100 bg-white">
@@ -217,9 +227,21 @@ export function ProductCard({ product }: { product: ProductCardType }) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-3 sm:p-4">
+      <div
+        className="flex flex-1 cursor-pointer flex-col p-3 sm:p-4"
+        onClick={openProduct}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openProduct();
+          }
+        }}
+        role="link"
+        tabIndex={0}
+        aria-label={`View ${product.name}`}
+      >
         <h3 className="h-10 text-sm font-bold leading-5 text-slate-900 sm:h-12 sm:text-base sm:leading-6">
-          <Link {...productShowLinkProps(product)} className="line-clamp-2 hover:text-blue-600">
+          <Link {...productShowLinkProps(product)} className="line-clamp-2 hover:text-blue-600" onClick={(event) => event.stopPropagation()}>
             {product.name}
           </Link>
         </h3>
