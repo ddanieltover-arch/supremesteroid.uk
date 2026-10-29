@@ -3,7 +3,8 @@ import { Eye, GitCompare } from 'lucide-react';
 import { useEffect, useState, type MouseEvent } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { QuickView } from '@/components/catalogue/QuickView';
-import { addCartItem } from '@/lib/cartApi';
+import { useCart } from '@/hooks/useCart';
+import { addCartItem, getCartOverride, optimisticAddToCart } from '@/lib/cartApi';
 import { formatMoney } from '@/lib/money';
 import { readCompareIds, toggleCompareId } from '@/lib/compare';
 import type { ProductCard as ProductCardType, ProductDetail, ProductVariant } from '@/types';
@@ -93,7 +94,7 @@ function productShowLinkProps(product: ProductCardType) {
 }
 
 export function ProductCard({ product }: { product: ProductCardType }) {
-  const [adding, setAdding] = useState(false);
+  const cart = useCart();
   const [added, setAdded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageFailed, setImageFailed] = useState(false);
@@ -115,37 +116,43 @@ export function ProductCard({ product }: { product: ProductCardType }) {
     return () => window.removeEventListener('ss:compare', sync);
   }, [product.id]);
 
-  const postCart = async (variantId?: string) => {
-    setAdding(true);
+  const postCart = (variantId?: string, variantName?: string | null) => {
     setError(null);
-    try {
-      await addCartItem({
-        product_id: product.id,
-        product_variant_id: variantId || null,
-        quantity: 1,
-      });
-      setAdded(true);
-      window.setTimeout(() => setAdded(false), 1200);
-      window.dispatchEvent(new CustomEvent('ss:open-cart'));
-    } catch {
+    optimisticAddToCart(getCartOverride() ?? cart, {
+      product_id: product.id,
+      product_name: product.name,
+      product_slug: product.slug,
+      product_sku: product.sku,
+      variant_id: variantId ?? null,
+      variant_name: variantName ?? null,
+      unit_price: product.pricing?.effective_price ?? '0.00',
+      quantity: 1,
+      image_url: product.image_url ?? null,
+    });
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1200);
+    window.dispatchEvent(new CustomEvent('ss:open-cart'));
+
+    void addCartItem({
+      product_id: product.id,
+      product_variant_id: variantId || null,
+      quantity: 1,
+    }).catch(() => {
       setError('This item could not be added. Availability is confirmed on the server.');
-    } finally {
-      setAdding(false);
-    }
+    });
   };
 
   const addToCart = async (event: MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    if (!product.is_purchasable || adding) {
+    if (!product.is_purchasable) {
       return;
     }
     if (!product.has_variants) {
-      void postCart();
+      postCart();
       return;
     }
 
-    setAdding(true);
     setError(null);
     try {
       const response = await fetch(`/product/${product.slug}/quick-view`);
@@ -155,19 +162,16 @@ export function ProductCard({ product }: { product: ProductCardType }) {
       const payload = (await response.json()) as { product: ProductDetail };
       const purchasable = (payload.product.variants ?? []).filter((variant) => variant.is_purchasable);
       if (purchasable.length === 1) {
-        await postCart(purchasable[0].id);
+        postCart(purchasable[0].id, purchasable[0].name);
         return;
       }
       if (purchasable.length > 1) {
         setVariantPicker(purchasable);
-        setAdding(false);
         return;
       }
       setError('No purchasable option is available.');
     } catch {
       setError('This item is unavailable.');
-    } finally {
-      setAdding(false);
     }
   };
 
@@ -276,10 +280,9 @@ export function ProductCard({ product }: { product: ProductCardType }) {
             <button
               type="button"
               onClick={addToCart}
-              disabled={adding}
-              className="flex h-11 w-full items-center justify-center rounded-lg bg-brand px-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-brand-dark disabled:opacity-70"
+              className="flex h-11 w-full items-center justify-center rounded-lg bg-brand px-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-brand-dark"
             >
-              {added ? 'Added' : adding ? 'Adding…' : product.has_variants ? 'Choose & add' : 'Add to cart'}
+              {added ? 'Added' : product.has_variants ? 'Choose & add' : 'Add to cart'}
             </button>
           ) : (
             <p className="flex h-11 items-center justify-center rounded-lg border border-slate-200 px-3 text-center text-xs text-slate-500">Not available to purchase</p>
@@ -298,7 +301,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
                 className="flex min-h-11 w-full items-center justify-between rounded-lg border border-slate-200 px-3 text-left text-sm text-slate-800 hover:border-blue-500"
                 onClick={() => {
                   setVariantPicker(null);
-                  postCart(variant.id);
+                  postCart(variant.id, variant.name);
                 }}
               >
                 <span>{variant.name}</span>

@@ -10,7 +10,8 @@ import { ProductGallery } from '@/components/catalogue/ProductGallery';
 import { ProductInfoPanels } from '@/components/catalogue/ProductInfoPanels';
 import { RecentlyViewed } from '@/components/catalogue/RecentlyViewed';
 import { TrustBlocks } from '@/components/catalogue/TrustBlocks';
-import { addCartItem } from '@/lib/cartApi';
+import { useCart } from '@/hooks/useCart';
+import { addCartItem, getCartOverride, optimisticAddToCart } from '@/lib/cartApi';
 import { rememberRecentlyViewed } from '@/lib/recentlyViewed';
 import { formatMoney } from '@/lib/money';
 import type { CartPayload, ProductCard as ProductCardType, ProductDetail, SeoProps } from '@/types';
@@ -134,12 +135,12 @@ export default function CatalogueShow({
   preview?: boolean;
   related_groups?: RelatedGroups | null;
 }) {
-  const page = usePage<{ auth?: { user?: unknown }; wishlistProductIds?: string[] }>();
+  const page = usePage<{ auth?: { user?: unknown }; wishlistProductIds?: string[]; cart?: CartPayload }>();
+  const cart = useCart();
   const saved = product ? (page.props.wishlistProductIds ?? []).includes(product.id) : false;
   const isPreview = Boolean(preview || product?.is_preview);
   const [variantId, setVariantId] = useState(product?.variants?.[0]?.id ?? '');
   const [quantity, setQuantity] = useState(1);
-  const [cartBusy, setCartBusy] = useState<'add' | 'buy' | null>(null);
   const [cartError, setCartError] = useState<string | null>(null);
   const notify = useForm({
     email: '',
@@ -154,7 +155,6 @@ export default function CatalogueShow({
   useEffect(() => {
     setVariantId(product?.variants?.[0]?.id ?? '');
     setQuantity(1);
-    setCartBusy(null);
     setCartError(null);
   }, [product?.id]);
 
@@ -164,31 +164,43 @@ export default function CatalogueShow({
     }
   }, [product?.slug, isPreview]);
 
-  const submitCart = async (mode: 'add' | 'buy') => {
-    if (!product?.id || cartBusy) {
+  const submitCart = (mode: 'add' | 'buy') => {
+    if (!product?.id) {
       return;
     }
     setCartError(null);
 
     if (mode === 'buy') {
-      // Instant Visit: paint checkout immediately, session is established by the GET.
+      // Instant Visit: paint checkout immediately — no waiting / Processing state.
       router.visit(buyNowCheckoutUrl(product.id, variantId, quantity), buyNowInstantProps(product, variantId, quantity));
       return;
     }
 
-    setCartBusy('add');
-    try {
-      await addCartItem({
-        product_id: product.id,
-        product_variant_id: variantId || null,
-        quantity,
-      });
-      window.dispatchEvent(new CustomEvent('ss:open-cart'));
-    } catch {
+    const selected = product.variants?.find((variant) => variant.id === variantId);
+    const unit = selected?.effective_price ?? product.pricing?.effective_price ?? '0.00';
+    const image = product.images?.find((item) => item.is_primary)?.url ?? product.image_url ?? null;
+
+    // Optimistic: update badge + open drawer on the same click, sync server in background.
+    optimisticAddToCart(getCartOverride() ?? cart, {
+      product_id: product.id,
+      product_name: product.name,
+      product_slug: product.slug,
+      product_sku: product.sku,
+      variant_id: selected?.id ?? null,
+      variant_name: selected?.name ?? null,
+      unit_price: unit,
+      quantity,
+      image_url: image,
+    });
+    window.dispatchEvent(new CustomEvent('ss:open-cart'));
+
+    void addCartItem({
+      product_id: product.id,
+      product_variant_id: variantId || null,
+      quantity,
+    }).catch(() => {
       setCartError('This item could not be added. Availability is confirmed on the server.');
-    } finally {
-      setCartBusy(null);
-    }
+    });
   };
 
   if (! product?.id) {
@@ -329,16 +341,10 @@ export default function CatalogueShow({
                 className="w-32 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
               />
               <div className="flex flex-wrap gap-2">
-                <Button variant="secondary" className="min-h-12" isLoading={cartBusy === 'add'} disabled={cartBusy !== null} onClick={() => void submitCart('add')}>
+                <Button variant="secondary" className="min-h-12" onClick={() => submitCart('add')}>
                   Add to cart
                 </Button>
-                <Button
-                  variant="primary"
-                  className="min-h-12"
-                  isLoading={cartBusy === 'buy'}
-                  disabled={cartBusy !== null}
-                  onClick={() => void submitCart('buy')}
-                >
+                <Button variant="primary" className="min-h-12" onClick={() => submitCart('buy')}>
                   Buy now
                 </Button>
                 {page.props.auth?.user ? (

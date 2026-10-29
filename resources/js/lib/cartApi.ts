@@ -1,10 +1,99 @@
 import { jsonFetch } from '@/lib/http';
-import type { CartPayload } from '@/types';
+import type { CartItem, CartPayload } from '@/types';
 
 type CartMutationResponse = {
   message?: string;
   cart: CartPayload;
 };
+
+function moneyTimes(amount: string | null | undefined, quantity: number): string {
+  const pence = Math.round(Number(amount ?? 0) * 100) * Math.max(0, quantity);
+  return (pence / 100).toFixed(2);
+}
+
+function recountCart(items: CartItem[], currency: string): CartPayload {
+  const subtotal = items.reduce((sum, item) => sum + Math.round(Number(item.line_total) * 100), 0);
+  const itemsCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotalAmount = (subtotal / 100).toFixed(2);
+
+  return {
+    id: null,
+    items,
+    totals: {
+      subtotal_amount: subtotalAmount,
+      discount_amount: '0.00',
+      shipping_amount: '0.00',
+      tax_amount: '0.00',
+      grand_total_amount: subtotalAmount,
+      items_count: itemsCount,
+      currency,
+    },
+    shipping_eligibility: {
+      free_shipping_threshold: '0.00',
+      current_eligible_subtotal: subtotalAmount,
+      remaining_to_threshold: '0.00',
+      free_shipping_eligible: false,
+      progress_percent: 0,
+      currency,
+    },
+    is_checkout_ready: itemsCount > 0,
+  };
+}
+
+/** Instant local cart update used before the server round-trip finishes. */
+export function optimisticAddToCart(
+  current: CartPayload | null | undefined,
+  line: {
+    product_id: string;
+    product_name: string;
+    product_slug: string;
+    product_sku: string;
+    variant_id?: string | null;
+    variant_name?: string | null;
+    unit_price: string;
+    quantity: number;
+    image_url?: string | null;
+  },
+): CartPayload {
+  const currency = current?.totals?.currency ?? 'GBP';
+  const quantity = Math.max(1, line.quantity);
+  const items = [...(current?.items ?? [])];
+  const existingIndex = items.findIndex(
+    (item) => item.product_id === line.product_id && (item.variant_id ?? null) === (line.variant_id ?? null),
+  );
+
+  if (existingIndex >= 0) {
+    const existing = items[existingIndex];
+    const nextQty = existing.quantity + quantity;
+    items[existingIndex] = {
+      ...existing,
+      quantity: nextQty,
+      subtotal: moneyTimes(existing.unit_price, nextQty),
+      line_total: moneyTimes(existing.unit_price, nextQty),
+      is_eligible: true,
+      ineligibility_reasons: [],
+    };
+  } else {
+    items.push({
+      id: `optimistic-${line.product_id}-${line.variant_id ?? 'base'}`,
+      product_id: line.product_id,
+      product_name: line.product_name,
+      product_slug: line.product_slug,
+      product_sku: line.product_sku,
+      variant_id: line.variant_id ?? null,
+      variant_name: line.variant_name ?? null,
+      unit_price: line.unit_price,
+      quantity,
+      subtotal: moneyTimes(line.unit_price, quantity),
+      line_total: moneyTimes(line.unit_price, quantity),
+      image_url: line.image_url ?? null,
+      is_eligible: true,
+      ineligibility_reasons: [],
+    });
+  }
+
+  return publishCart(recountCart(items, currency));
+}
 
 type CartListener = (cart: CartPayload) => void;
 
