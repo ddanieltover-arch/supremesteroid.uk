@@ -1,0 +1,58 @@
+{
+  "prompt": 28,
+  "verified_at": "2026-10-19T05:22:00+00:00",
+  "database": {
+    "driver": "sqlite",
+    "path": "database/qa.sqlite",
+    "neon": false,
+    "guard": "ok"
+  },
+  "public_sources": {
+    "robots_txt": { "url": "https://supremesteroids.co.uk/robots.txt", "status": 404, "automated_access": "no published disallow rules" },
+    "sitemap_index": { "url": "https://supremesteroids.co.uk/sitemap.xml", "status": 200, "permitted": true },
+    "product_sitemap": { "url": "https://supremesteroids.co.uk/product-sitemap.xml", "status": 200, "urls_discovered": 472, "records_retrieved": "not equal to 472" },
+    "product_cat_sitemap": { "url": "https://supremesteroids.co.uk/product_cat-sitemap.xml", "status": 200, "note": "categories predominantly restricted" },
+    "rss_feed": { "url": "https://supremesteroids.co.uk/feed", "status": 404 },
+    "product_rss": { "url": "https://supremesteroids.co.uk/product/feed", "status": 404 },
+    "wp_json": { "url": "https://supremesteroids.co.uk/wp-json", "status": 404 },
+    "wp_v2_product": { "url": "https://supremesteroids.co.uk/wp-json/wp/v2/product", "status": 404 },
+    "wc_store_api": { "url": "https://supremesteroids.co.uk/wp-json/wc/store/v1/products", "status": 404 },
+    "wc_rest_v3": { "url": "https://supremesteroids.co.uk/wp-json/wc/v3/products", "status": 404, "credentials_configured": false },
+    "shop_search_vitamin": { "url": "https://supremesteroids.co.uk/shop?search=vitamin", "status": 200 },
+    "product_html_jsonld": { "status": 200, "sample": "himalaya-liv52", "fields": ["name", "sku", "description", "price", "currency", "image URLs", "availability"], "brand_often_placeholder": true }
+  },
+  "slug_classification": {
+    "sitemap_urls": 472,
+    "slug_excluded_without_fetch": 469,
+    "page_fetch_candidates": 3,
+    "candidates": [
+      "proper-power-20-proper-labs-20tabs50mg",
+      "tudca-180mg-100caps-syncom-labs",
+      "himalaya-liv52-liver-care-tablets-100-tabs"
+    ]
+  },
+  "retrieval_and_staging": {
+    "full_sitemap_walk_run": "prompt-28-public-html",
+    "sitemap_urls_processed": 472,
+    "pages_fetched_in_full_walk": 3,
+    "note": "Initial full walk hard-excluded all 472 due to related-product chrome (needle/syringe/oral steroid) in page HTML; classification fixed and eligible subset re-fetched.",
+    "eligible_refetch_run": "prompt-28-eligible-refetch-v4",
+    "records_retrieved_with_page_evidence": 3,
+    "outcomes": {
+      "proper-power-20-proper-labs-20tabs50mg": "REJECTED (oral steroid category)",
+      "tudca-180mg-100caps-syncom-labs": "COMPLIANCE_REVIEW hold; draft product created; non-purchasable",
+      "himalaya-liv52-liver-care-tablets-100-tabs": "DUPLICATE of existing IMPORTED draft; publication gates preserved"
+    },
+    "products_in_qa": 2,
+    "purchasable": 0,
+    "approved_for_publication": 0,
+    "actually_published": 0,
+    "image_usage": "Public image URLs recorded as references only; not copied into persistent storage"
+  },
+  "liv52_preserved": {
+    "sku": "IMP-KBYUNVKHJA",
+    "status": "IMPORTED",
+    "classification": "OTHER_LAWFUL_PRODUCT",
+    "purchasable": false
+  }
+}

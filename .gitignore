@@ -34,6 +34,9 @@ storage/oauth-*.key
 !storage/framework/cache/data/.gitignore
 /storage/app/private/*
 /storage/app/testing/*
+/storage/app/catalogue-import/cache/*
+/storage/app/public/*
+!/storage/app/public/.gitignore
 .vercel
 
 

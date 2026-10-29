@@ -1,0 +1,39 @@
+{
+  "verified_at": "2026-10-17T02:50:00Z",
+  "prompt": "25",
+  "environment": {
+    "app_env_observed": "local",
+    "qa_database": "database/qa.sqlite",
+    "neon_rejected_by_guard": true,
+    "git_branch": "main",
+    "git_dirty": false
+  },
+  "reported_starting_point": {
+    "sitemap_urls": 472,
+    "urls_audited_1_to_208": 208,
+    "excluded": 190,
+    "held_for_review": 17,
+    "staged_liv52": 1,
+    "tests": 205
+  },
+  "verified_against_qa_and_files": {
+    "sitemap_urls": 472,
+    "durable_audit_batches_present_for_1_to_208": false,
+    "unique_urls_in_audit_ledger_before_batch_5": 0,
+    "qa_products": 1,
+    "qa_liv52_status": "IMPORTED",
+    "qa_liv52_sku": "IMP-FGYDT5KMC9",
+    "qa_liv52_purchasable": false,
+    "qa_compliance_hold_products": 0,
+    "qa_compliance_hold_import_records": 0,
+    "prior_17_held_records_located": false
+  },
+  "reconciliation_notes": [
+    "The live product sitemap still contains 472 URLs.",
+    "QA sqlite contains the staged Himalaya Liv52 draft (status IMPORTED, non-purchasable) and matching import/image/mapping rows.",
+    "No durable audit JSON files for batches covering URLs #1–#208 were present in the repository, storage/app/catalogue-import/audits, or agent stores at the start of Prompt 25.",
+    "Therefore the reported 190 excluded / 17 held totals for URLs #1–#208 could not be verified against audit files and are not treated as current ledger state.",
+    "The reported 17 held records do not exist as COMPLIANCE_REVIEW products or import records in QA; there was nothing product-level to reclassify without inventing history.",
+    "Batch 5 created the durable ledger starting at URLs #209–#260 and will be the source of truth going forward for audited indexes in that range."
+  ]
+}

@@ -1,0 +1,1068 @@
+{
+    "batch": "batch-05-urls-209-260",
+    "audited_at": "2026-10-17T02:52:11+00:00",
+    "from": 209,
+    "to": 260,
+    "sitemap_count": 472,
+    "audited": 52,
+    "excluded": 52,
+    "held": 0,
+    "lawful_candidates": 0,
+    "access_errors": 0,
+    "records": [
+        {
+            "index": 209,
+            "source_url": "https://supremesteroids.co.uk/product/buy-t3-proper-labs-online-uk",
+            "product_name": "Buy T3 Proper Labs Online Uk",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "liothyronine/t3"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "T3/liothyronine thyroid hormone product excluded from retail onboarding."
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 210,
+            "source_url": "https://supremesteroids.co.uk/product/testex-c-200-pharmaqo-labs",
+            "product_name": "Testex C 200 Pharmaqo Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: testex"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 211,
+            "source_url": "https://supremesteroids.co.uk/product/boldenone-undecylenate-300-proper-labs",
+            "product_name": "Boldenone Undecylenate 300 Proper Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "boldenone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: boldenone",
+                "Excluded from commerce onboarding: boldenone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 212,
+            "source_url": "https://supremesteroids.co.uk/product/testosterone-e-300mg-pharmaqo-labs-amps",
+            "product_name": "Testosterone E 300mg Pharmaqo Labs Amps",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "testosterone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: testosterone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 213,
+            "source_url": "https://supremesteroids.co.uk/product/hemi-pharma-trenbolone-ace",
+            "product_name": "Hemi Pharma Trenbolone Ace",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "trenbolone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: trenbolone",
+                "Excluded from commerce onboarding: trenbolone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 214,
+            "source_url": "https://supremesteroids.co.uk/product/hemi-pharma-masteron-e-drostanolone-200",
+            "product_name": "Hemi Pharma Masteron E Drostanolone 200",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "drostanolone",
+                "masteron"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: drostanolone",
+                "Excluded from commerce onboarding: masteron"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 215,
+            "source_url": "https://supremesteroids.co.uk/product/hemi-pharma-tmp-mix-400mg",
+            "product_name": "Hemi Pharma Tmp Mix 400mg",
+            "brand": null,
+            "category": null,
+            "active_substances": [],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: tmp-mix"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 216,
+            "source_url": "https://supremesteroids.co.uk/product/hemi-pharma-test-mix-400",
+            "product_name": "Hemi Pharma Test Mix 400",
+            "brand": null,
+            "category": null,
+            "active_substances": [],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: test-mix"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 217,
+            "source_url": "https://supremesteroids.co.uk/product/hemi-pharma-sustanon-250",
+            "product_name": "Hemi Pharma Sustanon 250",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "sustanon"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: sustanon"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 218,
+            "source_url": "https://supremesteroids.co.uk/product/hemi-pharma-hgh",
+            "product_name": "Hemi Pharma Hgh",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "hgh"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: hemi-pharma-hgh",
+                "Excluded from commerce onboarding: -hgh"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 219,
+            "source_url": "https://supremesteroids.co.uk/product/sustanon-300-testosterone-mix-syncom-labs",
+            "product_name": "Sustanon 300 Testosterone Mix Syncom Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "testosterone",
+                "sustanon"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: testosterone",
+                "Excluded from commerce onboarding: sustanon"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 220,
+            "source_url": "https://supremesteroids.co.uk/product/semaglutide-5mg-pharmaqo",
+            "product_name": "Semaglutide 5mg Pharmaqo",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "semaglutide"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: semaglutide"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 221,
+            "source_url": "https://supremesteroids.co.uk/product/clenbuterol-spiropent-40mcg100tabs-syncom-labs",
+            "product_name": "Clenbuterol Spiropent 40mcg100tabs Syncom Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "clenbuterol"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: clenbuterol",
+                "Excluded from commerce onboarding: clenbuterol"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 222,
+            "source_url": "https://supremesteroids.co.uk/product/clomid-50mg-pharmaqo-labs",
+            "product_name": "Clomid 50mg Pharmaqo Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "clomid"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: clomid"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 223,
+            "source_url": "https://supremesteroids.co.uk/product/xxx-tabs-pharmaqo-labs",
+            "product_name": "XXX Tabs – PharmaQo Labs",
+            "brand": null,
+            "category": "Oral Steroids",
+            "active_substances": [],
+            "source_sku": null,
+            "source_price": "54.00",
+            "source_currency": "GBP",
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "“XXX Tabs” identity is not established from the slug; held for product-page evidence before any retail decision.",
+                "Source category identifies an oral steroid catalogue listing; excluded from retail onboarding."
+            ],
+            "page_fetched": true,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 224,
+            "source_url": "https://supremesteroids.co.uk/product/yohimbine-hcl-10mg-100caps-syncom-labs",
+            "product_name": "Yohimbine HCL",
+            "brand": null,
+            "category": "Oral Steroids",
+            "active_substances": [
+                "yohimbine"
+            ],
+            "source_sku": null,
+            "source_price": "49.50",
+            "source_currency": "GBP",
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Yohimbine HCl requires qualified review of lawful retail status, dose presentation, and labelling before onboarding.",
+                "Source category identifies an oral steroid catalogue listing; excluded from retail onboarding."
+            ],
+            "page_fetched": true,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 225,
+            "source_url": "https://supremesteroids.co.uk/product/stenabolic-sr-9009-10mg",
+            "product_name": "Stenabolic Sr 9009 10mg",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "stenabolic"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: stenabolic"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 226,
+            "source_url": "https://supremesteroids.co.uk/product/methyltrienolone-1mg-pharmaqo-labs",
+            "product_name": "Methyltrienolone 1mg Pharmaqo Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "methyltrienolone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: methyltrienolone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 227,
+            "source_url": "https://supremesteroids.co.uk/product/testosterone-propionate-100mg-beligas-pharmaceuticals",
+            "product_name": "Testosterone Propionate 100mg Beligas Pharmaceuticals",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "testosterone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: testosterone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 228,
+            "source_url": "https://supremesteroids.co.uk/product/yk11-10mg",
+            "product_name": "Yk11 10mg",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "yk11"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: yk11"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 229,
+            "source_url": "https://supremesteroids.co.uk/product/tren-ace-100-trenbolone-acetate-syncom-labs",
+            "product_name": "Tren Ace 100 Trenbolone Acetate Syncom Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "trenbolone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: trenbolone",
+                "Excluded from commerce onboarding: trenbolone",
+                "Excluded from commerce onboarding: tren-ace"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 230,
+            "source_url": "https://supremesteroids.co.uk/product/trenbolone-acetate-100-proper-labs",
+            "product_name": "Trenbolone Acetate 100 Proper Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "trenbolone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: trenbolone",
+                "Excluded from commerce onboarding: trenbolone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 231,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-ghk-cu-50",
+            "product_name": "Deus Medical Ghk Cu 50",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "ghk-cu"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: ghk-cu"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 232,
+            "source_url": "https://supremesteroids.co.uk/product/kamagra-jelly",
+            "product_name": "Kamagra Jelly",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "kamagra"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: kamagra"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 233,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-clenomed-40",
+            "product_name": "Deus Medical Clenomed 40",
+            "brand": null,
+            "category": null,
+            "active_substances": [],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: clenomed"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 234,
+            "source_url": "https://supremesteroids.co.uk/product/testo-cyp-200-testosterone-cypionate-syncom-labs",
+            "product_name": "Testo Cyp 200 Testosterone Cypionate Syncom Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "testosterone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: testosterone cypionate",
+                "Excluded from commerce onboarding: testosterone",
+                "Excluded from commerce onboarding: testo-cyp"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 235,
+            "source_url": "https://supremesteroids.co.uk/product/qomatropin-hgh-100iu-pharmaqo-labs",
+            "product_name": "Qomatropin Hgh 100iu Pharmaqo Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "hgh"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: qomatropin",
+                "Excluded from commerce onboarding: -hgh",
+                "Excluded from commerce onboarding: hgh-"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 236,
+            "source_url": "https://supremesteroids.co.uk/product/drostanolone-e-100mg-pharmaqo",
+            "product_name": "Drostanolone E 100mg Pharmaqo",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "drostanolone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: drostanolone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 237,
+            "source_url": "https://supremesteroids.co.uk/product/trenbolone-acetate-100mg-pharmaqo-labs-amps",
+            "product_name": "Trenbolone Acetate 100mg Pharmaqo Labs Amps",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "trenbolone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: trenbolone",
+                "Excluded from commerce onboarding: trenbolone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 238,
+            "source_url": "https://supremesteroids.co.uk/product/ett-500-pharmaqo-labs",
+            "product_name": "ETT-500 – PharmaQo Labs",
+            "brand": null,
+            "category": "Injectable Steroids",
+            "active_substances": [],
+            "source_sku": null,
+            "source_price": "58.90",
+            "source_currency": "GBP",
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "ETT-500 identity is not established from the slug; held for product-page evidence.",
+                "Source category identifies an injectable steroid catalogue listing; excluded from retail onboarding."
+            ],
+            "page_fetched": true,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 239,
+            "source_url": "https://supremesteroids.co.uk/product/tri-tren-pharmaqo-labs",
+            "product_name": "Tri Tren Pharmaqo Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: tri-tren"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 240,
+            "source_url": "https://supremesteroids.co.uk/product/turinabol-10mg-pharmaqo-labs",
+            "product_name": "Turinabol 10mg Pharmaqo Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "turinabol"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: turinabol"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 241,
+            "source_url": "https://supremesteroids.co.uk/product/clenbuterol-proper-labs",
+            "product_name": "Clenbuterol Proper Labs",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "clenbuterol"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: clenbuterol",
+                "Excluded from commerce onboarding: clenbuterol"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 242,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-mots-c-mitochondrial-derived-peptide",
+            "product_name": "Deus Medical Mots C Mitochondrial Derived Peptide",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "mots-c"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: peptide",
+                "Excluded from commerce onboarding: mots-c"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 243,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-livamed-1-pitavastatin-calcium",
+            "product_name": "Deus Medical Livamed 1 Pitavastatin Calcium",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "pitavastatin"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: pitavastatin"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 244,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-mod-grf-1-29",
+            "product_name": "Deus Medical Mod Grf 1 29",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "mod grf"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: mod grf",
+                "Excluded from commerce onboarding: mod-grf"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 245,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-nolvamed-20-tamoxifen-citrate",
+            "product_name": "Deus Medical Nolvamed 20 Tamoxifen Citrate",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "tamoxifen"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: tamoxifen"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 246,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-pnc-27-peptide",
+            "product_name": "Deus Medical Pnc 27 Peptide",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "pnc-27"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: peptide",
+                "Excluded from commerce onboarding: pnc-27"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 247,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-primomed-25-methenolone-acetate",
+            "product_name": "Deus Medical Primomed 25 Methenolone Acetate",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "methenolone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: methenolone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 248,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-supermed-10-methyldrostanolone",
+            "product_name": "Deus Medical Supermed 10 Methyldrostanolone",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "drostanolone",
+                "methyldrostanolone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: drostanolone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 249,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-tb-500-thymosin-beta-4",
+            "product_name": "Deus Medical Tb 500 Thymosin Beta 4",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "tb-500",
+                "thymosin"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: tb-500",
+                "Excluded from commerce onboarding: thymosin"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 250,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-thymalin-thymic-factor",
+            "product_name": "Deus Medical Thymalin Thymic Factor",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "thymalin"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: thymalin"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 251,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-thymosin-a1-thymosin-alpha-1",
+            "product_name": "Deus Medical Thymosin A1 Thymosin Alpha 1",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "thymosin"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: thymosin"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 252,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-thyromed-50-t4",
+            "product_name": "Deus Medical Thyromed 50 T4",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "levothyroxine/t4"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: thyromed"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 253,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-trestolone-a-100-trestolone-acetate",
+            "product_name": "Deus Medical Trestolone A 100 Trestolone Acetate",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "trestolone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: trestolone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 254,
+            "source_url": "https://supremesteroids.co.uk/product/trestolone-e-100-trestolone-enanthate",
+            "product_name": "Trestolone E 100 Trestolone Enanthate",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "trestolone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: trestolone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 255,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-viamed-20-sildenafil-citrate",
+            "product_name": "Deus Medical Viamed 20 Sildenafil Citrate",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "sildenafil"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: sildenafil"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 256,
+            "source_url": "https://supremesteroids.co.uk/product/clomimed-clomiphene-citrate-deus-medical",
+            "product_name": "Clomimed Clomiphene Citrate Deus Medical",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "clomiphene"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: clomiphene"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 257,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-mastermed-p-100-drostanolone-propionate",
+            "product_name": "Deus Medical Mastermed P 100 Drostanolone Propionate",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "drostanolone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: drostanolone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 258,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-anadromed-50-oxymetholone",
+            "product_name": "Deus Medical Anadromed 50 Oxymetholone",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "oxymetholone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Excluded from commerce onboarding: oxymetholone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 259,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-trenbomed-e-200-trenbolone-enanthate",
+            "product_name": "Deus Medical Trenbomed E 200 Trenbolone Enanthate",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "trenbolone"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: trenbolone",
+                "Excluded from commerce onboarding: trenbolone"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        },
+        {
+            "index": 260,
+            "source_url": "https://supremesteroids.co.uk/product/deus-medical-winimed-50-stanozolol",
+            "product_name": "Deus Medical Winimed 50 Stanozolol",
+            "brand": null,
+            "category": null,
+            "active_substances": [
+                "stanozolol"
+            ],
+            "source_sku": null,
+            "source_price": null,
+            "source_currency": null,
+            "classification": "EXCLUDED_RESTRICTED",
+            "evidence": [
+                "Source text matched compliance review term: stanozolol",
+                "Excluded from commerce onboarding: stanozolol"
+            ],
+            "page_fetched": false,
+            "access_error": null,
+            "import_readiness": null
+        }
+    ]
+}

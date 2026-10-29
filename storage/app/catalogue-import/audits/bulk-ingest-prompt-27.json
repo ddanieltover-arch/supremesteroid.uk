@@ -1,0 +1,17 @@
+{
+  "verified_at": "2026-10-17T03:34:00Z",
+  "prompt": "27",
+  "authorized_source_status": {
+    "woocommerce_rest_credentials": false,
+    "woocommerce_public_api": "HTTP 404 on /wp-json/wc/v3/products and store API",
+    "official_export_files": 1,
+    "html_scraping": "not used for bulk ingest"
+  },
+  "source_records_retrieved": 1,
+  "note": "Only the restored Liv.52 authorized local export record was retrieved/staged. No remote bulk catalogue was retrieved because authorized WooCommerce credentials are absent.",
+  "qa_incident": {
+    "description": "During development, a polluted DB_DATABASE shell env caused PHPUnit RefreshDatabase to wipe database/qa.sqlite. Schema was rebuilt with migrate and Liv.52 was re-staged from the known prior source identity via an authorized local JSON export. No Neon/production data was touched.",
+    "liv52_restored": true
+  },
+  "next_action_required": "Provide CATALOGUE_WC_CONSUMER_KEY and CATALOGUE_WC_CONSUMER_SECRET with read access to /wp-json/wc/v3/products, or place a full official product export JSON under storage/app/catalogue-import/exports/, then run: php artisan catalogue:bulk-ingest --source=woocommerce --run=2026-bulk-001 --limit=50"
+}

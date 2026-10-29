@@ -1,0 +1,1251 @@
+{
+    "base_url": "https://steroids-uk.com",
+    "broken_count": 122,
+    "source_products": 427,
+    "repaired": [
+        {
+            "product_id": "01a17ffb-0c61-72eb-9b6b-ff5dc7b87340",
+            "name": "Aicar \u2013 AICA ribonucleotide [50mg] | Syncom Labs",
+            "slug": "aicar-aica-ribonucleotide-50mg-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/steroids-ukcom-AICAR.webp",
+            "source_url": "https://steroids-uk.com/shop/aicar-aica-ribonucleotide-50mg-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/881c1e4d-ac8a-4f1d-9764-71a86e0007e3/steroids-ukcom-AICAR.webp",
+            "stored_url": "/storage/product_images/01a17ffb-0c61-72eb-9b6b-ff5dc7b87340/primary.webp",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-52f6-70b3-ac0a-84520d27f352",
+            "name": "Anavar Lite \u2013 Oxandrolone (10mg/100tabs) \u2013 Beligas Pharmaceuticals",
+            "slug": "anavar-lite-oxandrolone-10mg100tabs-beligas-pharmaceuticals",
+            "broken_url": "https://supremestd.b-cdn.net/files/anavar-lite-beligas-1.webp",
+            "source_url": "https://steroids-uk.com/shop/anavar-lite-oxandrolone-10mg-100tabs-beligas-pharmaceuticals/",
+            "source_image": "https://steroids-uk.com/media/products/62339127-23f3-4bf1-99c8-3f6115ad8451/anavar-lite-beligas.webp",
+            "stored_url": "/storage/product_images/01a17ffa-52f6-70b3-ac0a-84520d27f352/primary.webp",
+            "match": "token_overlap",
+            "score": 0.875,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffb-0e46-72d4-8506-061558273626",
+            "name": "Anavar Oxandrolon [10mg/100caps] | Syncom Labs",
+            "slug": "anavar-oxandrolon-10mg100caps-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/oxandrolon-caps-V2.webp",
+            "source_url": "https://steroids-uk.com/shop/anavar-oxandrolon-10mg-100caps-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/6cb6f2d4-c72a-4786-9b64-45150ffcbc5a/oxandrolon-caps-V2.webp",
+            "stored_url": "/storage/product_images/01a17ffb-0e46-72d4-8506-061558273626/primary.webp",
+            "match": "token_overlap",
+            "score": 0.833,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffb-15e3-7180-8e24-92ce801a8cce",
+            "name": "BPC-157 Body Protective Compound-157 [5mg] | Syncom Labs",
+            "slug": "bpc-157-body-protective-compound-157-5mg-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/steroids-uk-com-BPC157.webp",
+            "source_url": "https://steroids-uk.com/shop/bpc-157-body-protective-compound-157-5mg-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/26bd2c4e-8d2e-4cb0-963d-072289001dcb/steroids-uk-com-BPC157.webp",
+            "stored_url": "/storage/product_images/01a17ffb-15e3-7180-8e24-92ce801a8cce/primary.webp",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-4901-7273-822c-78b853ce7a6f",
+            "name": "Beligas Pharmaceuticals Anavar \u2013 Oxandrolone (50mg/100tabs) \u2013 Beligas Pharmaceutical",
+            "slug": "beligas-pharmaceuticals-anavar-oxandrolone-50mg100tabs-beligas-pharmaceutical",
+            "broken_url": "https://supremestd.b-cdn.net/files/beligas-ANAVAR-50mg-1-1.webp",
+            "source_url": "https://steroids-uk.com/shop/anavar-oxandrolone-50mg-100tabs-beligas-pharmaceutical/",
+            "source_image": "https://steroids-uk.com/media/products/fc37a40d-1dc6-480c-a5a5-fd1adf3bfa51/beligas-ANAVAR-50mg.webp",
+            "stored_url": "/storage/product_images/01a17ffa-4901-7273-822c-78b853ce7a6f/primary.webp",
+            "match": "token_overlap",
+            "score": 0.75,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-f301-716c-aab0-07c6bb1ebd22",
+            "name": "Bolden U 300 \u2013 Boldenone Undecylenate | Syncom Labs",
+            "slug": "bolden-u-300-boldenone-undecylenate-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/steroids-uk.com-bolden300.webp",
+            "source_url": "https://steroids-uk.com/shop/boldenone-undecylenate-bolden-u-300-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/4939e11d-89db-4d8c-8934-2afe5200d2b8/steroids-uk.com-bolden300.webp",
+            "stored_url": "/storage/product_images/01a17ff9-f301-716c-aab0-07c6bb1ebd22/primary.webp",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-a478-723d-866d-da2622ad9d06",
+            "name": "Brand 2ml Syringes (Pack of 10)",
+            "slug": "brand-2ml-syringes-pack-of-10",
+            "broken_url": "https://supremestd.b-cdn.net/files/terumo-syringes2.webp",
+            "source_url": "https://steroids-uk.com/shop/2ml-syringes-pack-of-10/",
+            "source_image": "https://steroids-uk.com/media/products/ea121e6f-2f34-42a1-91c4-07574068f831/terumo-syringes2.webp",
+            "stored_url": "/storage/product_images/01a17ff9-a478-723d-866d-da2622ad9d06/primary.webp",
+            "match": "token_overlap",
+            "score": 0.833,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-a536-71b2-97a2-411f4d2a793a",
+            "name": "Brand 3ml Syringes (Pack of 10)",
+            "slug": "brand-3ml-syringes-pack-of-10",
+            "broken_url": "https://supremestd.b-cdn.net/files/terumo-syringe3ml.webp",
+            "source_url": "https://steroids-uk.com/shop/3ml-syringes-pack-of-10/",
+            "source_image": "https://steroids-uk.com/media/products/c2a14878-af4b-4d1c-b2cd-a6000de3e0bb/terumo-syringe3ml.webp",
+            "stored_url": "/storage/product_images/01a17ff9-a536-71b2-97a2-411f4d2a793a/primary.webp",
+            "match": "token_overlap",
+            "score": 0.833,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-f008-71d0-b7f7-1eb978052f44",
+            "name": "Brand 5ml Syringes (Pack of 10)",
+            "slug": "brand-5ml-syringes-pack-of-10",
+            "broken_url": "https://supremestd.b-cdn.net/files/terumo-syringe5ml.webp",
+            "source_url": "https://steroids-uk.com/shop/5ml-syringes-pack-of-10/",
+            "source_image": "https://steroids-uk.com/media/products/8c0dfadb-a224-4792-8660-87d0a570673c/terumo-syringe5ml.webp",
+            "stored_url": "/storage/product_images/01a17ff9-f008-71d0-b7f7-1eb978052f44/primary.webp",
+            "match": "token_overlap",
+            "score": 0.833,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-e7f3-735d-bc3c-fabd4e6aeaa2",
+            "name": "Caber Cabergoline \u2013 Pharmaqo Labs [10tab/1mg]",
+            "slug": "caber-cabergoline-pharmaqo-labs-10tab1mg",
+            "broken_url": "https://supremestd.b-cdn.net/files/caber-1-1.webp",
+            "source_url": "https://steroids-uk.com/shop/caber-cabergoline-pharmaqo-labs-10tab-1mg/",
+            "source_image": "https://steroids-uk.com/media/products/4090e6d8-f46b-49ec-8f49-77d52ce8bc49/caber-1.webp",
+            "stored_url": "/storage/product_images/01a17ff9-e7f3-735d-bc3c-fabd4e6aeaa2/primary.webp",
+            "match": "token_overlap",
+            "score": 0.833,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-7f03-731c-baa9-b275e726c861",
+            "name": "Clenbuterol \u2013 Spiropent [40mcg/100tabs] | Syncom Labs",
+            "slug": "clenbuterol-spiropent-40mcg100tabs-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/spiropent.webp",
+            "source_url": "https://steroids-uk.com/shop/clenbuterol-spiropent-40mcg-100tabs-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/afb931b0-8de5-4705-aa08-1c13c5376df7/spiropent.webp",
+            "stored_url": "/storage/product_images/01a17ff9-7f03-731c-baa9-b275e726c861/primary.webp",
+            "match": "token_overlap",
+            "score": 0.833,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-95b0-7290-83ce-132dbb6af2ef",
+            "name": "Deca 300 \u2013 Nandrolone Decanoate | Syncom Labs",
+            "slug": "deca-300-nandrolone-decanoate-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/steroids-uk-com-deca300.webp",
+            "source_url": "https://steroids-uk.com/shop/deca-300-nandrolone-decanoate-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/2f15b280-9c1b-4dfa-af54-96a14a5dde5a/steroids-uk-com-deca300.webp",
+            "stored_url": "/storage/product_images/01a17ff9-95b0-7290-83ce-132dbb6af2ef/primary.webp",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-f48f-73da-99b1-94450f574af8",
+            "name": "Deus Medical GHK-CU 50",
+            "slug": "deus-medical-ghk-cu-50",
+            "broken_url": "https://supremestd.b-cdn.net/files/product image-01.png",
+            "source_url": "https://steroids-uk.com/shop/deus-medical-ghk-cu-50/",
+            "source_image": "https://steroids-uk.com/media/products/7dd5266f-6110-44aa-a9b5-507c45e56586/20390b0e-791b-49a5-9912-983e203b1d1a.png",
+            "stored_url": "/storage/product_images/01a17ff9-f48f-73da-99b1-94450f574af8/primary.png",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-4a48-7092-a514-b381f2b3673b",
+            "name": "Etho Testosterone Enanthate 300mg \u2013 Beligas Pharmaceuticals",
+            "slug": "etho-testosterone-enanthate-300mg-beligas-pharmaceuticals",
+            "broken_url": "https://supremestd.b-cdn.net/files/steroids-ukcom-ethotestosterone-beligas.webp",
+            "source_url": "https://steroids-uk.com/shop/etho-testosterone-enanthate-300mg-beligas-pharmaceuticals/",
+            "source_image": "https://steroids-uk.com/media/products/df4dc107-cbd3-4a05-ab66-62dddd69fa91/steroids-ukcom-ethotestosterone-beligas.webp",
+            "stored_url": "/storage/product_images/01a17ffa-4a48-7092-a514-b381f2b3673b/primary.webp",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-1455-7119-86ca-8e94749697e9",
+            "name": "Hemi Pharma Anastrozole",
+            "slug": "hemi-pharma-anastrozole",
+            "broken_url": "https://supremestd.b-cdn.net/files/Anastrazole-min-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/anastrozole-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/b4d0f036-908d-45ae-96f6-de3a23ae9e0b/d32e5cd4-0291-42f0-a330-56811507aca8.png",
+            "stored_url": "/storage/product_images/01a17ffa-1455-7119-86ca-8e94749697e9/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffb-204e-7248-9a75-a98ca3683153",
+            "name": "Hemi Pharma BPC-157",
+            "slug": "hemi-pharma-bpc-157",
+            "broken_url": "https://supremestd.b-cdn.net/files/BPC-157-1-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/bpc-157-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/de542f26-64ed-48b4-9fdf-d829d21a33dd/1fe60656-244a-46eb-8c0d-fa77267927a3.png",
+            "stored_url": "/storage/product_images/01a17ffb-204e-7248-9a75-a98ca3683153/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-0974-715a-bcd6-119065f3bdcc",
+            "name": "Hemi Pharma Clenbuterol",
+            "slug": "hemi-pharma-clenbuterol",
+            "broken_url": "https://supremestd.b-cdn.net/files/CLENBUTEROL-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/clenbuterol-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/b4f2330a-a2dc-4b3d-9de8-fb6b6a48be79/ac57f8e2-6690-4497-8d23-e93b8137a93a.png",
+            "stored_url": "/storage/product_images/01a17ffa-0974-715a-bcd6-119065f3bdcc/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-0771-7075-9abe-6793f8507910",
+            "name": "Hemi Pharma Clomiphene Citrate",
+            "slug": "hemi-pharma-clomiphene-citrate",
+            "broken_url": "https://supremestd.b-cdn.net/files/IMG_3373334B1B4B-1-1-1.jpeg",
+            "source_url": "https://steroids-uk.com/shop/clomiphene-citrate-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/27f4bd44-5be1-4b33-a67b-ba29a77e9db4/45811bd6-df8c-43d8-bd3d-da2a75315cf2.png",
+            "stored_url": "/storage/product_images/01a17ffa-0771-7075-9abe-6793f8507910/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-792f-71a9-a87c-7ac720aea87d",
+            "name": "Hemi Pharma HCG 5000iu",
+            "slug": "hemi-pharma-hcg-5000iu",
+            "broken_url": "https://supremestd.b-cdn.net/files/HCG-5000-600x600-1-2.jpg",
+            "source_url": "https://steroids-uk.com/shop/hcg-5000iu-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/3c9d0fe1-118b-4b10-9650-f6b22a49a65a/9ce39549-0bee-4046-87c6-dcb39094a9a9.png",
+            "stored_url": "/storage/product_images/01a17ff9-792f-71a9-a87c-7ac720aea87d/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-06b8-7094-bf30-3a8edb8f0b0e",
+            "name": "Hemi Pharma IGF DES (1-3)",
+            "slug": "hemi-pharma-igf-des-1-3",
+            "broken_url": "https://supremestd.b-cdn.net/files/IFG-DES1-3-1-2.jpg",
+            "source_url": "https://steroids-uk.com/shop/igf-des-1-3-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/31c13159-a692-4177-ac97-e527026fc69e/7c350389-3e21-416b-ba8e-a46d2e174cab.png",
+            "stored_url": "/storage/product_images/01a17ffa-06b8-7094-bf30-3a8edb8f0b0e/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-0540-716c-bbb9-e319651ecc55",
+            "name": "Hemi Pharma IGF1-LR3",
+            "slug": "hemi-pharma-igf1-lr3",
+            "broken_url": "https://supremestd.b-cdn.net/files/IGF1-LR3-1mg-2.jpg",
+            "source_url": "https://steroids-uk.com/shop/igf1-lr3-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/c1e1cb09-67f6-4951-8f7a-aa5b804752f4/e41aa8b9-f3ed-4f31-8420-6ad602baded0.png",
+            "stored_url": "/storage/product_images/01a17ffa-0540-716c-bbb9-e319651ecc55/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-0046-73a8-8e7b-e8b9ef5152e5",
+            "name": "Hemi Pharma LIOTHYRONINE SODIUM",
+            "slug": "hemi-pharma-liothyronine-sodium",
+            "broken_url": "https://supremestd.b-cdn.net/files/LIOTHYRONINE-SODIUM-2.jpg",
+            "source_url": "https://steroids-uk.com/shop/liothyronine-sodium-t3-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/b8749b92-bd59-4044-bb45-880a75425b25/35abc53f-939e-4b5a-99f6-cddd9bd9ef2a.png",
+            "stored_url": "/storage/product_images/01a17ffa-0046-73a8-8e7b-e8b9ef5152e5/primary.png",
+            "match": "token_overlap",
+            "score": 0.75,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-1050-72fb-be90-506837cd9679",
+            "name": "Hemi Pharma METANDIENONE",
+            "slug": "hemi-pharma-metandienone",
+            "broken_url": "https://supremestd.b-cdn.net/files/Metandienone-10-min-2.jpg",
+            "source_url": "https://steroids-uk.com/shop/metandienone-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/98fbfee5-ab22-42a4-bccf-a51adf17dd82/dde4e0d8-a478-4330-a83b-d80eeb05e211.png",
+            "stored_url": "/storage/product_images/01a17ffa-1050-72fb-be90-506837cd9679/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-fcd7-7366-9525-d2ffb5f2cc25",
+            "name": "Hemi Pharma MT2",
+            "slug": "hemi-pharma-mt2",
+            "broken_url": "https://supremestd.b-cdn.net/files/MT2-10-2.jpg",
+            "source_url": "https://steroids-uk.com/shop/mt2-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/4a97fa44-8bd0-4e1d-9ab9-75b0b377af8c/1dc6a86a-82e5-4861-a571-86a269ae729f.png",
+            "stored_url": "/storage/product_images/01a17ff9-fcd7-7366-9525-d2ffb5f2cc25/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-a83a-70f0-8f23-132089ef1203",
+            "name": "Hemi Pharma Mass Mix 500",
+            "slug": "hemi-pharma-mass-mix-500",
+            "broken_url": "https://supremestd.b-cdn.net/files/MASS-MIX-500-min-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/mass-mix-500-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/a5956602-3e6f-49aa-b8f6-3c721caa1d73/0638c3f3-01d9-4216-8e22-079b64c140c9.png",
+            "stored_url": "/storage/product_images/01a17ff9-a83a-70f0-8f23-132089ef1203/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-0b83-70dd-b5da-46ddfab8052d",
+            "name": "Hemi Pharma Mesterolone",
+            "slug": "hemi-pharma-mesterolone",
+            "broken_url": "https://supremestd.b-cdn.net/files/Mesterolone-25-min-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/mesterolone-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/1152dd4c-228f-4862-9450-740306f38d1f/99ee34c5-ac43-4c93-b7f2-c9879e1b3945.png",
+            "stored_url": "/storage/product_images/01a17ffa-0b83-70dd-b5da-46ddfab8052d/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-c437-72a1-a1c2-d846428bca94",
+            "name": "Hemi Pharma NANDROLONE DECANOATE 300",
+            "slug": "hemi-pharma-nandrolone-decanoate-300",
+            "broken_url": "https://supremestd.b-cdn.net/files/NANDROLONE-DECANOATE-300-min-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/nandrolone-decanoate-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/bee7ec20-5c8d-4618-ab02-3c41fd968c5a/1934572e-5952-4cf4-84d4-2b214f06e499.png",
+            "stored_url": "/storage/product_images/01a17ff9-c437-72a1-a1c2-d846428bca94/primary.png",
+            "match": "token_overlap",
+            "score": 0.75,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-0c28-7223-b22e-28a22198dedf",
+            "name": "Hemi Pharma NANDROLONE PHENYLPROPIONATE 100",
+            "slug": "hemi-pharma-nandrolone-phenylpropionate-100",
+            "broken_url": "https://supremestd.b-cdn.net/files/npp-100-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/nandrolone-phenylpropionate-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/7840a180-9030-4544-a2f6-f13e67c57b7b/5e4d73d2-6323-4726-86f0-8df22496a95b.png",
+            "stored_url": "/storage/product_images/01a17ffa-0c28-7223-b22e-28a22198dedf/primary.png",
+            "match": "token_overlap",
+            "score": 0.75,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-0f6f-732c-86e3-237ef3de917a",
+            "name": "Hemi Pharma OXANDROLONE 10",
+            "slug": "hemi-pharma-oxandrolone-10",
+            "broken_url": "https://supremestd.b-cdn.net/files/Oxandrolone-10-min-3.jpg",
+            "source_url": "https://steroids-uk.com/shop/oxandrolone-10-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/7c9591ad-ec32-4020-ae93-61b66902a462/99197bc3-cd97-4d1d-be17-369efe122d97.png",
+            "stored_url": "/storage/product_images/01a17ffa-0f6f-732c-86e3-237ef3de917a/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-010f-71fe-8951-704318c3dec1",
+            "name": "Hemi Pharma OXANDROLONE 50",
+            "slug": "hemi-pharma-oxandrolone-50",
+            "broken_url": "https://supremestd.b-cdn.net/files/Oxandrolone-10-min-2.jpg",
+            "source_url": "https://steroids-uk.com/shop/oxandrolone-50-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/314f55d5-cddd-40a1-816d-216d9d5cb00b/a4479241-1e0b-4a42-92f8-74fcf43b230a.png",
+            "stored_url": "/storage/product_images/01a17ffa-010f-71fe-8951-704318c3dec1/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-12de-734f-b272-f6d85d9dea92",
+            "name": "Hemi Pharma OXYMETHOLONE",
+            "slug": "hemi-pharma-oxymetholone",
+            "broken_url": "https://supremestd.b-cdn.net/files/Oxymetholone-25-min-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/oxymetholone-25-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/f58cc38d-3a06-4cec-bf50-dbe039025a84/dc5dcfd5-c1c5-453c-a583-9c39edd7966f.png",
+            "stored_url": "/storage/product_images/01a17ffa-12de-734f-b272-f6d85d9dea92/primary.png",
+            "match": "token_overlap",
+            "score": 0.667,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-122b-734e-a133-30ad0882b9ce",
+            "name": "Hemi Pharma Post Cycle Therapy",
+            "slug": "hemi-pharma-post-cycle-therapy",
+            "broken_url": "https://supremestd.b-cdn.net/files/Post-Cycle-Therapy-55-min-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/post-cycle-therapy-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/baf6a829-d6d5-4fed-b23e-e807c5c9d489/d02176d2-14a1-4f9b-b157-70c01e5ec7a2.png",
+            "stored_url": "/storage/product_images/01a17ffa-122b-734e-a133-30ad0882b9ce/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-10ff-71d0-910f-76f2db7e8037",
+            "name": "Hemi Pharma SILDENAFIL",
+            "slug": "hemi-pharma-sildenafil",
+            "broken_url": "https://supremestd.b-cdn.net/files/SILDENAFIL-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/sildenafil-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/09db3166-8817-4a2a-8fd3-129be391d7e5/0b04e3b9-3106-4030-93af-bade9623034b.png",
+            "stored_url": "/storage/product_images/01a17ffa-10ff-71d0-910f-76f2db7e8037/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-138d-72ac-9d64-369dfeeee180",
+            "name": "Hemi Pharma STANOZOLOL 50",
+            "slug": "hemi-pharma-stanozolol-50",
+            "broken_url": "https://supremestd.b-cdn.net/files/Stanozolol-50-min-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/stanozolol-50-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/2690aece-2ca0-439a-b8d3-774dbd8a15a3/9791288a-e4f6-495b-9ae1-0f0643f0207f.png",
+            "stored_url": "/storage/product_images/01a17ffa-138d-72ac-9d64-369dfeeee180/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-f7d1-7087-acab-45f694bd2891",
+            "name": "Hemi Pharma Sustanon 250",
+            "slug": "hemi-pharma-sustanon-250",
+            "broken_url": "https://supremestd.b-cdn.net/files/sus-250-600x600-1-2.jpg",
+            "source_url": "https://steroids-uk.com/shop/sustanon-250-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/a2e9535a-7d4a-4782-a38e-589045ec9d42/8aa7a7f3-0516-4ba0-8f63-40506faee2ce.png",
+            "stored_url": "/storage/product_images/01a17ff9-f7d1-7087-acab-45f694bd2891/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-c351-710f-9084-49e3afd7d621",
+            "name": "Hemi Pharma TADALAFIL",
+            "slug": "hemi-pharma-tadalafil",
+            "broken_url": "https://supremestd.b-cdn.net/files/TADALAFIL--1.jpg",
+            "source_url": "https://steroids-uk.com/shop/tadalafil-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/85e96d20-aa8b-4f74-b613-55e1d14c880b/e090abd1-6eb4-451b-8208-00f566810721.png",
+            "stored_url": "/storage/product_images/01a17ff9-c351-710f-9084-49e3afd7d621/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-0384-719c-90ab-17b391a93169",
+            "name": "Hemi Pharma TB-500-10mg",
+            "slug": "hemi-pharma-tb-500-10mg",
+            "broken_url": "https://supremestd.b-cdn.net/files/TB-500-10-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/tb-500-2-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/bfd1d7ce-a7ca-47b0-bafa-e865ecd30bdc/9cc1ca43-3c14-468f-a404-0eb69c89f476.png",
+            "stored_url": "/storage/product_images/01a17ffa-0384-719c-90ab-17b391a93169/primary.png",
+            "match": "token_overlap",
+            "score": 0.75,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-fecc-7396-bd70-ec465a9e6753",
+            "name": "Hemi Pharma TB-500-2mg",
+            "slug": "hemi-pharma-tb-500-2mg",
+            "broken_url": "https://supremestd.b-cdn.net/files/TB-500-2mg-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/tb-500-2-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/bfd1d7ce-a7ca-47b0-bafa-e865ecd30bdc/9cc1ca43-3c14-468f-a404-0eb69c89f476.png",
+            "stored_url": "/storage/product_images/01a17ff9-fecc-7396-bd70-ec465a9e6753/primary.png",
+            "match": "token_overlap",
+            "score": 0.75,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-f708-7333-9c0f-3a8fae05968a",
+            "name": "Hemi Pharma Test-Mix 400",
+            "slug": "hemi-pharma-test-mix-400",
+            "broken_url": "https://supremestd.b-cdn.net/files/TEST-MIX-400-600x600-1-2.jpg",
+            "source_url": "https://steroids-uk.com/shop/test-400-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/0b95dda9-a2e1-4d19-9f67-6b25d448beaf/c96fdfc6-61cb-4d6d-a251-55a0418d13f1.png",
+            "stored_url": "/storage/product_images/01a17ff9-f708-7333-9c0f-3a8fae05968a/primary.png",
+            "match": "token_overlap",
+            "score": 0.75,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-02c5-7234-9ef5-fb2c56046fc7",
+            "name": "Hemi Pharma Testosterone Cypionate 200mg",
+            "slug": "hemi-pharma-testosterone-cypionate-200mg",
+            "broken_url": "https://supremestd.b-cdn.net/files/test-c-200-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/testosterone-cypionate-250-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/c00f53bb-dce8-49d4-ac23-8c9ab636eb1a/577cb5fd-23ae-410e-9f45-68adb165254b.png",
+            "stored_url": "/storage/product_images/01a17ffa-02c5-7234-9ef5-fb2c56046fc7/primary.png",
+            "match": "token_overlap",
+            "score": 0.6,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-a769-719d-992b-16eb5edb9b9e",
+            "name": "Hemi Pharma Testosterone Cypionate 250mg",
+            "slug": "hemi-pharma-testosterone-cypionate-250mg",
+            "broken_url": "https://supremestd.b-cdn.net/files/IMG_0273-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/testosterone-cypionate-250-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/c00f53bb-dce8-49d4-ac23-8c9ab636eb1a/577cb5fd-23ae-410e-9f45-68adb165254b.png",
+            "stored_url": "/storage/product_images/01a17ff9-a769-719d-992b-16eb5edb9b9e/primary.png",
+            "match": "token_overlap",
+            "score": 0.6,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-a62e-725a-bbfc-6e1a9e2f779b",
+            "name": "Hemi Pharma Testosterone Propionate",
+            "slug": "hemi-pharma-testosterone-propionate",
+            "broken_url": "https://supremestd.b-cdn.net/files/TESTOSTERONE-PROPIONATE-100-min.jpg",
+            "source_url": "https://steroids-uk.com/shop/testosterone-propionate-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/ccc390ac-7a76-43d5-8929-2ed4fc763d5b/437cfcfa-3387-4ffd-b42c-fd89dd9dae22.png",
+            "stored_url": "/storage/product_images/01a17ff9-a62e-725a-bbfc-6e1a9e2f779b/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-f639-7255-b41a-40f805589313",
+            "name": "Hemi Pharma Tmp mix 400mg",
+            "slug": "hemi-pharma-tmp-mix-400mg",
+            "broken_url": "https://supremestd.b-cdn.net/files/TMP-600x600-2.jpg",
+            "source_url": "https://steroids-uk.com/shop/tmp-mix-400-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/1fca9167-61a7-4806-b817-2e913e650958/5b3a01f4-aea6-4f0e-b6cc-35d0cea70302.png",
+            "stored_url": "/storage/product_images/01a17ff9-f639-7255-b41a-40f805589313/primary.png",
+            "match": "token_overlap",
+            "score": 0.6,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-0831-7319-acb7-fef8ea6766a7",
+            "name": "Hemi Pharma Trenbolone Enanthate",
+            "slug": "hemi-pharma-trenbolone-enanthate",
+            "broken_url": "https://supremestd.b-cdn.net/files/TRENBOLONE-ENANTHATE-200-min-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/trenbolone-enanthate-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/1b901c88-4789-499b-b808-a84aa6045d2e/c9e587f9-11c7-4651-a80f-50b2f31d684c.png",
+            "stored_url": "/storage/product_images/01a17ffa-0831-7319-acb7-fef8ea6766a7/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-fa12-70b7-908c-a60dec42ee56",
+            "name": "Hemi Pharma metenolone acetate",
+            "slug": "hemi-pharma-metenolone-acetate",
+            "broken_url": "https://supremestd.b-cdn.net/files/Metenolone-Acetate-25-min-1.jpg",
+            "source_url": "https://steroids-uk.com/shop/metenolone-acetate-hemi-pharma/",
+            "source_image": "https://steroids-uk.com/media/products/b50d1b00-5629-4ecf-9414-fa1f5f2945c3/8d9afa85-320a-44d4-b0a8-f5557486de37.png",
+            "stored_url": "/storage/product_images/01a17ff9-fa12-70b7-908c-a60dec42ee56/primary.png",
+            "match": "token_overlap",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-c529-709b-b664-e2abb3e969b4",
+            "name": "Intex Pharma Tren Ace-100 (Trenbolone Acetate)",
+            "slug": "intex-pharma-tren-ace-100-trenbolone-acetate",
+            "broken_url": "https://supremestd.b-cdn.net/files/INTEX-TREN-ACE-100-600x600-2.jpg",
+            "source_url": "https://steroids-uk.com/shop/tren-ace-100-trenbolone-acetate-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/1c609fe2-46ab-4cf7-ba87-ee7f061ce210/steroids-uk-com-trenace100.webp",
+            "stored_url": "/storage/product_images/01a17ff9-c529-709b-b664-e2abb3e969b4/primary.webp",
+            "match": "token_overlap",
+            "score": 0.714,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-f219-7011-aa12-5ec93204bbf0",
+            "name": "NPP 100 \u2013 Nandrolone Phenylpropionate | Syncom Labs",
+            "slug": "npp-100-nandrolone-phenylpropionate-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/steroids-ukcom-npp100.webp",
+            "source_url": "https://steroids-uk.com/shop/npp-100-nandrolone-phenylpropionate-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/e66f5e31-cc4e-4963-9637-7041e3bc2ddd/steroids-ukcom-npp100.webp",
+            "stored_url": "/storage/product_images/01a17ff9-f219-7011-aa12-5ec93204bbf0/primary.webp",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-ee49-73d4-95fe-179e94cbb7c6",
+            "name": "NPP Nandrolone Phenylpropionate 100mg \u2013 Beligas Pharmaceuticals",
+            "slug": "npp-nandrolone-phenylpropionate-100mg-beligas-pharmaceuticals",
+            "broken_url": "https://supremestd.b-cdn.net/files/NPP-beligas100mg.webp",
+            "source_url": "https://steroids-uk.com/shop/npp-nandrolone-phenylpropionate-100mg-beligas-pharmaceuticals/",
+            "source_image": "https://steroids-uk.com/media/products/7f0186e4-e8db-48de-a2ca-347294acad99/NPP-beligas100mg.webp",
+            "stored_url": "/storage/product_images/01a17ff9-ee49-73d4-95fe-179e94cbb7c6/primary.webp",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-ef19-728a-a3a7-6055d83a8e44",
+            "name": "Oral Turinabol [10mg/100caps] | Syncom Labs",
+            "slug": "oral-turinabol-10mg100caps-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/ot-caps-V2.webp",
+            "source_url": "https://steroids-uk.com/shop/oral-turinabol-10mg-100caps-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/73a2e7eb-4ad8-487d-9530-dcec76de7a04/ot-caps-V2.webp",
+            "stored_url": "/storage/product_images/01a17ff9-ef19-728a-a3a7-6055d83a8e44/primary.webp",
+            "match": "token_overlap",
+            "score": 0.8,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffb-05cd-70bd-ab15-6c29cacb4bba",
+            "name": "Oxymetholone \u2013 Anapolon [50mg/100caps] | Syncom Labs",
+            "slug": "oxymetholone-anapolon-50mg100caps-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/oxy-caps-V2.webp",
+            "source_url": "https://steroids-uk.com/shop/oxymetholone-anapolon-50mg-100caps-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/cfb5e13a-e2d5-4635-a43a-5fe47d458b0f/oxy-caps-V2.webp",
+            "stored_url": "/storage/product_images/01a17ffb-05cd-70bd-ab15-6c29cacb4bba/primary.webp",
+            "match": "token_overlap",
+            "score": 0.833,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-908a-71c1-9d24-908e140b90ac",
+            "name": "Stanozolol \u2013 Winstrol [10mg/100tabs] | Syncom Labs",
+            "slug": "stanozolol-winstrol-10mg100tabs-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/winstrol.webp",
+            "source_url": "https://steroids-uk.com/shop/stanozolol-winstrol-10mg-100tabs-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/c778365c-8cbc-478d-a415-6b4a4af13862/winstrol.webp",
+            "stored_url": "/storage/product_images/01a17ff9-908a-71c1-9d24-908e140b90ac/primary.webp",
+            "match": "token_overlap",
+            "score": 0.833,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-8557-708c-a65f-f7a84f0c91ef",
+            "name": "Sustanon 250 \u2013 Beligas Pharmaceuticals",
+            "slug": "sustanon-250-beligas-pharmaceuticals",
+            "broken_url": "https://supremestd.b-cdn.net/files/Suste-Testosterone-250-1.webp",
+            "source_url": "https://steroids-uk.com/shop/sustanon-250-beligas-pharmaceuticals/",
+            "source_image": "https://steroids-uk.com/media/products/919964b6-ace0-4363-9c3d-6a912cb332ce/Suste-Testosterone-250.webp",
+            "stored_url": "/storage/product_images/01a17ff9-8557-708c-a65f-f7a84f0c91ef/primary.webp",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-eaa0-700a-9690-51da5f6000ff",
+            "name": "Sustanon 300 \u2013 Testosterone MIX | Syncom Labs",
+            "slug": "sustanon-300-testosterone-mix-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/steroids-ukcom-sustanon300.webp",
+            "source_url": "https://steroids-uk.com/shop/sustanon-300-testosterone-mix-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/b79a41e8-787f-4db8-8497-cfd21f191df8/steroids-ukcom-sustanon300.webp",
+            "stored_url": "/storage/product_images/01a17ff9-eaa0-700a-9690-51da5f6000ff/primary.webp",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-f564-7223-b7fa-a38682fcd381",
+            "name": "Syncom Labs Yohimbine HCL",
+            "slug": "syncom-labs-yohimbine-hcl",
+            "broken_url": "https://supremestd.b-cdn.net/files/yohimbin-caps-V2-1.webp",
+            "source_url": "https://steroids-uk.com/shop/yohimbine-hcl-10mg-100caps-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/0fe47315-e93c-4f68-9b56-0b37ae417256/yohimbin-caps-V2.webp",
+            "stored_url": "/storage/product_images/01a17ff9-f564-7223-b7fa-a38682fcd381/primary.webp",
+            "match": "token_overlap",
+            "score": 0.6,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-f110-703c-9bea-683319aa6c1f",
+            "name": "TUDCA [180mg/100caps] | Syncom Labs",
+            "slug": "tudca-180mg100caps-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/tudca-caps-V2.webp",
+            "source_url": "https://steroids-uk.com/shop/tudca-180mg-100caps-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/9a75f84b-2842-45e1-b267-e65f50c8a742/tudca-caps-V2.webp",
+            "stored_url": "/storage/product_images/01a17ff9-f110-703c-9bea-683319aa6c1f/primary.webp",
+            "match": "token_overlap",
+            "score": 0.8,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-88dc-72b8-ad1a-99714d8aa31c",
+            "name": "Tadalafil \u2013 Pharmaqo Labs [50tab/20mg]",
+            "slug": "tadalafil-pharmaqo-labs-50tab20mg",
+            "broken_url": "https://supremestd.b-cdn.net/files/Tadalafil-Pharmaqolabs.webp",
+            "source_url": "https://steroids-uk.com/shop/tadalafil-pharmaqo-labs-50tab-20mg/",
+            "source_image": "https://steroids-uk.com/media/products/d4600dee-7313-4a11-9315-5391520eca7b/Tadalafil-Pharmaqolabs.webp",
+            "stored_url": "/storage/product_images/01a17ffa-88dc-72b8-ad1a-99714d8aa31c/primary.webp",
+            "match": "token_overlap",
+            "score": 0.8,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffb-1be1-72cb-bf59-b2fcc4c52628",
+            "name": "Tamoxifen Citrate [20mg/100caps] | Syncom Labs",
+            "slug": "tamoxifen-citrate-20mg100caps-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/tamoxifen-caps-V2-1.webp",
+            "source_url": "https://steroids-uk.com/shop/tamoxifen-citrate-20mg-100caps-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/ba5ebfd7-7a16-4e05-af83-e6fcd156de0d/tamoxifen-caps-V2.webp",
+            "stored_url": "/storage/product_images/01a17ffb-1be1-72cb-bf59-b2fcc4c52628/primary.webp",
+            "match": "token_overlap",
+            "score": 0.833,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-ec69-701c-9e19-daa4974c4258",
+            "name": "Tamoxifen \u2013 Nolvadex [20mg/50tabs] | Syncom Labs",
+            "slug": "tamoxifen-nolvadex-20mg50tabs-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/tamoxifen-1.webp",
+            "source_url": "https://steroids-uk.com/shop/tamoxifen-nolvadex-20mg-100tabs-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/a77d1464-3ece-455b-9039-1a46e5c64ef3/tamoxifen-1.webp",
+            "stored_url": "/storage/product_images/01a17ff9-ec69-701c-9e19-daa4974c4258/primary.webp",
+            "match": "token_overlap",
+            "score": 0.571,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-505c-7122-9a71-c2f9713e6238",
+            "name": "Testo Cyp 200 \u2013 Testosterone Cypionate | Syncom Labs",
+            "slug": "testo-cyp-200-testosterone-cypionate-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/steroids-ukcom-testcyp200.webp",
+            "source_url": "https://steroids-uk.com/shop/testo-cyp-200-testosterone-cypionate-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/7cb34149-7db5-4483-816e-82ce40b8b0a1/steroids-ukcom-testcyp200.webp",
+            "stored_url": "/storage/product_images/01a17ffa-505c-7122-9a71-c2f9713e6238/primary.webp",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffa-4f70-7021-9b43-1c690c055630",
+            "name": "Testo Enan 300 \u2013 Testosterone Enanthate | Syncom Labs",
+            "slug": "testo-enan-300-testosterone-enanthate-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/uksteroidsshop-testenan300.webp",
+            "source_url": "https://steroids-uk.com/shop/testo-enan-300-testosterone-enanthate-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/0a2de9d1-4134-42ed-af8b-a8053342b181/steroids-ukcom-testenan300.webp",
+            "stored_url": "/storage/product_images/01a17ffa-4f70-7021-9b43-1c690c055630/primary.webp",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-c0a0-70a2-bc98-fc343042467b",
+            "name": "Testo Prop 100 \u2013 Testosterone Propionate | Syncom Labs",
+            "slug": "testo-prop-100-testosterone-propionate-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/steroids-ukcom-testprop100.webp",
+            "source_url": "https://steroids-uk.com/shop/testo-prop-100-testosterone-propionate-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/afb31948-e0a8-4ded-aff6-c544abeea2fb/steroids-ukcom-testprop100.webp",
+            "stored_url": "/storage/product_images/01a17ff9-c0a0-70a2-bc98-fc343042467b/primary.webp",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ffb-19fa-7024-a198-8990a02e08db",
+            "name": "Tren Ace 100 \u2013 Trenbolone Acetate | Syncom Labs",
+            "slug": "tren-ace-100-trenbolone-acetate-syncom-labs",
+            "broken_url": "https://supremestd.b-cdn.net/files/steroids-uk-com-trenace100.webp",
+            "source_url": "https://steroids-uk.com/shop/tren-ace-100-trenbolone-acetate-syncom-labs/",
+            "source_image": "https://steroids-uk.com/media/products/1c609fe2-46ab-4cf7-ba87-ee7f061ce210/steroids-uk-com-trenace100.webp",
+            "stored_url": "/storage/product_images/01a17ffb-19fa-7024-a198-8990a02e08db/primary.webp",
+            "match": "exact_slug",
+            "score": 1,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-e8d5-7080-b1a2-0e4b8865eccf",
+            "name": "Ultima Pharmaceuticals Boldenone Undecylenate \u2013 Ultima-Bold 250mg",
+            "slug": "ultima-pharmaceuticals-boldenone-undecylenate-ultima-bold-250mg",
+            "broken_url": "https://supremestd.b-cdn.net/files/Ultima-Bold.webp",
+            "source_url": "https://steroids-uk.com/shop/boldenone-undecylenate-ultima-bold-250mg/",
+            "source_image": "https://steroids-uk.com/media/products/0e262738-93d6-416f-b189-a24cf273cdcd/Ultima-Bold.webp",
+            "stored_url": "/storage/product_images/01a17ff9-e8d5-7080-b1a2-0e4b8865eccf/primary.webp",
+            "match": "token_overlap",
+            "score": 0.833,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-be92-702f-97da-bd9a4d5f4a2c",
+            "name": "Ultima Pharmaceuticals Testosterone Enanthate \u2013 Ultima-Enan 250mg/10ml",
+            "slug": "ultima-pharmaceuticals-testosterone-enanthate-ultima-enan-250mg10ml",
+            "broken_url": "https://supremestd.b-cdn.net/files/Testosterone Enanthate \u2013 Ultima-Enan 250mg 10ml.webp",
+            "source_url": "https://steroids-uk.com/shop/testosterone-enanthate-ultima-enan-250mg-10ml/",
+            "source_image": "https://steroids-uk.com/media/products/d6f9d16f-77fe-444e-92f0-b9ef8fd7cbea/steroids-uk-com-Ultima-Enan-250mg.webp",
+            "stored_url": "/storage/product_images/01a17ff9-be92-702f-97da-bd9a4d5f4a2c/primary.webp",
+            "match": "token_overlap",
+            "score": 0.75,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-bf71-70a1-b6fa-d6580dd4d5c0",
+            "name": "Winstrol Lite \u2013 Stanozolol (100tabs/10mg) \u2013 Beligas Pharmaceuticals",
+            "slug": "winstrol-lite-stanozolol-100tabs10mg-beligas-pharmaceuticals",
+            "broken_url": "https://supremestd.b-cdn.net/files/Winstrol-Lite-Beligas-1.webp",
+            "source_url": "https://steroids-uk.com/shop/winstrol-lite-stanozolol-100tabs-10mg-beligas-pharmaceuticals/",
+            "source_image": "https://steroids-uk.com/media/products/ffcce235-f949-4d29-8c44-39c50d6508a9/Winstrol-Lite-Beligas-1.webp",
+            "stored_url": "/storage/product_images/01a17ff9-bf71-70a1-b6fa-d6580dd4d5c0/primary.webp",
+            "match": "token_overlap",
+            "score": 0.875,
+            "status": "repaired"
+        },
+        {
+            "product_id": "01a17ff9-ed5e-713f-a070-a2fb0fdb3b2a",
+            "name": "Winstrol \u2013 Stanozolol (100tabs/50mg) \u2013 Beligas Pharmaceuticals",
+            "slug": "winstrol-stanozolol-100tabs50mg-beligas-pharmaceuticals",
+            "broken_url": "https://supremestd.b-cdn.net/files/PRO-WINSTROL-50mg-1.webp",
+            "source_url": "https://steroids-uk.com/shop/winstrol-stanozolol-100tabs-50mg-beligas-pharmaceuticals/",
+            "source_image": "https://steroids-uk.com/media/products/83eeb693-d05f-4dff-ac57-0432c172ff4e/PRO-WINSTROL-50mg.webp",
+            "stored_url": "/storage/product_images/01a17ff9-ed5e-713f-a070-a2fb0fdb3b2a/primary.webp",
+            "match": "token_overlap",
+            "score": 0.857,
+            "status": "repaired"
+        }
+    ],
+    "unmatched": [
+        {
+            "product_id": "01a17ffb-179c-73fa-9747-ba57bd1cd70c",
+            "name": "10x Small syringe + needle for peptides / hcg / hgh",
+            "slug": "10x-small-syringe-needle-for-peptides-hcg-hgh",
+            "sku": "REF-0453",
+            "broken_url": "https://supremesteroids.co.uk/assets/supremesteroids/img/no-image.png",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffb-01d9-70fc-a648-a1179cdfb29a",
+            "name": "Brand Proper Power 2.0 \u2013 Proper Labs [20Tabs/50mg]",
+            "slug": "brand-proper-power-20-proper-labs-20tabs50mg",
+            "sku": "16645356",
+            "broken_url": "https://supremestd.b-cdn.net/files/ProperPower20-20-Front.webp",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-87be-71c8-bc95-22152a51ce2a",
+            "name": "Deus Medical MASTERMED P 100 (Drostanolone Propionate)",
+            "slug": "deus-medical-mastermed-p-100-drostanolone-propionate",
+            "sku": "98535018",
+            "broken_url": "https://supremestd.b-cdn.net/files/mastermedp100_amp.webp",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffb-1d74-7287-aa34-b842bd3d47b9",
+            "name": "Deus Medical MOTS-C (Mitochondrial-Derived Peptide)",
+            "slug": "deus-medical-mots-c-mitochondrial-derived-peptide",
+            "sku": "REF-0458",
+            "broken_url": "https://supremestd.b-cdn.net/files/mots-c.webp",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-83b8-73df-9023-05ff634d30fe",
+            "name": "Deus Medical TESTOMED PP 100 (Testosterone Phenylpropionate)",
+            "slug": "deus-medical-testomed-pp-100-testosterone-phenylpropionate",
+            "sku": "72670138",
+            "broken_url": "https://supremestd.b-cdn.net/files/testomed-pp.webp",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-5515-72d7-ae62-570081eff615",
+            "name": "Deus Medical TIRZEPATIDE 10mg",
+            "slug": "deus-medical-tirzepatide-10mg",
+            "sku": "97255733",
+            "broken_url": "https://supremestd.b-cdn.net/files/tirzepatide.webp",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffb-16bc-73de-a314-688d9eb136b3",
+            "name": "Deus Medical TRENBOMED A 100 (Trenbolone Acetate)",
+            "slug": "deus-medical-trenbomed-a-100-trenbolone-acetate",
+            "sku": "REF-0452",
+            "broken_url": "https://supremestd.b-cdn.net/files/trenbomeda100_amp.webp",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffb-1203-7342-8b9e-e1dc1df28816",
+            "name": "Deus Medical TRENBOMED E 200 (Trenbolone Enanthate)",
+            "slug": "deus-medical-trenbomed-e-200-trenbolone-enanthate",
+            "sku": "REF-0450",
+            "broken_url": "https://supremestd.b-cdn.net/files/trenbomede200_amp.webp",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-84b4-7238-a311-bda2e3714c07",
+            "name": "Deus Medical WINIMED 10 (Stanozolol)",
+            "slug": "deus-medical-winimed-10-stanozolol",
+            "sku": "60221294",
+            "broken_url": "https://supremestd.b-cdn.net/files/winimed10_tab.webp",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffb-191b-7082-b124-ba55b60cd20b",
+            "name": "Deus Medical WINIMED 50 (Stanozolol)",
+            "slug": "deus-medical-winimed-50-stanozolol",
+            "sku": "REF-0454",
+            "broken_url": "https://supremestd.b-cdn.net/files/winimed50_front_no_bg_amp-1.webp",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-c25d-71b7-a6dc-196ecb1db5b8",
+            "name": "Hemi Pharma Masteron-E (Drostanolone) 200",
+            "slug": "hemi-pharma-masteron-e-drostanolone-200",
+            "sku": "48678817",
+            "broken_url": "https://supremestd.b-cdn.net/files/DROST-E-1-1-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffb-2150-7253-a526-978ead89a2d4",
+            "name": "Hemi Pharma Retatrutide 10mg",
+            "slug": "hemi-pharma-retatrutide-10mg",
+            "sku": "REF-0462",
+            "broken_url": "https://supremestd.b-cdn.net/files/hemi_retatrutide_10mg-1.jpeg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-fad8-73ad-b2ce-1257b865da00",
+            "name": "Hemi Pharma SEMAGLUTIDE 5mg",
+            "slug": "hemi-pharma-semaglutide-5mg",
+            "sku": "35109249",
+            "broken_url": "https://supremestd.b-cdn.net/files/Semaglutide-5.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-0459-7073-86b0-6922e2efdcc7",
+            "name": "Hemi Pharma TIRZEPATIDE 5mg",
+            "slug": "hemi-pharma-tirzepatide-5mg",
+            "sku": "73146861",
+            "broken_url": "https://supremestd.b-cdn.net/files/TIRZEPATIDE-5-2.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-0606-72d9-bdcd-c1708ec16d67",
+            "name": "Hemi Pharma Tamox",
+            "slug": "hemi-pharma-tamox",
+            "sku": "93602477",
+            "broken_url": "https://supremestd.b-cdn.net/files/IMG_51323A6850E9-1-1.jpeg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-7b67-71ca-b43e-c6bbe552fe98",
+            "name": "Hemi Pharma Test Enanthate 300",
+            "slug": "hemi-pharma-test-enanthate-300",
+            "sku": "78397340",
+            "broken_url": "https://supremestd.b-cdn.net/files/test-e-300-600x600-1-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-0a25-7357-b982-e18450162b0f",
+            "name": "Hemi Pharma Tren Mix",
+            "slug": "hemi-pharma-tren-mix",
+            "sku": "57885244",
+            "broken_url": "https://supremestd.b-cdn.net/files/TRENBOLONE-MIX-200-min-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-f88d-702e-a87f-3718c566d572",
+            "name": "Hemi Pharma Trenbolone Ace",
+            "slug": "hemi-pharma-trenbolone-ace",
+            "sku": "93877806",
+            "broken_url": "https://supremestd.b-cdn.net/files/TRENBOLONE-ACETATE-100-min-600x600-1-2.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-01eb-71ba-aed3-c8f8c9f02c62",
+            "name": "Hemi Pharma Turinabol",
+            "slug": "hemi-pharma-turinabol",
+            "sku": "32513991",
+            "broken_url": "https://supremestd.b-cdn.net/files/TURINABOL-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-912d-72b7-9bb6-ed567f9f9d31",
+            "name": "Intex Pharma (Human Growth Hormone) HGH 100IU 10 x 10ius vials",
+            "slug": "intex-pharma-human-growth-hormone-hgh-100iu-10-x-10ius-vials",
+            "sku": "20290690",
+            "broken_url": "https://supremestd.b-cdn.net/files/IMG_F0024269D555-2-1024x1024-1.jpeg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-8a6b-71d7-a76d-8970f87b5098",
+            "name": "Intex Pharma Anadrol 25mg x 100 tabs",
+            "slug": "intex-pharma-anadrol-25mg-x-100-tabs",
+            "sku": "76597878",
+            "broken_url": "https://supremestd.b-cdn.net/files/ANADROL-2-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-297c-73ba-ae3e-35c48c4bf015",
+            "name": "Intex Pharma Arimidex 1mg x 60 tabs (Anastrazole)",
+            "slug": "intex-pharma-arimidex-1mg-x-60-tabs-anastrazole",
+            "sku": "64578606",
+            "broken_url": "https://supremestd.b-cdn.net/files/ARIMIDEX-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-9f34-7240-ab69-32cbf6705d14",
+            "name": "Intex Pharma Bacteriostatic Water 10ml",
+            "slug": "intex-pharma-bacteriostatic-water-10ml",
+            "sku": "90689277",
+            "broken_url": "https://supremestd.b-cdn.net/files/IMG_F0024269D555-3-1-2.jpeg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-abe1-700b-8c0b-a57162296de1",
+            "name": "Intex Pharma Clenbuterol (Clen) 40mcg x 100 tabs",
+            "slug": "intex-pharma-clenbuterol-clen-40mcg-x-100-tabs",
+            "sku": "51748033",
+            "broken_url": "https://supremestd.b-cdn.net/files/CLEN-600x600-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-c8f1-722e-a00c-472c0b8740e0",
+            "name": "Intex Pharma Clomid 50mg x 60 tabs",
+            "slug": "intex-pharma-clomid-50mg-x-60-tabs",
+            "sku": "87118821",
+            "broken_url": "https://supremestd.b-cdn.net/files/CLOMID-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-c762-7308-b42a-d889bec4dce8",
+            "name": "Intex Pharma Dbol 10mg x 100 tabs (Dianabol)",
+            "slug": "intex-pharma-dbol-10mg-x-100-tabs-dianabol",
+            "sku": "25941927",
+            "broken_url": "https://supremestd.b-cdn.net/files/DBOL-10-2.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-c60f-7290-bdc2-571e2134e925",
+            "name": "Intex Pharma EQ-300 (Boldenone Undecylenate)",
+            "slug": "intex-pharma-eq-300-boldenone-undecylenate",
+            "sku": "86907261",
+            "broken_url": "https://supremestd.b-cdn.net/files/INTEX-EQ-300-scaled-1-1024x1024-1-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-89ce-70d5-9577-9128bb54b20f",
+            "name": "Intex Pharma Equitest 450",
+            "slug": "intex-pharma-equitest-450",
+            "sku": "64667178",
+            "broken_url": "https://supremestd.b-cdn.net/files/Intex-pharma-Equitest-450-600x600-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-79f8-71f7-9dbc-b8e8b867ad62",
+            "name": "Intex Pharma HCG 5000iu",
+            "slug": "intex-pharma-hcg-5000iu",
+            "sku": "80895400",
+            "broken_url": "https://supremestd.b-cdn.net/files/2024-hcg-min-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-34a7-700e-a629-20bd9190c878",
+            "name": "Intex Pharma INTEX SET-2",
+            "slug": "intex-pharma-intex-set-2",
+            "sku": "73696064",
+            "broken_url": "https://supremestd.b-cdn.net/files/INTEX-SET-2-scaled-1-1024x1024-1-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-3697-71d7-a3b3-d17c1df33c86",
+            "name": "Intex Pharma INTEX SET-3",
+            "slug": "intex-pharma-intex-set-3",
+            "sku": "43895764",
+            "broken_url": "https://supremestd.b-cdn.net/files/INTEX-SET-3-scaled-1-1024x1024-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-378a-704c-9d1c-e043c9bb91d0",
+            "name": "Intex Pharma INTEX SET-4",
+            "slug": "intex-pharma-intex-set-4",
+            "sku": "82694305",
+            "broken_url": "https://supremestd.b-cdn.net/files/INTEX-SET-6-scaled-1-600x600-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-35a9-7355-8e3d-e1f8e3db6b7c",
+            "name": "Intex Pharma INTEX SET-5",
+            "slug": "intex-pharma-intex-set-5",
+            "sku": "75835369",
+            "broken_url": "https://supremestd.b-cdn.net/files/INTEX-SET-5-scaled-1-600x600-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-33b2-7121-a8f7-e7ac17a69806",
+            "name": "Intex Pharma INTEX SET-6",
+            "slug": "intex-pharma-intex-set-6",
+            "sku": "29418836",
+            "broken_url": "https://supremestd.b-cdn.net/files/INTEX-SET-6-scaled-1-600x600-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-1601-7213-9ca7-8708e154c3eb",
+            "name": "Intex Pharma IntexPharma Nad+ Prefilled Pen 500mg",
+            "slug": "intex-pharma-intexpharma-nad-prefilled-pen-500mg",
+            "sku": "74519401",
+            "broken_url": "https://supremestd.b-cdn.net/files/IntexPharma Nad+ Prefilled Pen 500mg-01.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-7fd7-72c6-8b53-a8038eb2e591",
+            "name": "Intex Pharma IntexPharma Retatrutide Prefilled Pen 20mg",
+            "slug": "intex-pharma-intexpharma-retatrutide-prefilled-pen-20mg",
+            "sku": "65363931",
+            "broken_url": "https://supremestd.b-cdn.net/files/IntexPharma Retatrutide Prefilled Pen 20mg 2-01.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-16c4-70d4-99f6-244ed17178c2",
+            "name": "Intex Pharma IntexPharma Semaglutide Prefilled Pen 5mg",
+            "slug": "intex-pharma-intexpharma-semaglutide-prefilled-pen-5mg",
+            "sku": "60904483",
+            "broken_url": "https://supremestd.b-cdn.net/files/IntexPharma Semaglutide Prefilled Pen 5mg-01.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-1539-7234-8c6b-a28e5c96e6bc",
+            "name": "Intex Pharma IntexPharma Tirzepatide Prefilled Pen 20mg",
+            "slug": "intex-pharma-intexpharma-tirzepatide-prefilled-pen-20mg",
+            "sku": "31937560",
+            "broken_url": "https://supremestd.b-cdn.net/files/IntexPharma Tirzepatide Prefilled Pen 20mg-01.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-6434-7006-a7be-e76a0b8dd7a8",
+            "name": "Intex Pharma Melanotan MT2",
+            "slug": "intex-pharma-melanotan-mt2",
+            "sku": "93948018",
+            "broken_url": "https://supremestd.b-cdn.net/files/2024-MT2-min-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-2560-71d8-b416-db0977617e17",
+            "name": "Intex Pharma Mtren-1mg/60tabs (Methyltrienolone)",
+            "slug": "intex-pharma-mtren-1mg60tabs-methyltrienolone",
+            "sku": "35493749",
+            "broken_url": "https://supremestd.b-cdn.net/files/MTREN-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-966d-710f-86a7-07e3df4d0a86",
+            "name": "Intex Pharma ND-300 (Nandrolone Decanoate)",
+            "slug": "intex-pharma-nd-300-nandrolone-decanoate",
+            "sku": "76883925",
+            "broken_url": "https://supremestd.b-cdn.net/files/INTE-ND-300-scaled-1-1024x1024-1-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-c9ad-7002-b80e-906061271448",
+            "name": "Intex Pharma Nolvadex (Tamoxifen) 20mg x 60 tabs",
+            "slug": "intex-pharma-nolvadex-tamoxifen-20mg-x-60-tabs",
+            "sku": "18697141",
+            "broken_url": "https://supremestd.b-cdn.net/files/NOLVA-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-86a6-7372-bc02-e97b7dfbe5b7",
+            "name": "Intex Pharma PCT 100 tabs",
+            "slug": "intex-pharma-pct-100-tabs",
+            "sku": "15259680",
+            "broken_url": "https://supremestd.b-cdn.net/files/PCT-1-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-9bb7-71a4-ab2d-bda04d7e5163",
+            "name": "Intex Pharma Primo E-100 Methenolone Enanthate-10",
+            "slug": "intex-pharma-primo-e-100-methenolone-enanthate-10",
+            "sku": "75051817",
+            "broken_url": "https://supremestd.b-cdn.net/files/PRIMOE100-scaled-1-1024x1024-1-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-28b6-72bc-8f93-49cbead1f122",
+            "name": "Intex Pharma Proviron 25mg x 60 tabs",
+            "slug": "intex-pharma-proviron-25mg-x-60-tabs",
+            "sku": "26835868",
+            "broken_url": "https://supremestd.b-cdn.net/files/PROVIRON-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-aa4b-703c-8008-250ed9e5ffc8",
+            "name": "Intex Pharma RIP-400 400mg/ml",
+            "slug": "intex-pharma-rip-400-400mgml",
+            "sku": "26165850",
+            "broken_url": "https://supremestd.b-cdn.net/files/INTEX-RIP-400-600x600-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-c827-7262-acaf-4012a5b091a9",
+            "name": "Intex Pharma Superdrol (Methyl Drostanolone) 10mg x 100 tabs",
+            "slug": "intex-pharma-superdrol-methyl-drostanolone-10mg-x-100-tabs",
+            "sku": "94715715",
+            "broken_url": "https://supremestd.b-cdn.net/files/SUPERDROL-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffa-2630-71ac-9a7e-efb3c9facc46",
+            "name": "Intex Pharma T3 100 tabs",
+            "slug": "intex-pharma-t3-100-tabs",
+            "sku": "18844912",
+            "broken_url": "https://supremestd.b-cdn.net/files/T3-1-600x600-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-8f19-716f-ba42-f194eb0eafd5",
+            "name": "Intex Pharma T400 (Test 400)",
+            "slug": "intex-pharma-t400-test-400",
+            "sku": "38117990",
+            "broken_url": "https://supremestd.b-cdn.net/files/INTEX-T-400-600x600-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-808e-739f-a54e-82e1ba245b42",
+            "name": "Intex Pharma TE-300 (Testosterone Enanthate, Test E)",
+            "slug": "intex-pharma-te-300-testosterone-enanthate-test-e",
+            "sku": "43000995",
+            "broken_url": "https://supremestd.b-cdn.net/files/INTEX-TEST-E-300-1024x1024-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-9d62-712e-81a6-2ed363939181",
+            "name": "Intex Pharma TM-400",
+            "slug": "intex-pharma-tm-400",
+            "sku": "80184778",
+            "broken_url": "https://supremestd.b-cdn.net/files/Intex-Pharma-TM-400-600x600-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-8608-733c-90ef-745843bdb1eb",
+            "name": "Intex Pharma Test Cyp 200mg/1ml",
+            "slug": "intex-pharma-test-cyp-200mg1ml",
+            "sku": "34788714",
+            "broken_url": "https://supremestd.b-cdn.net/files/INTEX-TESTCYP-200-1024x1024-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-9731-7292-a804-6976d667a740",
+            "name": "Intex Pharma Turinabol 10mg x 100 tabs",
+            "slug": "intex-pharma-turinabol-10mg-x-100-tabs",
+            "sku": "33665686",
+            "broken_url": "https://supremestd.b-cdn.net/files/TBOL-10-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-acc2-70a0-b91f-c77ed50c647f",
+            "name": "Intex Pharma VAR 10 \u2013 10mg x 100 tabs (Anavar)",
+            "slug": "intex-pharma-var-10-10mg-x-100-tabs-anavar",
+            "sku": "84392020",
+            "broken_url": "https://supremestd.b-cdn.net/files/VAR-10-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ff9-7316-70fb-aed2-7395cd870d1a",
+            "name": "Intex Pharma Viagra 50mg x 25 tabs",
+            "slug": "intex-pharma-viagra-50mg-x-25-tabs",
+            "sku": "49860729",
+            "broken_url": "https://supremestd.b-cdn.net/files/VIAGRA-600x600-1.jpg",
+            "reason": "no_confident_match"
+        },
+        {
+            "product_id": "01a17ffb-1e51-7244-a2a9-ba6288b1afd5",
+            "name": "Nolvadex-D / Tamoxifen \u2013 Astra Zeneca [30tabx20mg]",
+            "slug": "nolvadex-d-tamoxifen-astra-zeneca-30tabx20mg",
+            "sku": "REF-0459",
+            "broken_url": "https://supremestd.b-cdn.net/files/Nolvadex-D-AStra-1-1.webp",
+            "reason": "no_confident_match"
+        }
+    ],
+    "skipped": [],
+    "dry_run": false
+}

@@ -1,0 +1,42 @@
+{
+  "updated_at": "2026-10-17T02:56:30+00:00",
+  "sitemap_count": 472,
+  "unique_urls_audited": 52,
+  "max_index_audited": 260,
+  "urls_remaining": 420,
+  "excluded": 52,
+  "compliance_holds": 0,
+  "lawful_candidates": 0,
+  "classification_total": 52,
+  "reconciles": true,
+  "batch_files": [
+    "batch-05-urls-209-260.json"
+  ],
+  "qa_note": "Staged catalogue products are tracked separately in database/qa.sqlite and are not duplicated here.",
+  "prior_report_reconciliation": {
+    "claimed_urls_audited_1_to_208": 208,
+    "claimed_excluded": 190,
+    "claimed_held": 17,
+    "claimed_staged_liv52": 1,
+    "verified_liv52_in_qa": true,
+    "verified_prior_audit_files": false,
+    "verified_prior_held_records_in_qa": false,
+    "explanation": "URLs #1–#208 remain unaudited in the durable ledger because prior batch JSON files were not present. Only the Liv.52 QA draft from the earlier report could be verified. Batch 5 totals below cover only the 52 newly audited URLs (#209–#260)."
+  },
+  "batch_5": {
+    "from": 209,
+    "to": 260,
+    "audited": 52,
+    "excluded": 52,
+    "compliance_holds": 0,
+    "lawful_candidates": 0,
+    "newly_staged": 0,
+    "approved_for_publication": 0
+  },
+  "qa_catalogue": {
+    "products": 1,
+    "staged_liv52_status": "IMPORTED",
+    "purchasable_products": 0,
+    "approved_for_publication": 0
+  }
+}

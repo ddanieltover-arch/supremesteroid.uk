@@ -1,0 +1,47 @@
+{
+  "reviewed_at": "2026-10-17T02:52:00Z",
+  "prior_report_held_count": 17,
+  "prior_held_records_found_in_qa": 0,
+  "prior_held_records_found_in_audit_ledger": 0,
+  "action": "No prior held product or audit records were available to reclassify. Nothing was invented.",
+  "batch_5_page_evidence_reclassifications": [
+    {
+      "index": 223,
+      "source_url": "https://supremesteroids.co.uk/product/xxx-tabs-pharmaqo-labs",
+      "from": "COMPLIANCE_HOLD",
+      "to": "EXCLUDED_RESTRICTED",
+      "evidence": "Product page category is Oral Steroids."
+    },
+    {
+      "index": 224,
+      "source_url": "https://supremesteroids.co.uk/product/yohimbine-hcl-10mg-100caps-syncom-labs",
+      "from": "COMPLIANCE_HOLD",
+      "to": "EXCLUDED_RESTRICTED",
+      "evidence": "Product page category is Oral Steroids."
+    },
+    {
+      "index": 238,
+      "source_url": "https://supremesteroids.co.uk/product/ett-500-pharmaqo-labs",
+      "from": "COMPLIANCE_HOLD",
+      "to": "EXCLUDED_RESTRICTED",
+      "evidence": "Product page category is Injectable Steroids."
+    }
+  ],
+  "liv52_draft": {
+    "sku": "IMP-FGYDT5KMC9",
+    "status": "IMPORTED",
+    "purchasable": false,
+    "publication": "BLOCKED",
+    "blocking_failures": [
+      "Inventory configuration invalid.",
+      "Compliance review incomplete.",
+      "Missing primary image.",
+      "SEO title missing."
+    ],
+    "mappings": {
+      "category": "PENDING",
+      "brand": "PENDING"
+    },
+    "image_status": "PENDING"
+  }
+}

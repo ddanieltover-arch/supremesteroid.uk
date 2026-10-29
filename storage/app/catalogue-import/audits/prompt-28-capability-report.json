@@ -1,0 +1,229 @@
+{
+    "generated_at": "2026-10-19T05:20:25+00:00",
+    "reference_base": "https://supremesteroids.co.uk",
+    "robots_txt": {
+        "url": "https://supremesteroids.co.uk/robots.txt",
+        "outcome": "HTTP 404 (no published robots rules retrieved)",
+        "automated_access": "No disallow rules published; retrieval limited to publicly linked sitemap/product URLs with paced HTTPS requests and no credential bypass."
+    },
+    "rate_limiting": {
+        "client_pacing_ms": 2000,
+        "notes": "ReferenceSiteHttpClient enforces inter-request delay; does not evade bot protection."
+    },
+    "endpoints_tested": [
+        {
+            "url": "https://supremesteroids.co.uk/robots.txt",
+            "status": 404,
+            "notes": "No published robots.txt",
+            "automated_access": "no-disallow-rules-published"
+        },
+        {
+            "url": "https://supremesteroids.co.uk/sitemap.xml",
+            "status": 200,
+            "notes": "Sitemap index",
+            "automated_access": "permitted-as-public"
+        },
+        {
+            "url": "https://supremesteroids.co.uk/product-sitemap.xml",
+            "status": 200,
+            "notes": "Product URL list only",
+            "automated_access": "permitted-as-public"
+        },
+        {
+            "url": "https://supremesteroids.co.uk/product_cat-sitemap.xml",
+            "status": 200,
+            "notes": "Category URLs predominantly restricted",
+            "automated_access": "permitted-as-public"
+        },
+        {
+            "url": "https://supremesteroids.co.uk/feed",
+            "status": 404,
+            "notes": "RSS unavailable",
+            "automated_access": "unavailable"
+        },
+        {
+            "url": "https://supremesteroids.co.uk/product/feed",
+            "status": 404,
+            "notes": "Product RSS unavailable",
+            "automated_access": "unavailable"
+        },
+        {
+            "url": "https://supremesteroids.co.uk/wp-json",
+            "status": 404,
+            "notes": "WP REST unavailable",
+            "automated_access": "unavailable"
+        },
+        {
+            "url": "https://supremesteroids.co.uk/wp-json/wp/v2/product",
+            "status": 404,
+            "notes": "WP product REST unavailable",
+            "automated_access": "unavailable"
+        },
+        {
+            "url": "https://supremesteroids.co.uk/wp-json/wc/store/v1/products",
+            "status": 404,
+            "notes": "Store API unavailable",
+            "automated_access": "unavailable"
+        },
+        {
+            "url": "https://supremesteroids.co.uk/wp-json/wc/v3/products",
+            "status": 404,
+            "notes": "WC REST v3 unavailable without credentials",
+            "automated_access": "unavailable"
+        },
+        {
+            "url": "https://supremesteroids.co.uk/shop?search=vitamin",
+            "status": 200,
+            "notes": "Public shop search HTML",
+            "automated_access": "permitted-as-public-with-pacing"
+        }
+    ],
+    "sources": [
+        {
+            "type": "sitemap-index",
+            "url": "https://supremesteroids.co.uk/sitemap.xml",
+            "outcome": "HTTP 200 (verified in probe phase)",
+            "automated_access": "permitted-as-public",
+            "records_discovered": 6,
+            "records_retrieved": 0,
+            "fields": [
+                "child sitemap locs"
+            ],
+            "missing": [
+                "product fields"
+            ]
+        },
+        {
+            "type": "product-sitemap",
+            "url": "https://supremesteroids.co.uk/product-sitemap.xml",
+            "outcome": "http-200-parsed; 472 product URLs listed (URLs discovered, not retrieved)",
+            "automated_access": "permitted-as-public",
+            "urls_discovered": 472,
+            "records_retrieved": 0,
+            "note": "Sitemap URL count must not be equated with retrieved product records.",
+            "slug_excluded_without_fetch": 469,
+            "page_fetch_candidates": 3,
+            "fields": [
+                "source_url"
+            ],
+            "missing": [
+                "name confirmed",
+                "sku",
+                "price",
+                "brand",
+                "category",
+                "images",
+                "description"
+            ]
+        },
+        {
+            "type": "public-product-html-jsonld",
+            "url": "https://supremesteroids.co.uk/product/{slug}",
+            "outcome": "200",
+            "automated_access": "permitted-as-public-with-pacing",
+            "sample": {
+                "url": "https://supremesteroids.co.uk/product/himalaya-liv52-liver-care-tablets-100-tabs",
+                "http": "200",
+                "fields_present": [
+                    "name",
+                    "sku",
+                    "price",
+                    "currency",
+                    "category",
+                    "description",
+                    "availability",
+                    "images"
+                ],
+                "fields_missing": [
+                    "brand",
+                    "variants"
+                ],
+                "fields_from": [
+                    "json-ld",
+                    "html-markup"
+                ],
+                "image_usage": "Public image URLs recorded as references only; not copied into persistent storage.",
+                "sample_name": "Himalaya Liv.52 \u2013 Liver care Tablets [100tabs]",
+                "sample_sku": "78088819",
+                "sample_price": "8.90"
+            },
+            "fields_when_page_retrieved": [
+                "name",
+                "description",
+                "sku (when published in JSON-LD)",
+                "price",
+                "currency",
+                "image URLs",
+                "availability",
+                "category (markup)",
+                "brand (when non-placeholder)"
+            ],
+            "missing_or_unreliable": [
+                "brand often placeholder \"Brand\" in JSON-LD",
+                "HTML SKU label sometimes absent when only JSON-LD sku exists",
+                "variants only when variation select is present",
+                "ingredients only when explicitly published"
+            ],
+            "pagination": "one product page per URL; no store API pagination available"
+        },
+        {
+            "type": "rss-product-feed",
+            "url": "https://supremesteroids.co.uk/feed and https://supremesteroids.co.uk/product/feed",
+            "outcome": "HTTP 404",
+            "automated_access": "unavailable",
+            "records_discovered": 0,
+            "records_retrieved": 0
+        },
+        {
+            "type": "wordpress-rest",
+            "url": "https://supremesteroids.co.uk/wp-json and /wp-json/wp/v2/product",
+            "outcome": "HTTP 404",
+            "automated_access": "unavailable",
+            "records_discovered": 0,
+            "records_retrieved": 0
+        },
+        {
+            "type": "woocommerce-store-api",
+            "url": "https://supremesteroids.co.uk/wp-json/wc/store/v1/products",
+            "outcome": "HTTP 404",
+            "automated_access": "unavailable",
+            "records_discovered": 0,
+            "records_retrieved": 0
+        },
+        {
+            "type": "woocommerce-rest-v3",
+            "url": "https://supremesteroids.co.uk/wp-json/wc/v3/products",
+            "outcome": "HTTP 404 without credentials; credentials not configured",
+            "automated_access": "unavailable",
+            "records_discovered": 0,
+            "records_retrieved": 0
+        },
+        {
+            "type": "product-category-sitemap",
+            "url": "https://supremesteroids.co.uk/product_cat-sitemap.xml",
+            "outcome": "HTTP 200; categories are predominantly restricted (steroids, SARMs, peptides, PCT, etc.)",
+            "automated_access": "permitted-as-public; restricted category pages are not opened for retail onboarding",
+            "fields": [
+                "category urls"
+            ],
+            "missing": [
+                "lawful consumer category tree"
+            ]
+        },
+        {
+            "type": "shop-search",
+            "url": "https://supremesteroids.co.uk/shop?search=vitamin",
+            "outcome": "HTTP 200 HTML listing page",
+            "automated_access": "permitted-as-public-with-pacing",
+            "note": "Useful for discovery hints only; product identity still requires product-page evidence."
+        }
+    ],
+    "summary": {
+        "sitemap_urls_discovered": 472,
+        "slug_classified_excluded": 469,
+        "page_fetch_candidates": 3,
+        "authorized_api_available": false,
+        "public_html_jsonld_available": true,
+        "image_copy_into_storage": false
+    }
+}

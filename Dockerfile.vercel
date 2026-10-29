@@ -75,7 +75,8 @@ RUN chmod +x /usr/local/bin/vercel-entrypoint.sh && \
     composer dump-autoload --optimize --no-dev --no-interaction && \
     rm -f bootstrap/cache/packages.php bootstrap/cache/services.php bootstrap/cache/config.php
 
-RUN php artisan package:discover --ansi || true
+RUN php artisan package:discover --ansi || true && \
+    php artisan storage:link --force || true
 
 # Vercel Serverless ephemeral filesystem adaptation:
 # Ensure storage and bootstrap/cache directories exist and have proper permissions

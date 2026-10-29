@@ -1,0 +1,52 @@
+{
+  "batch_label": "prompt-29-batch-01",
+  "run_key": "prompt-29-batch-01",
+  "import_batch": "2026-007",
+  "executed_at": "2026-10-20T00:42:34+00:00",
+  "ledger": {
+    "sitemap_urls": 472,
+    "page_evidence_before": 3,
+    "page_evidence_after": 53,
+    "unfetched_after": 419,
+    "batch_url_file": "prompt-29-page-batch-01-urls.json",
+    "retrieval_ledger": "public-html-page-retrieval-ledger.json"
+  },
+  "retrieval": {
+    "urls_attempted": 50,
+    "pages_successfully_fetched": 50,
+    "http_failures": 0,
+    "access_denied": 0
+  },
+  "ingest_outcomes": {
+    "records_parsed": 50,
+    "restricted_excluded": 46,
+    "compliance_holds": 4,
+    "new_staging_products": 4,
+    "existing_matched": 0,
+    "lawful_retail_candidates": 0
+  },
+  "qa_before": {
+    "products": 2,
+    "import_records": 501,
+    "page_fetched_refs": 3
+  },
+  "qa_after": {
+    "products": 6,
+    "import_records": 551,
+    "page_fetched_refs": 53,
+    "purchasable": 0,
+    "active_published": 0
+  },
+  "preserved": {
+    "liv52_sku": "IMP-KBYUNVKHJA",
+    "liv52_status": "IMPORTED",
+    "tudca_sku": "59383645",
+    "tudca_status": "COMPLIANCE_REVIEW"
+  },
+  "next_batch": {
+    "label": "prompt-29-page-batch-02",
+    "starts_at_sitemap_index": 51,
+    "unfetched_remaining": 419,
+    "command": "php artisan catalogue:bulk-ingest --product-page-batch --limit=50 --run=prompt-29-batch-02"
+  }
+}
