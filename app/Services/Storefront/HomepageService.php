@@ -24,9 +24,9 @@ use Illuminate\Support\Str;
 
 class HomepageService
 {
-    public const CACHE_PAGE = 'homepage.page.v3';
+    public const CACHE_PAGE = 'homepage.page.v4';
 
-    public const CACHE_CHROME = 'homepage.chrome.v3';
+    public const CACHE_CHROME = 'homepage.chrome.v4';
 
     public function __construct(
         protected ShippingEngine $shipping,

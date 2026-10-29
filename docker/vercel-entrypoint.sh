@@ -19,7 +19,7 @@ case "$migrate_url" in
 esac
 
 # Drop stale homepage payloads so product image URLs re-resolve after deploys.
-for key in homepage.page homepage.chrome homepage.page.v3 homepage.chrome.v3; do
+for key in homepage.page homepage.chrome homepage.page.v3 homepage.chrome.v3 homepage.page.v4 homepage.chrome.v4; do
   php artisan cache:forget "$key" 2>/dev/null || true
 done
 

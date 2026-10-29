@@ -72,19 +72,20 @@ class ProductImage extends Model
         }
 
         if (str_starts_with($value, '/storage/')) {
-            $relative = ltrim(substr($value, strlen('/storage/')), '/');
-            $existsLocally = false;
-            try {
-                $existsLocally = Storage::disk('public')->exists($relative);
-            } catch (\Throwable) {
-                $existsLocally = false;
+            // Prefer the recorded CDN original whenever available. Localized
+            // /storage files are gitignored and missing from Vercel containers.
+            $remote = app(CatalogueStoredImageCdnFallback::class)->remoteUrlForStoredPath($value);
+            if (is_string($remote) && $remote !== '') {
+                return CataloguePresentation::encodeImageUrl($remote);
             }
 
-            if (! $existsLocally) {
-                $remote = app(CatalogueStoredImageCdnFallback::class)->remoteUrlForStoredPath($value);
-                if (is_string($remote) && $remote !== '') {
-                    return CataloguePresentation::encodeImageUrl($remote);
+            $relative = ltrim(substr($value, strlen('/storage/')), '/');
+            try {
+                if (Storage::disk('public')->exists($relative)) {
+                    return $value;
                 }
+            } catch (\Throwable) {
+                // fall through
             }
 
             return $value;
