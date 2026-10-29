@@ -70,6 +70,29 @@ class CartService
         throw new InvalidArgumentException('Either a user or a guest session_id is required to resolve a cart.');
     }
 
+    /**
+     * Locate an existing cart for the request without creating one.
+     * Used for Inertia shared props so catalogue browsing does not write carts.
+     */
+    public function findRequestCart(Request $request): ?Cart
+    {
+        if ($request->user()) {
+            return $this->findCart($request->user());
+        }
+
+        $sessionId = $request->hasSession() ? $request->session()->getId() : null;
+        $cartId = $request->hasSession() ? $request->session()->get('cart_id') : null;
+
+        if (is_string($cartId) && $cartId !== '') {
+            $existing = Cart::query()->where('id', $cartId)->whereNull('user_id')->first();
+            if ($existing) {
+                return $existing;
+            }
+        }
+
+        return $this->findCart(null, $sessionId);
+    }
+
     public function resolveRequestCart(Request $request): Cart
     {
         if ($request->user()) {
@@ -338,7 +361,11 @@ class CartService
      */
     public function calculateCart(Cart $cart): array
     {
-        $cart->load(['items.product.images', 'items.variant']);
+        $cart->load([
+            'items.product.images',
+            'items.product.inventory',
+            'items.variant.inventory',
+        ]);
 
         $preparedItems = [];
         $calculatedItems = [];
@@ -348,7 +375,7 @@ class CartService
             $product = $item->product;
             $variant = $item->variant;
 
-            $eligibility = $this->eligibilityService->checkEligibility($product, $variant, $item->quantity, true);
+            $eligibility = $this->eligibilityService->checkCartLineEligibility($product, $variant, $item->quantity);
             if (! $eligibility['is_eligible']) {
                 $allEligible = false;
             }

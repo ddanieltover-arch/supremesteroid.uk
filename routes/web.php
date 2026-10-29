@@ -72,6 +72,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
+Route::post('/checkout/buy-now', [CheckoutController::class, 'buyNow'])->middleware('throttle:30,1')->name('checkout.buy-now');
 Route::post('/checkout/details', [CheckoutController::class, 'saveDetails'])->middleware('throttle:30,1')->name('checkout.details.save');
 Route::get('/checkout/delivery', [CheckoutController::class, 'delivery'])->name('checkout.delivery');
 Route::post('/checkout/delivery', [CheckoutController::class, 'saveDelivery'])->middleware('throttle:30,1')->name('checkout.delivery.save');

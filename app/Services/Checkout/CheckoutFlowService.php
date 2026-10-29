@@ -17,6 +17,7 @@ use App\Models\ProductVariant;
 use App\Models\User;
 use App\Services\Cart\CartService;
 use App\Services\Catalogue\ProductPurchaseEligibilityService;
+use App\Services\Pricing\PricingService;
 use App\Services\Shipping\ShippingEngine;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,12 +25,15 @@ use Illuminate\Support\Str;
 
 class CheckoutFlowService
 {
+    public const BUY_NOW_SESSION_KEY = 'checkout_buy_now';
+
     public function __construct(
         protected CartService $cartService,
         protected CheckoutSessionService $checkoutSessionService,
         protected ShippingEngine $shippingEngine,
         protected ProductPurchaseEligibilityService $eligibilityService,
-        protected GuestCustomerService $guestCustomerService
+        protected GuestCustomerService $guestCustomerService,
+        protected PricingService $pricingService,
     ) {}
 
     public function actor(Request $request): ?User
@@ -63,10 +67,8 @@ class CheckoutFlowService
             return redirect()->route('checkout.confirmation');
         }
 
-        $cart = $this->cartService->summarize(
-            $this->cartService->resolveRequestCart($request)
-        );
-        $empty = ((int) ($cart['totals']['items_count'] ?? 0)) === 0;
+        $basket = $this->checkoutBasket($request);
+        $empty = ((int) ($basket['totals']['items_count'] ?? 0)) === 0;
 
         if ($step === 'details') {
             if ($completedOrder && $empty) {
@@ -138,8 +140,7 @@ class CheckoutFlowService
     public function pageProps(Request $request, string $step): array
     {
         $user = $this->actor($request);
-        $cart = $this->cartService->resolveRequestCart($request);
-        $cartData = $this->cartService->summarize($cart);
+        $cartData = $this->checkoutBasket($request);
 
         $warnings = [];
         $affectedItems = [];
@@ -537,11 +538,87 @@ class CheckoutFlowService
     }
 
     /**
+     * Begin an express checkout for one product without mutating the shopping cart.
+     */
+    public function startBuyNow(Request $request, string $productId, ?string $variantId, int $quantity): void
+    {
+        $product = Product::query()->findOrFail($productId);
+        $variant = filled($variantId)
+            ? ProductVariant::query()->findOrFail($variantId)
+            : null;
+
+        if ($variant && $variant->product_id !== $product->id) {
+            throw new InvalidCheckoutException(
+                'Buy now variant does not belong to product.',
+                'The selected option is not available for this product.'
+            );
+        }
+
+        $this->eligibilityService->assertPurchasable($product, $variant, $quantity, true);
+
+        $request->session()->put(self::BUY_NOW_SESSION_KEY, [
+            'product_id' => $product->id,
+            'product_variant_id' => $variant?->id,
+            'quantity' => max(1, $quantity),
+        ]);
+        $request->session()->forget([
+            'checkout_token',
+            'checkout_idempotency_key',
+            'checkout_requires_acknowledgement',
+            'checkout_order_id',
+        ]);
+    }
+
+    public function clearBuyNow(Request $request): void
+    {
+        $request->session()->forget(self::BUY_NOW_SESSION_KEY);
+    }
+
+    public function hasBuyNow(Request $request): bool
+    {
+        $payload = $request->session()->get(self::BUY_NOW_SESSION_KEY);
+
+        return is_array($payload)
+            && filled($payload['product_id'] ?? null)
+            && (int) ($payload['quantity'] ?? 0) > 0;
+    }
+
+    /**
+     * Basket used for checkout gates and UI — buy-now takes priority over the cart.
+     *
+     * @return array<string, mixed>
+     */
+    public function checkoutBasket(Request $request): array
+    {
+        if ($this->hasBuyNow($request)) {
+            return $this->summarizeBuyNow($request);
+        }
+
+        return $this->cartService->summarize($this->cartService->findRequestCart($request));
+    }
+
+    /**
      * @return list<array{product_id: string, variant_id: ?string, quantity: int}>
      */
     public function cartItemsPayload(Request $request): array
     {
-        $cart = $this->cartService->resolveRequestCart($request);
+        if ($this->hasBuyNow($request)) {
+            $payload = $request->session()->get(self::BUY_NOW_SESSION_KEY);
+
+            return [[
+                'product_id' => (string) $payload['product_id'],
+                'variant_id' => filled($payload['product_variant_id'] ?? null)
+                    ? (string) $payload['product_variant_id']
+                    : null,
+                'quantity' => (int) $payload['quantity'],
+            ]];
+        }
+
+        $cart = $this->cartService->findRequestCart($request);
+        if (! $cart) {
+            return [];
+        }
+
         $data = $this->cartService->calculateCart($cart);
 
         return array_map(static fn (array $item) => [
@@ -549,6 +626,60 @@ class CheckoutFlowService
             'variant_id' => $item['variant_id'],
             'quantity' => $item['quantity'],
         ], $data['items']);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function summarizeBuyNow(Request $request): array
+    {
+        $payload = $request->session()->get(self::BUY_NOW_SESSION_KEY);
+        $product = Product::query()
+            ->with(['images', 'inventory'])
+            ->findOrFail((string) $payload['product_id']);
+        $variant = filled($payload['product_variant_id'] ?? null)
+            ? ProductVariant::query()
+                ->with('inventory')
+                ->find((string) $payload['product_variant_id'])
+            : null;
+        $quantity = (int) $payload['quantity'];
+
+        $eligibility = $this->eligibilityService->checkCartLineEligibility($product, $variant, $quantity);
+        $lineCalc = $this->pricingService->calculateLineItem($product, $variant, $quantity, 0);
+        $totals = $this->pricingService->calculateTotals([
+            [
+                'product' => $product,
+                'variant' => $variant,
+                'quantity' => $quantity,
+                'discount' => 0,
+            ],
+        ], 0, 0, 0, $product->currency ?? 'GBP');
+
+        $image = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
+
+        return [
+            'id' => null,
+            'items' => [[
+                'id' => 'buy-now',
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'product_slug' => $product->slug,
+                'product_sku' => $product->sku,
+                'variant_id' => $variant?->id,
+                'variant_name' => $variant?->name,
+                'unit_price' => $lineCalc['unit_price_amount'],
+                'quantity' => $quantity,
+                'subtotal' => $lineCalc['line_subtotal_amount'],
+                'line_total' => $lineCalc['line_total_amount'],
+                'image_url' => $image?->url,
+                'is_eligible' => $eligibility['is_eligible'],
+                'ineligibility_reasons' => $eligibility['reasons'],
+            ]],
+            'totals' => $totals,
+            'shipping_eligibility' => $this->shippingEngine->freeShippingEligibility($totals['subtotal_amount'] ?? '0.00'),
+            'is_checkout_ready' => $eligibility['is_eligible'],
+            'buy_now' => true,
+        ];
     }
 
     /**

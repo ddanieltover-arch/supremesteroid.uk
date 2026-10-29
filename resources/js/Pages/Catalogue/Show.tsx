@@ -1,6 +1,6 @@
 import StorefrontLayout from '../../Layouts/StorefrontLayout';
 import { Deferred, Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { ProductCard } from '@/components/ProductCard';
@@ -10,9 +10,112 @@ import { ProductGallery } from '@/components/catalogue/ProductGallery';
 import { ProductInfoPanels } from '@/components/catalogue/ProductInfoPanels';
 import { RecentlyViewed } from '@/components/catalogue/RecentlyViewed';
 import { TrustBlocks } from '@/components/catalogue/TrustBlocks';
+import { addCartItem } from '@/lib/cartApi';
 import { rememberRecentlyViewed } from '@/lib/recentlyViewed';
 import { formatMoney } from '@/lib/money';
-import type { ProductCard as ProductCardType, ProductDetail, SeoProps } from '@/types';
+import type { CartPayload, ProductCard as ProductCardType, ProductDetail, SeoProps } from '@/types';
+
+function moneyTimes(amount: string | null | undefined, quantity: number): string {
+  const pence = Math.round(Number(amount ?? 0) * 100) * Math.max(1, quantity);
+  return (pence / 100).toFixed(2);
+}
+
+function buyNowCheckoutUrl(productId: string, variantId: string, quantity: number): string {
+  const params = new URLSearchParams({
+    buy_now: '1',
+    product_id: productId,
+    quantity: String(Math.max(1, quantity)),
+  });
+  if (variantId) {
+    params.set('product_variant_id', variantId);
+  }
+  return `/checkout?${params.toString()}`;
+}
+
+function buyNowInstantProps(product: ProductDetail, variantId: string, quantity: number) {
+  const variant = product.variants?.find((item) => item.id === variantId);
+  const currency = product.pricing?.currency ?? 'GBP';
+  const unit = variant?.effective_price ?? product.pricing?.effective_price ?? '0.00';
+  const line = moneyTimes(unit, quantity);
+  const image = product.images?.find((item) => item.is_primary)?.url ?? product.image_url ?? null;
+  const cart: CartPayload = {
+    id: null,
+    items: [
+      {
+        id: 'buy-now',
+        product_id: product.id,
+        product_name: product.name,
+        product_slug: product.slug,
+        product_sku: product.sku,
+        variant_id: variant?.id ?? null,
+        variant_name: variant?.name ?? null,
+        unit_price: unit,
+        quantity,
+        subtotal: line,
+        line_total: line,
+        image_url: image,
+        is_eligible: true,
+        ineligibility_reasons: [],
+      },
+    ],
+    totals: {
+      subtotal_amount: line,
+      discount_amount: '0.00',
+      shipping_amount: '0.00',
+      tax_amount: '0.00',
+      grand_total_amount: line,
+      items_count: quantity,
+      currency,
+    },
+    shipping_eligibility: {
+      free_shipping_threshold: '0.00',
+      current_eligible_subtotal: line,
+      remaining_to_threshold: '0.00',
+      free_shipping_eligible: false,
+      progress_percent: 0,
+      currency,
+    },
+    is_checkout_ready: true,
+  };
+
+  return {
+    component: 'Checkout/Index',
+    pageProps: (_current: Record<string, unknown>, shared: Record<string, unknown>) => ({
+      ...shared,
+      cart,
+      checkout: null,
+      checkoutPreview: {
+        country_code: 'GB',
+        shipping_method_code: null,
+        items_subtotal: line,
+        discount: '0.00',
+        shipping: '0.00',
+        tax: '0.00',
+        grand_total: line,
+        currency,
+      },
+      addresses: [],
+      countries: [
+        { code: 'GB', name: 'United Kingdom' },
+      ],
+      checkout_step: 'details',
+      checkout_steps: [
+        { key: 'details', label: 'Details', state: 'current' },
+        { key: 'delivery', label: 'Delivery', state: 'upcoming' },
+        { key: 'payment', label: 'Payment', state: 'upcoming' },
+        { key: 'confirmation', label: 'Order placed', state: 'upcoming' },
+      ],
+      warnings: [],
+      affected_items: [],
+      requires_acknowledgement: false,
+      seo: {
+        title: 'Checkout details',
+        description: 'Secure checkout.',
+        robots: 'noindex,nofollow',
+      },
+    }),
+  };
+}
 
 type RelatedGroups = {
   related?: ProductCardType[];
@@ -34,11 +137,10 @@ export default function CatalogueShow({
   const page = usePage<{ auth?: { user?: unknown }; wishlistProductIds?: string[] }>();
   const saved = product ? (page.props.wishlistProductIds ?? []).includes(product.id) : false;
   const isPreview = Boolean(preview || product?.is_preview);
-  const form = useForm({
-    product_id: product?.id ?? '',
-    product_variant_id: product?.variants?.[0]?.id ?? '',
-    quantity: 1,
-  });
+  const [variantId, setVariantId] = useState(product?.variants?.[0]?.id ?? '');
+  const [quantity, setQuantity] = useState(1);
+  const [cartBusy, setCartBusy] = useState<'add' | 'buy' | null>(null);
+  const [cartError, setCartError] = useState<string | null>(null);
   const notify = useForm({
     email: '',
     product_variant_id: product?.variants?.[0]?.id ?? '',
@@ -50,10 +152,44 @@ export default function CatalogueShow({
   });
 
   useEffect(() => {
+    setVariantId(product?.variants?.[0]?.id ?? '');
+    setQuantity(1);
+    setCartBusy(null);
+    setCartError(null);
+  }, [product?.id]);
+
+  useEffect(() => {
     if (product?.slug && ! isPreview) {
       rememberRecentlyViewed(product.slug);
     }
   }, [product?.slug, isPreview]);
+
+  const submitCart = async (mode: 'add' | 'buy') => {
+    if (!product?.id || cartBusy) {
+      return;
+    }
+    setCartError(null);
+
+    if (mode === 'buy') {
+      // Instant Visit: paint checkout immediately, session is established by the GET.
+      router.visit(buyNowCheckoutUrl(product.id, variantId, quantity), buyNowInstantProps(product, variantId, quantity));
+      return;
+    }
+
+    setCartBusy('add');
+    try {
+      await addCartItem({
+        product_id: product.id,
+        product_variant_id: variantId || null,
+        quantity,
+      });
+      window.dispatchEvent(new CustomEvent('ss:open-cart'));
+    } catch {
+      setCartError('This item could not be added. Availability is confirmed on the server.');
+    } finally {
+      setCartBusy(null);
+    }
+  };
 
   if (! product?.id) {
     return (
@@ -71,7 +207,7 @@ export default function CatalogueShow({
     );
   }
 
-  const selectedVariant = product.variants?.find((variant) => variant.id === form.data.product_variant_id);
+  const selectedVariant = product.variants?.find((variant) => variant.id === variantId);
   const stock = selectedVariant?.stock ?? product.stock;
   const canBuy = ! isPreview && (selectedVariant ? selectedVariant.is_purchasable : product.is_purchasable);
   const useButtons = (product.variants?.length ?? 0) > 0 && (product.variants?.length ?? 0) <= 6;
@@ -146,9 +282,9 @@ export default function CatalogueShow({
                     <button
                       key={variant.id}
                       type="button"
-                      className={`min-h-11 rounded-lg border px-3 py-2 text-sm ${form.data.product_variant_id === variant.id ? 'border-blue-500 text-blue-600' : 'border-slate-200 text-slate-800'}`}
+                      className={`min-h-11 rounded-lg border px-3 py-2 text-sm ${variantId === variant.id ? 'border-blue-500 text-blue-600' : 'border-slate-200 text-slate-800'}`}
                       onClick={() => {
-                        form.setData('product_variant_id', variant.id);
+                        setVariantId(variant.id);
                         notify.setData('product_variant_id', variant.id);
                       }}
                     >
@@ -162,9 +298,9 @@ export default function CatalogueShow({
               ) : (
                 <select
                   className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
-                  value={form.data.product_variant_id}
+                  value={variantId}
                   onChange={(event) => {
-                    form.setData('product_variant_id', event.target.value);
+                    setVariantId(event.target.value);
                     notify.setData('product_variant_id', event.target.value);
                   }}
                 >
@@ -188,23 +324,20 @@ export default function CatalogueShow({
                 type="number"
                 min={1}
                 max={99}
-                value={form.data.quantity}
-                onChange={(event) => form.setData('quantity', Number(event.target.value))}
+                value={quantity}
+                onChange={(event) => setQuantity(Math.max(1, Number(event.target.value) || 1))}
                 className="w-32 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
               />
               <div className="flex flex-wrap gap-2">
-                <Button variant="secondary" className="min-h-12" isLoading={form.processing} onClick={() => form.post('/cart/items')}>
+                <Button variant="secondary" className="min-h-12" isLoading={cartBusy === 'add'} disabled={cartBusy !== null} onClick={() => void submitCart('add')}>
                   Add to cart
                 </Button>
                 <Button
                   variant="primary"
                   className="min-h-12"
-                  isLoading={form.processing}
-                  onClick={() =>
-                    form.post('/cart/items', {
-                      onSuccess: () => router.visit('/checkout'),
-                    })
-                  }
+                  isLoading={cartBusy === 'buy'}
+                  disabled={cartBusy !== null}
+                  onClick={() => void submitCart('buy')}
                 >
                   Buy now
                 </Button>
@@ -218,6 +351,7 @@ export default function CatalogueShow({
                   </Button>
                 ) : null}
               </div>
+              {cartError ? <p className="text-sm text-rose-600">{cartError}</p> : null}
             </div>
           ) : (
             <div className="mt-6">

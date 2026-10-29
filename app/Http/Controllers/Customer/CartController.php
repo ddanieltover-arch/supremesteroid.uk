@@ -10,6 +10,7 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\Cart\CartService;
+use App\Services\Checkout\CheckoutFlowService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,7 +21,8 @@ use Inertia\Response;
 class CartController extends Controller
 {
     public function __construct(
-        protected CartService $cartService
+        protected CartService $cartService,
+        protected CheckoutFlowService $checkoutFlowService,
     ) {}
 
     protected function resolveSessionId(Request $request): string
@@ -68,12 +70,13 @@ class CartController extends Controller
             sessionId: $sessionId
         );
 
-        $payload = $this->cartService->summarize($cart->fresh('items'));
+        // A normal cart add cancels any pending express buy-now basket.
+        $this->checkoutFlowService->clearBuyNow($request);
 
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Item added to cart.',
-                'cart' => $payload,
+                'cart' => $this->cartService->summarize($cart->fresh('items')),
             ]);
         }
 
@@ -101,12 +104,10 @@ class CartController extends Controller
             $cart = $item->cart()->first();
         }
 
-        $payload = $this->cartService->summarize($cart?->fresh('items') ?? $cart);
-
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Cart updated.',
-                'cart' => $payload,
+                'cart' => $this->cartService->summarize($cart?->fresh('items') ?? $cart),
             ]);
         }
 
@@ -121,12 +122,11 @@ class CartController extends Controller
         $sessionId = $this->resolveSessionId($request);
         $cart = $item->cart;
         $this->cartService->removeItem($item, $user, $sessionId);
-        $payload = $this->cartService->summarize($cart->fresh('items') ?? $cart);
 
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Item removed.',
-                'cart' => $payload,
+                'cart' => $this->cartService->summarize($cart->fresh('items') ?? $cart),
             ]);
         }
 
@@ -137,12 +137,11 @@ class CartController extends Controller
     {
         $cart = $this->cartService->resolveRequestCart($request);
         $this->cartService->clearCart($cart, $request->user(), $this->resolveSessionId($request));
-        $payload = $this->cartService->summarize($cart->fresh('items'));
 
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Cart cleared.',
-                'cart' => $payload,
+                'cart' => $this->cartService->summarize($cart->fresh('items')),
             ]);
         }
 

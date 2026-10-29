@@ -1,6 +1,7 @@
 import { AccountLayout } from '@/Layouts/AccountLayout';
 import { Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/Button';
+import { addCartItem } from '@/lib/cartApi';
 import { formatMoney } from '@/lib/money';
 import type { ProductCard as ProductCardType } from '@/types';
 
@@ -41,7 +42,9 @@ export default function Wishlist({ products }: { products: ProductCardType[] }) 
                     if (!product.is_purchasable) {
                       return;
                     }
-                    router.post('/cart/items', { product_id: product.id, quantity: 1 }, { preserveScroll: true });
+                    void addCartItem({ product_id: product.id, quantity: 1 }).then(() => {
+                      window.dispatchEvent(new CustomEvent('ss:open-cart'));
+                    });
                   }}
                 >
                   {product.is_purchasable ? 'Add to cart' : 'Unavailable'}

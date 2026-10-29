@@ -20,7 +20,9 @@ class CatalogueDiscoveryService
      */
     public function navigation(): array
     {
-        return Cache::remember('catalogue.navigation.v2', 300, function () {
+        return Cache::remember('catalogue.navigation.v3', 300, function () {
+            $variantCount = fn ($query) => $query->where('is_active', true);
+
             $categories = Category::query()
                 ->where('is_visible', true)
                 ->whereNull('parent_id')
@@ -39,6 +41,7 @@ class CatalogueDiscoveryService
                 ->purchasable()
                 ->where('is_featured', true)
                 ->with(['brand', 'category', 'images', 'inventory'])
+                ->withCount(['variants as variant_count' => $variantCount])
                 ->orderBy('sort_order')
                 ->limit(4)
                 ->get();
@@ -47,6 +50,7 @@ class CatalogueDiscoveryService
             $newArrivals = Product::query()
                 ->purchasable()
                 ->with(['brand', 'category', 'images', 'inventory'])
+                ->withCount(['variants as variant_count' => $variantCount])
                 ->orderByDesc('published_at')
                 ->orderByDesc('created_at')
                 ->limit(4)

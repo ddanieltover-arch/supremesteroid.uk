@@ -3,6 +3,7 @@ import { Eye, GitCompare } from 'lucide-react';
 import { useEffect, useState, type MouseEvent } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { QuickView } from '@/components/catalogue/QuickView';
+import { addCartItem } from '@/lib/cartApi';
 import { formatMoney } from '@/lib/money';
 import { readCompareIds, toggleCompareId } from '@/lib/compare';
 import type { ProductCard as ProductCardType, ProductDetail, ProductVariant } from '@/types';
@@ -114,22 +115,23 @@ export function ProductCard({ product }: { product: ProductCardType }) {
     return () => window.removeEventListener('ss:compare', sync);
   }, [product.id]);
 
-  const postCart = (variantId?: string) => {
+  const postCart = async (variantId?: string) => {
     setAdding(true);
     setError(null);
-    router.post(
-      '/cart/items',
-      { product_id: product.id, product_variant_id: variantId || null, quantity: 1 },
-      {
-        preserveScroll: true,
-        onError: () => setError('This item could not be added. Availability is confirmed on the server.'),
-        onFinish: () => {
-          setAdding(false);
-          setAdded(true);
-          window.setTimeout(() => setAdded(false), 1200);
-        },
-      },
-    );
+    try {
+      await addCartItem({
+        product_id: product.id,
+        product_variant_id: variantId || null,
+        quantity: 1,
+      });
+      setAdded(true);
+      window.setTimeout(() => setAdded(false), 1200);
+      window.dispatchEvent(new CustomEvent('ss:open-cart'));
+    } catch {
+      setError('This item could not be added. Availability is confirmed on the server.');
+    } finally {
+      setAdding(false);
+    }
   };
 
   const addToCart = async (event: MouseEvent) => {
@@ -139,7 +141,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
       return;
     }
     if (!product.has_variants) {
-      postCart();
+      void postCart();
       return;
     }
 
@@ -153,7 +155,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
       const payload = (await response.json()) as { product: ProductDetail };
       const purchasable = (payload.product.variants ?? []).filter((variant) => variant.is_purchasable);
       if (purchasable.length === 1) {
-        postCart(purchasable[0].id);
+        await postCart(purchasable[0].id);
         return;
       }
       if (purchasable.length > 1) {

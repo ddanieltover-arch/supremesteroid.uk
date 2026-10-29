@@ -3,11 +3,13 @@ import { createRoot } from 'react-dom/client';
 import type { ComponentType, ErrorInfo, ReactNode } from 'react';
 import React, { Component } from 'react';
 import '../css/app.css';
-// Eager product page so Instant Visits swap on click without waiting for a lazy chunk.
+// Eager key pages so Instant Visits swap on click without waiting for a lazy chunk.
 import CatalogueShow from './Pages/Catalogue/Show';
+import CheckoutIndex from './Pages/Checkout/Index';
 
 const eagerPages: Record<string, ComponentType> = {
   'Catalogue/Show': CatalogueShow,
+  'Checkout/Index': CheckoutIndex,
 };
 
 const pageModules = import.meta.glob('./Pages/**/*.tsx');

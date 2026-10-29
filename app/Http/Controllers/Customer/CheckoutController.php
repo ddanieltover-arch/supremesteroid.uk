@@ -10,6 +10,7 @@ use App\Http\Requests\PrepareCheckoutRequest;
 use App\Http\Requests\SaveCheckoutDeliveryRequest;
 use App\Http\Requests\SaveCheckoutDetailsRequest;
 use App\Http\Requests\SaveCheckoutPaymentRequest;
+use App\Http\Requests\StoreCartItemRequest;
 use App\Http\Requests\StoreCheckoutRequest;
 use App\Http\Resources\OrderDetailResource;
 use App\Models\Order;
@@ -36,11 +37,53 @@ class CheckoutController extends Controller
 
     public function show(Request $request): Response|RedirectResponse
     {
+        // Accept buy-now query params on first paint so Instant Visits can open
+        // checkout immediately without waiting for a separate POST.
+        if ($request->boolean('buy_now') && $request->filled('product_id')) {
+            try {
+                $this->checkoutFlowService->startBuyNow(
+                    $request,
+                    (string) $request->query('product_id'),
+                    $request->filled('product_variant_id') ? (string) $request->query('product_variant_id') : null,
+                    max(1, (int) $request->query('quantity', 1)),
+                );
+            } catch (\Throwable $exception) {
+                $message = method_exists($exception, 'getCustomerMessage')
+                    ? (string) $exception->getCustomerMessage()
+                    : 'This item could not be checked out right now.';
+
+                return redirect()
+                    ->back()
+                    ->with('error', $message);
+            }
+        }
+
         if ($redirect = $this->checkoutFlowService->gate($request, 'details')) {
             return $redirect;
         }
 
         return Inertia::render('Checkout/Index', $this->checkoutFlowService->pageProps($request, 'details'));
+    }
+
+    public function buyNow(StoreCartItemRequest $request): RedirectResponse|JsonResponse
+    {
+        $validated = $request->validated();
+
+        $this->checkoutFlowService->startBuyNow(
+            $request,
+            (string) $validated['product_id'],
+            ! empty($validated['product_variant_id']) ? (string) $validated['product_variant_id'] : null,
+            (int) $validated['quantity'],
+        );
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Ready for checkout.',
+                'redirect' => route('checkout.show'),
+            ]);
+        }
+
+        return redirect()->route('checkout.show');
     }
 
     public function saveDetails(SaveCheckoutDetailsRequest $request): RedirectResponse
@@ -167,8 +210,12 @@ class CheckoutController extends Controller
             'customer_notes' => $validated['customer_notes'] ?? null,
         ]);
 
-        $cart = $this->cartService->resolveRequestCart($request);
-        $this->cartService->clearCart($cart, $request->user(), $request->session()->getId());
+        if ($this->checkoutFlowService->hasBuyNow($request)) {
+            $this->checkoutFlowService->clearBuyNow($request);
+        } else {
+            $cart = $this->cartService->resolveRequestCart($request);
+            $this->cartService->clearCart($cart, $request->user(), $request->session()->getId());
+        }
 
         $request->session()->forget('checkout_token');
         $request->session()->put('checkout_order_id', $order->id);

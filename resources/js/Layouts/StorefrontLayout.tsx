@@ -1,6 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { BackToTop } from '@/components/BackToTop';
 import { CartDrawer } from '@/components/CartDrawer';
 import { Footer } from '@/components/Footer';
@@ -9,7 +9,8 @@ import { Header } from '@/components/Header';
 import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
 import SeoHead from '@/components/SeoHead';
 import { ToastStack } from '@/components/ToastStack';
-import type { CartPayload, SeoProps } from '@/types';
+import { useCart } from '@/hooks/useCart';
+import type { SeoProps } from '@/types';
 import clsx from 'clsx';
 
 const CompareBar = lazy(() =>
@@ -21,11 +22,18 @@ export default function StorefrontLayout({
   seo,
   chrome = 'storefront',
 }: PropsWithChildren<{ seo?: SeoProps; chrome?: 'storefront' | 'checkout' }>) {
-  const page = usePage<{ cart?: CartPayload; wishlistCount?: number }>();
+  const page = usePage<{ wishlistCount?: number }>();
+  const cart = useCart();
   const [cartOpen, setCartOpen] = useState(false);
-  const cartCount = page.props.cart?.totals?.items_count ?? 0;
+  const cartCount = cart.totals?.items_count ?? 0;
   const checkout = chrome === 'checkout';
   const openCart = () => setCartOpen(true);
+
+  useEffect(() => {
+    const onOpen = () => setCartOpen(true);
+    window.addEventListener('ss:open-cart', onOpen);
+    return () => window.removeEventListener('ss:open-cart', onOpen);
+  }, []);
 
   return (
     <div
@@ -40,7 +48,7 @@ export default function StorefrontLayout({
       </a>
       <div className="sticky top-0 z-40 print:hidden">
         {checkout ? null : <AnnouncementBar />}
-        <Header cartCount={cartCount} wishlistCount={page.props.wishlistCount} onOpenCart={openCart} compact={checkout} />
+        <Header cartCount={cartCount} wishlistCount={page.props.wishlistCount ?? 0} onOpenCart={openCart} compact={checkout} />
       </div>
       <ToastStack />
       <div className="flex min-h-0 flex-1 flex-col overflow-x-clip">

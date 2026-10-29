@@ -1,11 +1,15 @@
 import StorefrontLayout from '../../Layouts/StorefrontLayout';
-import { Link, router } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { useCart } from '@/hooks/useCart';
+import { removeCartItem } from '@/lib/cartApi';
 import { formatMoney } from '@/lib/money';
 import type { CartPayload } from '@/types';
 
-export default function CartIndex({ cart }: { cart: CartPayload }) {
+export default function CartIndex({ cart: initialCart }: { cart: CartPayload }) {
+  const liveCart = useCart();
+  const cart = liveCart.items.length > 0 || liveCart.id ? liveCart : initialCart;
   const [pending, setPending] = useState<string | null>(null);
   const currency = cart.totals?.currency ?? 'GBP';
   const eligibility = cart.shipping_eligibility;
@@ -40,7 +44,7 @@ export default function CartIndex({ cart }: { cart: CartPayload }) {
                 isLoading={pending === item.id}
                 onClick={() => {
                   setPending(item.id);
-                  router.delete(`/cart/items/${item.id}`, { onFinish: () => setPending(null) });
+                  void removeCartItem(item.id).finally(() => setPending(null));
                 }}
               >
                 Remove

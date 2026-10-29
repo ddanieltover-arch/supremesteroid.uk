@@ -1,12 +1,13 @@
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { ArrowRight, ShoppingBag, Trash2, Truck, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Portal } from '@/components/ui/Portal';
+import { useCart } from '@/hooks/useCart';
 import { usePresence } from '@/hooks/usePresence';
+import { clearCart, removeCartItem, updateCartItemQuantity } from '@/lib/cartApi';
 import { formatMoney } from '@/lib/money';
-import type { CartPayload } from '@/types';
 import clsx from 'clsx';
 
 type CartDrawerProps = {
@@ -15,8 +16,8 @@ type CartDrawerProps = {
 };
 
 export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  const page = usePage<{ cart: CartPayload; auth?: { user?: unknown } }>();
-  const cart = page.props.cart;
+  const page = usePage<{ auth?: { user?: unknown } }>();
+  const cart = useCart();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
@@ -73,10 +74,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
   const updateQuantity = (id: string, quantity: number) => {
     setPendingId(id);
-    router.patch(`/cart/items/${id}`, { quantity }, {
-      preserveScroll: true,
-      onFinish: () => setPendingId(null),
-    });
+    void updateCartItemQuantity(id, quantity).finally(() => setPendingId(null));
   };
 
   return (
@@ -195,7 +193,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         disabled={pendingId === item.id}
                         onClick={() => {
                           setPendingId(item.id);
-                          router.delete(`/cart/items/${item.id}`, { preserveScroll: true, onFinish: () => setPendingId(null) });
+                          void removeCartItem(item.id).finally(() => setPendingId(null));
                         }}
                         aria-label={`Remove ${item.product_name}`}
                       >
@@ -225,7 +223,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               <Link href="/shop" className="inline-flex w-full min-h-11 items-center justify-center text-sm text-slate-800 transition-colors hover:text-brand" onClick={onClose}>
                 Continue shopping
               </Link>
-              <Button variant="ghost" className="w-full" disabled={pendingId !== null} onClick={() => router.delete('/cart', { preserveScroll: true })}>
+              <Button variant="ghost" className="w-full" disabled={pendingId !== null} onClick={() => void clearCart()}>
                 Clear basket
               </Button>
             </div>

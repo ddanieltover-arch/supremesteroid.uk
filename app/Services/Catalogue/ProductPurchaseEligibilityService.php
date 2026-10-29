@@ -131,6 +131,56 @@ class ProductPurchaseEligibilityService
     }
 
     /**
+     * Lightweight cart-line check used when recounting an existing basket.
+     * Full catalogue compliance belongs on publication / add-to-cart asserts.
+     *
+     * @return array{is_eligible: bool, reasons: list<string>}
+     */
+    public function checkCartLineEligibility(
+        Product $product,
+        ?ProductVariant $variant = null,
+        int $quantity = 1
+    ): array {
+        $reasons = [];
+
+        if ($product->is_demo) {
+            $reasons[] = 'Demo catalogue items cannot be purchased.';
+        }
+
+        if ($product->status !== ProductStatus::ACTIVE) {
+            $reasons[] = "Product status '{$product->status->value}' is not active for retail purchase.";
+        }
+
+        if ($product->trashed()) {
+            $reasons[] = 'Product has been decommissioned or deleted.';
+        }
+
+        if ($variant !== null) {
+            if ($variant->product_id !== $product->id) {
+                $reasons[] = 'Specified product variant does not belong to this product.';
+            }
+            if (! $variant->is_active) {
+                $reasons[] = 'Selected product variant is inactive.';
+            }
+        }
+
+        if ($quantity > 0) {
+            $inventory = $variant ? $variant->inventory : $product->inventory;
+            if ($inventory) {
+                $available = $inventory->available();
+                if ($available < $quantity) {
+                    $reasons[] = "Insufficient stock available ({$available} in stock, {$quantity} requested).";
+                }
+            }
+        }
+
+        return [
+            'is_eligible' => empty($reasons),
+            'reasons' => $reasons,
+        ];
+    }
+
+    /**
      * @throws ProductNotPurchasableException
      */
     public function assertPurchasable(

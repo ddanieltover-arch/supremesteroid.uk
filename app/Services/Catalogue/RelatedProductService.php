@@ -35,7 +35,13 @@ class RelatedProductService
     public function purchasableRelated(Product $product, ?ProductRelationType $type = null, int $limit = 8): Collection
     {
         $query = $product->relations()
-            ->with(['relatedProduct.brand', 'relatedProduct.category', 'relatedProduct.images', 'relatedProduct.inventory'])
+            ->with([
+                'relatedProduct' => function ($relatedQuery): void {
+                    $relatedQuery
+                        ->with(['brand', 'category', 'images', 'inventory'])
+                        ->withCount(['variants as variant_count' => fn ($variantQuery) => $variantQuery->where('is_active', true)]);
+                },
+            ])
             ->orderBy('display_order');
 
         if ($type !== null) {

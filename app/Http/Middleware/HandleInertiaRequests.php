@@ -26,7 +26,6 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $cartService = app(CartService::class);
-        $sessionId = $request->hasSession() ? $request->session()->getId() : null;
         $wishlistIds = $request->user()
             ? app(WishlistService::class)->productIds($request->user())
             : [];
@@ -59,11 +58,8 @@ class HandleInertiaRequests extends Middleware
                 'support_phone' => config('store.support_phone'),
             ],
             'chrome' => $chrome,
-            'cart' => $cartService->summarize(
-                $request->hasSession()
-                    ? $cartService->resolveRequestCart($request)
-                    : $cartService->findCart($request->user(), $sessionId)
-            ),
+            // Never create carts while sharing props — browsing must stay read-only.
+            'cart' => $cartService->summarize($cartService->findRequestCart($request)),
             'wishlistProductIds' => $wishlistIds,
             'wishlistCount' => count($wishlistIds),
             'catalogueNav' => app(CatalogueDiscoveryService::class)->navigation(),

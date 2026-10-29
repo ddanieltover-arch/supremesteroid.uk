@@ -1,6 +1,6 @@
 import StorefrontLayout from '../../Layouts/StorefrontLayout';
 import { router, useForm, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CheckoutAlerts } from '@/components/checkout/CheckoutAlerts';
 import { CheckoutProgress, type CheckoutStep } from '@/components/checkout/CheckoutProgress';
 import { OrderSummary } from '@/components/checkout/OrderSummary';
@@ -48,6 +48,18 @@ export default function CheckoutIndex({
   const errors = page.props.errors ?? {};
   const [mode, setMode] = useState<'saved' | 'new'>(addresses.length > 0 ? 'saved' : 'new');
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has('buy_now')) {
+      return;
+    }
+    url.search = '';
+    window.history.replaceState(window.history.state, '', `${url.pathname}${url.hash}`);
+  }, []);
   const selectedAddress = addresses[0];
   const destination = checkout && 'shipping_destination' in checkout ? (checkout as { shipping_destination?: Address }).shipping_destination : undefined;
   const form = useForm({

@@ -1,9 +1,10 @@
-import { Link, router } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { PriceDisplay } from '@/components/catalogue/PriceDisplay';
+import { addCartItem } from '@/lib/cartApi';
 import { formatMoney } from '@/lib/money';
 import type { ProductDetail } from '@/types';
 
@@ -115,19 +116,23 @@ export function QuickView({ slug, open, onClose }: { slug: string | null; open: 
                 disabled={!canBuy}
                 isLoading={adding}
                 onClick={() => {
-                  if (!canBuy) {
+                  if (!canBuy || adding) {
                     return;
                   }
                   setAdding(true);
-                  router.post(
-                    '/cart/items',
-                    { product_id: product.id, product_variant_id: variantId || null, quantity: 1 },
-                    {
-                      preserveScroll: true,
-                      onFinish: () => setAdding(false),
-                      onSuccess: onClose,
-                    },
-                  );
+                  void addCartItem({
+                    product_id: product.id,
+                    product_variant_id: variantId || null,
+                    quantity: 1,
+                  })
+                    .then(() => {
+                      window.dispatchEvent(new CustomEvent('ss:open-cart'));
+                      onClose();
+                    })
+                    .catch(() => {
+                      setError('This item could not be added.');
+                    })
+                    .finally(() => setAdding(false));
                 }}
               >
                 {canBuy ? 'Add to cart' : 'Unavailable'}
