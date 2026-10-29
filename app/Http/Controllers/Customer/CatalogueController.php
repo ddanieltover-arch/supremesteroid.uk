@@ -16,7 +16,6 @@ use App\Services\Catalogue\ReviewService;
 use App\Services\Catalogue\SeoService;
 use App\Services\Catalogue\StockNotificationService;
 use App\Services\Catalogue\StructuredDataService;
-use App\Services\Inventory\InventoryReservationService;
 use App\Services\Shipping\ShippingEngine;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -34,7 +33,6 @@ class CatalogueController extends Controller
     public function __construct(
         protected SeoService $seoService,
         protected ShippingEngine $shippingEngine,
-        protected InventoryReservationService $reservations,
         protected RelatedProductService $relatedProducts,
         protected StructuredDataService $structuredData,
         protected StockNotificationService $stockNotifications,
@@ -94,8 +92,6 @@ class CatalogueController extends Controller
 
     public function show(Request $request, string $slug): Response
     {
-        $this->reservations->releaseExpiredReservations();
-
         $product = Product::query()
             ->purchasable()
             ->with([
@@ -115,16 +111,7 @@ class CatalogueController extends Controller
 
         $this->authorize('view', $product);
 
-        $grouped = $this->relatedProducts->grouped($product);
-        $related = $grouped['related']->merge($grouped['alternative'])->merge($grouped['complementary'])->unique('id')->values();
-
         $payload = (new ProductDetailResource($product))->resolve();
-        $payload['related_products'] = ProductCardResource::collection($related)->resolve();
-        $payload['related_groups'] = [
-            'related' => ProductCardResource::collection($grouped['related'])->resolve(),
-            'alternative' => ProductCardResource::collection($grouped['alternative'])->resolve(),
-            'complementary' => ProductCardResource::collection($grouped['complementary'])->resolve(),
-        ];
         $payload['shipping_methods'] = $this->shippingEngine->calculateRates('0.00', 'GB')->values();
         $payload['breadcrumbs'] = $this->productBreadcrumbs($product);
         $payload['structured_data'] = [
@@ -134,6 +121,17 @@ class CatalogueController extends Controller
 
         return Inertia::render('Catalogue/Show', [
             'product' => $payload,
+            // Related rails are deferred so Instant Visits get the core product
+            // immediately; related cards resolve after first paint.
+            'related_groups' => Inertia::defer(function () use ($product) {
+                $grouped = $this->relatedProducts->grouped($product, 4);
+
+                return [
+                    'related' => ProductCardResource::collection($grouped['related'])->resolve(),
+                    'alternative' => ProductCardResource::collection($grouped['alternative'])->resolve(),
+                    'complementary' => ProductCardResource::collection($grouped['complementary'])->resolve(),
+                ];
+            }),
             'preview' => false,
             'seo' => $this->seoService->forPage(
                 $request,
@@ -381,8 +379,6 @@ class CatalogueController extends Controller
         $collection = $request->query('collection');
         $classification = $request->query('classification');
         $attributes = $request->query('attributes');
-
-        $this->reservations->releaseExpiredReservations();
 
         $query = Product::query()
             ->purchasable()

@@ -1,3 +1,5 @@
+import { router } from '@inertiajs/react';
+import { useEffect } from 'react';
 import { ProductCard } from '@/components/ProductCard';
 import type { ProductCard as ProductCardType } from '@/types';
 
@@ -12,6 +14,17 @@ export function ProductRail({
   title: string;
   products: ProductCardType[];
 }) {
+  useEffect(() => {
+    // Warm product payloads for visible cards so clicks often hit a warm cache.
+    products.slice(0, 8).forEach((product) => {
+      router.prefetch(
+        `/product/${product.slug}`,
+        {},
+        { cacheFor: '60s' },
+      );
+    });
+  }, [products]);
+
   if (products.length === 0) {
     return null;
   }

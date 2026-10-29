@@ -102,9 +102,10 @@ class ProductPurchaseEligibilityService
         }
 
         if ($checkInventory && $quantity > 0) {
-            $this->reservations->releaseExpiredReservations();
-            $product->unsetRelation('inventory');
-            $variant?->unsetRelation('inventory');
+            // Do not garbage-collect expired reservations on hot catalogue reads.
+            // That work belongs to the scheduled ExpiredReservationReleaser (and
+            // cart mutation paths). Running it here made every product card /
+            // detail request scan+release reservations and could take seconds.
             $inventory = $variant ? $variant->inventory : $product->inventory;
             if ($inventory) {
                 $available = $inventory->available();

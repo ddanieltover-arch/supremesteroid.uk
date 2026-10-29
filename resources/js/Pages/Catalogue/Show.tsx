@@ -1,5 +1,5 @@
 import StorefrontLayout from '../../Layouts/StorefrontLayout';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Deferred, Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -12,9 +12,25 @@ import { RecentlyViewed } from '@/components/catalogue/RecentlyViewed';
 import { TrustBlocks } from '@/components/catalogue/TrustBlocks';
 import { rememberRecentlyViewed } from '@/lib/recentlyViewed';
 import { formatMoney } from '@/lib/money';
-import type { ProductDetail, SeoProps } from '@/types';
+import type { ProductCard as ProductCardType, ProductDetail, SeoProps } from '@/types';
 
-export default function CatalogueShow({ product, seo, preview = false }: { product?: ProductDetail | null; seo?: SeoProps; preview?: boolean }) {
+type RelatedGroups = {
+  related?: ProductCardType[];
+  alternative?: ProductCardType[];
+  complementary?: ProductCardType[];
+};
+
+export default function CatalogueShow({
+  product,
+  seo,
+  preview = false,
+  related_groups,
+}: {
+  product?: ProductDetail | null;
+  seo?: SeoProps;
+  preview?: boolean;
+  related_groups?: RelatedGroups | null;
+}) {
   const page = usePage<{ auth?: { user?: unknown }; wishlistProductIds?: string[] }>();
   const saved = product ? (page.props.wishlistProductIds ?? []).includes(product.id) : false;
   const isPreview = Boolean(preview || product?.is_preview);
@@ -268,35 +284,46 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
         </section>
       ) : null}
 
-      {[
-        { title: 'Related products', items: product.related_groups?.related ?? [] },
-        { title: 'Alternative products', items: product.related_groups?.alternative ?? [] },
-        { title: 'Complementary products', items: product.related_groups?.complementary ?? [] },
-      ].map((group) =>
-        group.items.length > 0 ? (
-          <section key={group.title} className="mt-12">
-            <h2 className="mb-6 text-xl font-semibold text-slate-900">{group.title}</h2>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {group.items.map((related) => (
-                <ProductCard key={related.id} product={related} />
-              ))}
-            </div>
-          </section>
-        ) : null,
-      )}
+      <Deferred data="related_groups" fallback={null}>
+        {() => {
+          const groups = related_groups ?? product.related_groups;
+          const rails = [
+            { title: 'Related products', items: groups?.related ?? [] },
+            { title: 'Alternative products', items: groups?.alternative ?? [] },
+            { title: 'Complementary products', items: groups?.complementary ?? [] },
+          ];
 
-      {(!product.related_groups || Object.values(product.related_groups).every((group) => !group || group.length === 0)) &&
-      product.related_products &&
-      product.related_products.length > 0 ? (
-        <section className="mt-12">
-          <h2 className="mb-6 text-xl font-semibold text-slate-900">Related products</h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {product.related_products.map((related) => (
-              <ProductCard key={related.id} product={related} />
-            ))}
-          </div>
-        </section>
-      ) : null}
+          return (
+            <>
+              {rails.map((group) =>
+                group.items.length > 0 ? (
+                  <section key={group.title} className="mt-12">
+                    <h2 className="mb-6 text-xl font-semibold text-slate-900">{group.title}</h2>
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                      {group.items.map((related) => (
+                        <ProductCard key={related.id} product={related} />
+                      ))}
+                    </div>
+                  </section>
+                ) : null,
+              )}
+
+              {(!groups || Object.values(groups).every((group) => !group || group.length === 0)) &&
+              product.related_products &&
+              product.related_products.length > 0 ? (
+                <section className="mt-12">
+                  <h2 className="mb-6 text-xl font-semibold text-slate-900">Related products</h2>
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    {product.related_products.map((related) => (
+                      <ProductCard key={related.id} product={related} />
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+            </>
+          );
+        }}
+      </Deferred>
 
       <RecentlyViewed excludeSlug={product.slug} />
       <TrustBlocks />

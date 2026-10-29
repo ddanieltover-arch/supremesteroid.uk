@@ -42,13 +42,24 @@ class RelatedProductService
             $query->where('relation_type', $type->value);
         }
 
-        return $query->get()
+        $related = $query->get()
             ->map(fn ($relation) => $relation->relatedProduct)
-            ->filter(fn ($related) => $related !== null)
-            ->filter(function (Product $related) {
-                return Product::query()->purchasable()->whereKey($related->id)->exists();
-            })
+            ->filter(fn ($item) => $item !== null)
             ->unique('id')
+            ->values();
+
+        if ($related->isEmpty()) {
+            return $related;
+        }
+
+        $purchasableIds = Product::query()
+            ->purchasable()
+            ->whereKey($related->modelKeys())
+            ->pluck('id')
+            ->all();
+
+        return $related
+            ->filter(fn (Product $item) => in_array($item->id, $purchasableIds, true))
             ->take($limit)
             ->values();
     }
