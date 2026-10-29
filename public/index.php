@@ -12,14 +12,20 @@ register_shutdown_function(function (): void {
         return;
     }
 
-    if (! headers_sent()) {
-        http_response_code(500);
-        header('Content-Type: text/plain; charset=UTF-8');
+    // Never append plain text onto an already-started HTML response — that is
+    // what made production show "The application could not start." as raw source.
+    if (headers_sent()) {
+        return;
     }
 
+    http_response_code(500);
+    header('Content-Type: text/html; charset=UTF-8');
+
     echo app_debug_enabled()
-        ? 'Fatal: '.redact_connection_string((string) $error['message']).' in '.$error['file'].':'.$error['line']."\n"
-        : "The application could not start.\n";
+        ? bootstrap_error_page(
+            'Fatal: '.redact_connection_string((string) $error['message']).' in '.$error['file'].':'.$error['line']
+        )
+        : bootstrap_error_page('The store is temporarily unavailable. Please try again shortly.');
 });
 
 $problems = production_env_problems();
@@ -42,14 +48,18 @@ try {
     $app = require_once __DIR__.'/../bootstrap/app.php';
     $app->handleRequest(Request::capture());
 } catch (Throwable $e) {
-    if (! headers_sent()) {
-        http_response_code(500);
-        header('Content-Type: text/plain; charset=UTF-8');
+    if (headers_sent()) {
+        return;
     }
 
+    http_response_code(500);
+    header('Content-Type: text/html; charset=UTF-8');
+
     echo app_debug_enabled()
-        ? $e::class.': '.redact_connection_string($e->getMessage()).' in '.$e->getFile().':'.$e->getLine()
-        : 'The application could not start.';
+        ? bootstrap_error_page(
+            $e::class.': '.redact_connection_string($e->getMessage()).' in '.$e->getFile().':'.$e->getLine()
+        )
+        : bootstrap_error_page('The store is temporarily unavailable. Please try again shortly.');
 }
 
 function production_env_problems(): array
@@ -118,6 +128,20 @@ function env_value(string $name): string
 function redact_connection_string(string $message): string
 {
     return preg_replace('/(?:postgres|postgresql|mysql|pgsql):\/\/\S+/i', '[redacted-url]', $message) ?? $message;
+}
+
+function bootstrap_error_page(string $message): string
+{
+    $safe = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
+
+    return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
+        .'<meta name="viewport" content="width=device-width, initial-scale=1">'
+        .'<title>Temporary interruption | Supreme Steroids</title></head>'
+        .'<body style="font-family:Figtree,system-ui,sans-serif;max-width:32rem;margin:4rem auto;padding:0 1.25rem;line-height:1.5;color:#0f172a;background:#f9f9f9">'
+        .'<h1 style="font-size:1.5rem;margin:0 0 .75rem">Temporary service interruption</h1>'
+        .'<p style="margin:0 0 1.25rem;color:#475569">'.$safe.'</p>'
+        .'<p style="margin:0"><a href="/" style="color:#1e6fd9;font-weight:600;text-decoration:none">Reload homepage</a></p>'
+        .'</body></html>';
 }
 
 function production_setup_page(array $problems): string
