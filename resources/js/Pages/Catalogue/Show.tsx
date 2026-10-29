@@ -284,7 +284,7 @@ export default function CatalogueShow({
         </section>
       ) : null}
 
-      <Deferred data="related_groups" fallback={null}>
+      <Deferred data="related_groups" fallback={<></>}>
         {() => {
           const groups = related_groups ?? product.related_groups;
           const rails = [
