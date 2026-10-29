@@ -50,6 +50,41 @@ function ImagePlaceholder({ label = 'Image unavailable' }: { label?: string }) {
   );
 }
 
+function productShowLinkProps(product: ProductCardType) {
+  return {
+    href: `/product/${product.slug}`,
+    prefetch: ['hover', 'click'] as Array<'hover' | 'click'>,
+    cacheFor: '60s',
+    component: 'Catalogue/Show',
+    pageProps: (_current: Record<string, unknown>, shared: Record<string, unknown>) => ({
+      ...shared,
+      product: {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        image_url: product.image_url,
+        image_alt: product.image_alt,
+        pricing: product.pricing,
+        stock: product.stock,
+        is_purchasable: product.is_purchasable,
+        badges: product.badges,
+        images: product.image_url
+          ? [{ id: 'preview', url: product.image_url, alt_text: product.image_alt || product.name, is_primary: true }]
+          : [],
+        variants: [],
+        breadcrumbs: [
+          { name: 'Catalogue', url: '/catalogue' },
+          { name: product.name, url: `/product/${product.slug}` },
+        ],
+      },
+      preview: false,
+    }),
+    onMouseEnter: () => {
+      void import('../Pages/Catalogue/Show');
+    },
+  };
+}
+
 export function ProductCard({ product }: { product: ProductCardType }) {
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
@@ -131,13 +166,14 @@ export function ProductCard({ product }: { product: ProductCardType }) {
   return (
     <article className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0">
       <div className="relative shrink-0 overflow-hidden border-b border-slate-100 bg-white">
-        <Link href={`/product/${product.slug}`} className="relative block aspect-square">
+        <Link {...productShowLinkProps(product)} className="relative block aspect-square">
           {product.image_url && !imageFailed ? (
             <img
               src={product.image_url}
               alt={product.image_alt || product.name}
               className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
               loading="lazy"
+              decoding="async"
               onError={() => setImageFailed(true)}
             />
           ) : (
@@ -183,7 +219,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
 
       <div className="flex flex-1 flex-col p-3 sm:p-4">
         <h3 className="h-10 text-sm font-bold leading-5 text-slate-900 sm:h-12 sm:text-base sm:leading-6">
-          <Link href={`/product/${product.slug}`} className="line-clamp-2 hover:text-blue-600">
+          <Link {...productShowLinkProps(product)} className="line-clamp-2 hover:text-blue-600">
             {product.name}
           </Link>
         </h3>

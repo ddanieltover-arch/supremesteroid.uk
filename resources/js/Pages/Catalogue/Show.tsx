@@ -14,18 +14,18 @@ import { rememberRecentlyViewed } from '@/lib/recentlyViewed';
 import { formatMoney } from '@/lib/money';
 import type { ProductDetail, SeoProps } from '@/types';
 
-export default function CatalogueShow({ product, seo, preview = false }: { product: ProductDetail; seo?: SeoProps; preview?: boolean }) {
+export default function CatalogueShow({ product, seo, preview = false }: { product?: ProductDetail | null; seo?: SeoProps; preview?: boolean }) {
   const page = usePage<{ auth?: { user?: unknown }; wishlistProductIds?: string[] }>();
-  const saved = (page.props.wishlistProductIds ?? []).includes(product.id);
-  const isPreview = Boolean(preview || product.is_preview);
+  const saved = product ? (page.props.wishlistProductIds ?? []).includes(product.id) : false;
+  const isPreview = Boolean(preview || product?.is_preview);
   const form = useForm({
-    product_id: product.id,
-    product_variant_id: product.variants?.[0]?.id ?? '',
+    product_id: product?.id ?? '',
+    product_variant_id: product?.variants?.[0]?.id ?? '',
     quantity: 1,
   });
   const notify = useForm({
     email: '',
-    product_variant_id: product.variants?.[0]?.id ?? '',
+    product_variant_id: product?.variants?.[0]?.id ?? '',
   });
   const review = useForm({
     rating: 5,
@@ -34,10 +34,26 @@ export default function CatalogueShow({ product, seo, preview = false }: { produ
   });
 
   useEffect(() => {
-    if (! isPreview) {
+    if (product?.slug && ! isPreview) {
       rememberRecentlyViewed(product.slug);
     }
-  }, [product.slug, isPreview]);
+  }, [product?.slug, isPreview]);
+
+  if (! product?.id) {
+    return (
+      <StorefrontLayout seo={seo}>
+        <div className="grid animate-pulse gap-8 lg:grid-cols-2" aria-busy="true" aria-label="Loading product">
+          <div className="aspect-square rounded-2xl bg-slate-100" />
+          <div className="space-y-4 pt-2">
+            <div className="h-8 w-3/4 rounded-lg bg-slate-100" />
+            <div className="h-5 w-1/3 rounded-lg bg-slate-100" />
+            <div className="h-24 w-full rounded-lg bg-slate-100" />
+            <div className="h-12 w-full rounded-lg bg-slate-100" />
+          </div>
+        </div>
+      </StorefrontLayout>
+    );
+  }
 
   const selectedVariant = product.variants?.find((variant) => variant.id === form.data.product_variant_id);
   const stock = selectedVariant?.stock ?? product.stock;

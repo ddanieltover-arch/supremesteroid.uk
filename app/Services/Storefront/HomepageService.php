@@ -24,9 +24,9 @@ use Illuminate\Support\Str;
 
 class HomepageService
 {
-    public const CACHE_PAGE = 'homepage.page';
+    public const CACHE_PAGE = 'homepage.page.v3';
 
-    public const CACHE_CHROME = 'homepage.chrome';
+    public const CACHE_CHROME = 'homepage.chrome.v3';
 
     public function __construct(
         protected ShippingEngine $shipping,
@@ -520,40 +520,6 @@ class HomepageService
      */
     protected function encodeImageUrl(string $url): string
     {
-        if (str_starts_with($url, '/')) {
-            $parts = explode('?', $url, 2);
-            $path = implode('/', array_map(
-                static fn (string $segment): string => rawurlencode(rawurldecode($segment)),
-                explode('/', $parts[0])
-            ));
-
-            return $path.(isset($parts[1]) ? '?'.$parts[1] : '');
-        }
-
-        $parts = parse_url($url);
-        if (! is_array($parts) || empty($parts['scheme']) || empty($parts['host'])) {
-            return str_replace(' ', '%20', $url);
-        }
-
-        $path = isset($parts['path'])
-            ? implode('/', array_map(
-                static fn (string $segment): string => rawurlencode(rawurldecode($segment)),
-                explode('/', $parts['path'])
-            ))
-            : '';
-
-        $encoded = $parts['scheme'].'://'.$parts['host'];
-        if (isset($parts['port'])) {
-            $encoded .= ':'.$parts['port'];
-        }
-        $encoded .= $path;
-        if (isset($parts['query'])) {
-            $encoded .= '?'.$parts['query'];
-        }
-        if (isset($parts['fragment'])) {
-            $encoded .= '#'.$parts['fragment'];
-        }
-
-        return $encoded;
+        return \App\Services\Catalogue\CataloguePresentation::encodeImageUrl($url);
     }
 }

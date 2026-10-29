@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Services\Catalogue\CataloguePresentation;
+use App\Services\Catalogue\CatalogueStoredImageCdnFallback;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
 class ProductImage extends Model
@@ -68,12 +71,35 @@ class ProductImage extends Model
             return null;
         }
 
-        if (preg_match('#^https?://#i', $value) === 1 || str_starts_with($value, '/')) {
+        if (str_starts_with($value, '/storage/')) {
+            $relative = ltrim(substr($value, strlen('/storage/')), '/');
+            $existsLocally = false;
+            try {
+                $existsLocally = Storage::disk('public')->exists($relative);
+            } catch (\Throwable) {
+                $existsLocally = false;
+            }
+
+            if (! $existsLocally) {
+                $remote = app(CatalogueStoredImageCdnFallback::class)->remoteUrlForStoredPath($value);
+                if (is_string($remote) && $remote !== '') {
+                    return CataloguePresentation::encodeImageUrl($remote);
+                }
+            }
+
+            return $value;
+        }
+
+        if (preg_match('#^https?://#i', $value) === 1) {
+            return CataloguePresentation::encodeImageUrl($value);
+        }
+
+        if (str_starts_with($value, '/')) {
             return $value;
         }
 
         try {
-            return \Illuminate\Support\Facades\Storage::disk((string) config('filesystems.cloud', 'public'))->url($value);
+            return Storage::disk((string) config('filesystems.cloud', 'public'))->url($value);
         } catch (\Throwable) {
             return null;
         }
