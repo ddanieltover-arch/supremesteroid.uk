@@ -7,8 +7,6 @@ namespace App\Console\Commands;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Hash;
-
 class EnsureAdminUserCommand extends Command
 {
     protected $signature = 'app:ensure-admin
@@ -19,6 +17,7 @@ class EnsureAdminUserCommand extends Command
     public function handle(): int
     {
         $email = (string) env('ADMIN_DEFAULT_EMAIL', 'info@supremesteroid.uk');
+        // Plain text: the User model hashed cast hashes once on save.
         $password = (string) env('ADMIN_BOOTSTRAP_PASSWORD', 'AdminPass123!');
 
         if ($email === '' || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -30,15 +29,16 @@ class EnsureAdminUserCommand extends Command
         $user = User::query()->where('email', $email)->first();
 
         if ($user === null) {
-            User::query()->create([
+            $user = new User;
+            $user->forceFill([
                 'name' => 'Supreme Super Admin',
                 'email' => $email,
-                'password' => Hash::make($password),
+                'password' => $password,
                 'role' => UserRole::SUPER_ADMIN,
                 'phone' => '+442080000001',
                 'is_active' => true,
                 'email_verified_at' => now(),
-            ]);
+            ])->save();
 
             $this->info("Created admin account for {$email}.");
 
@@ -67,7 +67,7 @@ class EnsureAdminUserCommand extends Command
             || ! ($user->role instanceof UserRole && $user->role->canAccessFilament());
 
         if ($shouldResetPassword) {
-            $user->password = Hash::make($password);
+            $user->password = $password;
             $changed = true;
         }
 
