@@ -15,6 +15,10 @@ case "$migrate_url" in
   *)
     echo "Running database migrations."
     DATABASE_URL="$migrate_url" php artisan migrate --force --no-interaction || echo "Migrations failed; serving requests anyway."
+    echo "Ensuring Filament admin account exists."
+    # --reset-password makes the known bootstrap password work after first production bring-up.
+    # Set ADMIN_RESET_PASSWORD=false later if you no longer want deploys to reset it.
+    DATABASE_URL="$migrate_url" php artisan app:ensure-admin --reset-password --no-interaction || echo "Admin ensure failed; serving requests anyway."
     ;;
 esac
 
