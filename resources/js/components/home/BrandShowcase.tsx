@@ -17,7 +17,7 @@ export function BrandShowcase({ brands }: { brands: HomepagePayload['brands'] })
           <Link
             key={brand.id}
             href={brand.url}
-            className="hover-lift group rounded-2xl border border-slate-200 bg-white/70 p-5"
+            className="group rounded-2xl border border-slate-200 bg-white/70 p-5"
           >
             <div className="flex h-16 items-center">
               {brand.logo_url ? (

@@ -264,7 +264,7 @@ export default function CheckoutIndex({
             }))}
             totals={totals}
           />
-          <Button type="submit" variant="gold" className="mt-6 w-full" isLoading={submitting} disabled={submitting || requires_acknowledgement}>
+          <Button type="submit" variant="gold" className="mt-6 w-full" isLoading={submitting} disabled={submitting}>
             Continue to delivery
           </Button>
         </aside>

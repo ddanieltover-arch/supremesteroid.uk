@@ -163,13 +163,13 @@ export default function BlogIndex({
             {posts.data.map((post) => (
               <article
                 key={post.id}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
               >
                 <Link href={`/blog/${post.slug}`} className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                   <img
                     src={post.featured_image_url || 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&auto=format&fit=crop&q=80'}
                     alt={post.title}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="h-full w-full object-cover"
                   />
                   <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-lg bg-slate-900/80 px-2.5 py-1 text-xs font-medium text-white backdrop-blur">
                     <Clock className="h-3 w-3" />

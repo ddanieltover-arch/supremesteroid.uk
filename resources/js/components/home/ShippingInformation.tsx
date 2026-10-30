@@ -16,7 +16,7 @@ export function ShippingInformation({ shipping }: { shipping: HomepagePayload['s
       </p>
       <ul className="mt-6 grid gap-3 sm:grid-cols-2">
         {shipping.methods.map((method) => (
-          <li key={method.code} className="hover-lift rounded-xl border border-slate-200 bg-white/70 px-4 py-3">
+          <li key={method.code} className="rounded-xl border border-slate-200 bg-white/70 px-4 py-3">
             <p className="font-semibold text-slate-900">{method.name}</p>
             <p className="mt-1 text-sm text-slate-500">
               {formatMoney(method.rate_amount ?? method.rate ?? '0.00', shipping.currency)}

@@ -102,14 +102,14 @@ export function ShopEditorialContent() {
               <Link
                 key={cat.url}
                 href={cat.url}
-                className="hover-lift group relative flex flex-col justify-between rounded-2xl border border-slate-200 bg-slate-50/70 p-5"
+                className="group relative flex flex-col justify-between rounded-2xl border border-slate-200 bg-slate-50/70 p-5"
               >
                 <div>
                   <h4 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">{cat.name}</h4>
                   <p className="mt-2 text-xs text-slate-600 leading-relaxed">{cat.desc}</p>
                 </div>
                 <div className="mt-4 flex items-center text-xs font-semibold text-blue-600">
-                  Shop category <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                  Shop category <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                 </div>
               </Link>
             ))}
@@ -193,7 +193,7 @@ export function ShopEditorialContent() {
           </div>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {buyingSteps.map((step) => (
-              <div key={step.step} className="hover-lift relative rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div key={step.step} className="relative rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="text-3xl font-extrabold text-brand/30">{step.step}</div>
                 <h4 className="mt-2 font-semibold text-slate-900 text-base">{step.title}</h4>
                 <p className="mt-2 text-xs leading-relaxed text-slate-600">{step.desc}</p>
@@ -210,7 +210,7 @@ export function ShopEditorialContent() {
           </div>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             {shopFaqs.map((faq, i) => (
-              <div key={i} className="hover-lift rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div key={i} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex items-start gap-3">
                   <HelpCircle className="h-5 w-5 text-brand shrink-0 mt-0.5" />
                   <div>

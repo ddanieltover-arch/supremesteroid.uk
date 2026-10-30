@@ -98,7 +98,7 @@ export function HomeEditorialContent() {
           </h3>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {usersLookFor.map((item, idx) => (
-              <div key={idx} className="hover-lift rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div key={idx} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-brand font-semibold text-sm">
                     0{idx + 1}
@@ -222,7 +222,7 @@ export function HomeEditorialContent() {
           </div>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             {faqs.map((faq, idx) => (
-              <div key={idx} className="hover-lift rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div key={idx} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex items-start gap-3">
                   <HelpCircle className="h-5 w-5 text-brand shrink-0 mt-0.5" />
                   <div>

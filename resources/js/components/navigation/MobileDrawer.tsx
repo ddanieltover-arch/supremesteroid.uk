@@ -2,9 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { X } from 'lucide-react';
 import { useEffect, useId, useRef } from 'react';
 import { Portal } from '@/components/ui/Portal';
-import { usePresence } from '@/hooks/usePresence';
 import type { CatalogueNav } from '@/types';
-import clsx from 'clsx';
 
 type Policy = { title: string; slug: string; url: string };
 
@@ -21,10 +19,9 @@ export function MobileDrawer({
   const panelRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
   const policies = usePage<{ chrome?: { policies?: Policy[] } }>().props.chrome?.policies ?? [];
-  const { mounted, visible } = usePresence(open, 220);
 
   useEffect(() => {
-    if (!open || !visible) {
+    if (!open) {
       return;
     }
     previousFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -65,9 +62,9 @@ export function MobileDrawer({
       document.body.style.overflow = original;
       previousFocus.current?.focus();
     };
-  }, [open, visible, onClose]);
+  }, [open, onClose]);
 
-  if (!mounted) {
+  if (!open) {
     return null;
   }
 
@@ -76,10 +73,7 @@ export function MobileDrawer({
       <div className="fixed inset-0 z-[60] lg:hidden">
         <button
           type="button"
-          className={clsx(
-            'absolute inset-0 bg-slate-900/40 transition-opacity duration-200',
-            visible ? 'opacity-100' : 'opacity-0',
-          )}
+          className="absolute inset-0 bg-slate-900/40"
           aria-label="Close menu"
           onClick={onClose}
         />
@@ -88,11 +82,7 @@ export function MobileDrawer({
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
-          className={clsx(
-            'absolute inset-y-0 right-0 flex w-[min(100%,22rem)] flex-col border-l border-slate-200 bg-white shadow-2xl transition-transform ease-out',
-            visible ? 'translate-x-0' : 'translate-x-full',
-          )}
-          style={{ transitionDuration: '220ms' }}
+          className="absolute inset-y-0 right-0 flex w-[min(100%,22rem)] flex-col border-l border-slate-200 bg-white shadow-2xl"
         >
           <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
             <h2 id={titleId} className="text-sm font-semibold text-slate-900">

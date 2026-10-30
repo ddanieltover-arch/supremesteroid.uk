@@ -38,63 +38,6 @@ body {
   }
 }
 
-@keyframes drawer-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes dialog-in {
-  from {
-    opacity: 0;
-    transform: translateY(0.75rem) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.motion-drawer-panel {
-  animation: drawer-in-right 0.28s ease-out both;
-}
-
-.motion-dialog-panel {
-  animation: dialog-in 0.28s ease-out both;
-}
-
-.hover-lift {
-  transition:
-    box-shadow 0.2s ease,
-    border-color 0.2s ease,
-    background-color 0.2s ease;
-}
-
-.hover-lift:hover {
-  border-color: rgb(191 219 254);
-  background-color: #ffffff;
-  box-shadow:
-    0 12px 24px -12px rgb(15 23 42 / 0.18),
-    0 4px 8px -4px rgb(15 23 42 / 0.08);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .motion-drawer-panel,
-  .motion-dialog-panel {
-    animation: none !important;
-  }
-
-  .hover-lift,
-  .hover-lift:hover {
-    transition: none !important;
-  }
-}
-
 .sr-only {
   position: absolute;
   width: 1px;

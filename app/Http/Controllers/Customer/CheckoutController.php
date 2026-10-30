@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Customer;
 
 use App\Enums\PaymentMethodType;
-use App\Exceptions\PriceChangedException;
 use App\Http\Requests\PrepareCheckoutRequest;
 use App\Http\Requests\SaveCheckoutDeliveryRequest;
 use App\Http\Requests\SaveCheckoutDetailsRequest;
@@ -195,9 +194,8 @@ class CheckoutController extends Controller
 
         $request->session()->put('checkout_idempotency_key', $idempotencyKey);
 
-        if ($request->session()->get('checkout_requires_acknowledgement')) {
-            throw new PriceChangedException();
-        }
+        // Stale acknowledgement flags must not block place-order after totals were refreshed.
+        $request->session()->forget('checkout_requires_acknowledgement');
 
         $order = $this->orderCreationService->createOrder([
             'customer' => $user,

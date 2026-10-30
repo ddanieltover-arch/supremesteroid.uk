@@ -13,7 +13,7 @@ export function ApprovedReviews({ reviews }: { reviews?: HomepagePayload['review
       </h2>
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         {reviews.map((review) => (
-          <article key={review.id} className="hover-lift rounded-2xl border border-slate-200 bg-white/80 p-5">
+          <article key={review.id} className="rounded-2xl border border-slate-200 bg-white/80 p-5">
             <p className="text-xs text-brand">{review.rating}/5</p>
             <p className="mt-2 font-semibold text-slate-900">{review.title || 'Customer review'}</p>
             {review.body ? <p className="mt-2 text-sm text-slate-500">{review.body}</p> : null}

@@ -1,6 +1,5 @@
-import { Link, router } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { Alert } from '@/components/ui/Alert';
-import { Button } from '@/components/ui/Button';
 
 export function CheckoutAlerts({
   warnings = [],
@@ -50,12 +49,7 @@ export function CheckoutAlerts({
       ) : null}
       {requiresAcknowledgement ? (
         <Alert type="warning">
-          Your basket has changed. We refreshed the latest pricing and availability.
-          <div className="mt-3">
-            <Button type="button" size="sm" onClick={() => router.post('/checkout/acknowledge')}>
-              Continue with updated totals
-            </Button>
-          </div>
+          Your basket has changed. Totals below already use the latest pricing and availability — you can continue checkout.
         </Alert>
       ) : null}
     </div>

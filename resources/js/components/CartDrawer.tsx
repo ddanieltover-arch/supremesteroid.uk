@@ -5,12 +5,10 @@ import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Portal } from '@/components/ui/Portal';
 import { useCart } from '@/hooks/useCart';
-import { usePresence } from '@/hooks/usePresence';
 import { awaitCartSync, clearCart, isCartSyncing, publishCart, removeCartItem, subscribeCartSync, updateCartItemQuantity } from '@/lib/cartApi';
 import { jsonFetch } from '@/lib/http';
 import { formatMoney } from '@/lib/money';
 import type { CartPayload } from '@/types';
-import clsx from 'clsx';
 
 type CartDrawerProps = {
   isOpen: boolean;
@@ -57,10 +55,9 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const previousFocus = useRef<HTMLElement | null>(null);
   const currency = cart?.totals?.currency ?? 'GBP';
   const eligibility = cart?.shipping_eligibility;
-  const { mounted, visible } = usePresence(isOpen, 220);
 
   useEffect(() => {
-    if (!isOpen || !visible) {
+    if (!isOpen) {
       return;
     }
     previousFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -100,9 +97,9 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       document.body.style.overflow = original;
       previousFocus.current?.focus();
     };
-  }, [isOpen, visible, onClose]);
+  }, [isOpen, onClose]);
 
-  if (!mounted) {
+  if (!isOpen) {
     return null;
   }
 
@@ -116,20 +113,13 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     <div className="fixed inset-0 z-[60] overflow-hidden">
       <button
         type="button"
-        className={clsx(
-          'absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-200',
-          visible ? 'opacity-100' : 'opacity-0',
-        )}
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
         aria-label="Close cart"
         onClick={onClose}
       />
       <div
         ref={panelRef}
-        className={clsx(
-          'fixed inset-y-0 right-0 flex max-w-full pl-4 transition-transform ease-out sm:pl-10',
-          visible ? 'translate-x-0' : 'translate-x-full',
-        )}
-        style={{ transitionDuration: '220ms' }}
+        className="fixed inset-y-0 right-0 flex max-w-full pl-4 sm:pl-10"
         role="dialog"
         aria-modal="true"
         aria-labelledby="cart-drawer-title"
@@ -249,7 +239,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               <button
                 type="button"
                 disabled={!canCheckout || syncing || checkingOut || pendingId !== null}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white transition-transform duration-200 active:scale-[0.98] motion-reduce:active:scale-100 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 onClick={() => {
                   if (checkingOut || syncing) {
                     return;

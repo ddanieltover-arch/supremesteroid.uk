@@ -1,6 +1,6 @@
 import StorefrontLayout from '../../Layouts/StorefrontLayout';
 import { Link, router, usePage } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CheckoutAlerts } from '@/components/checkout/CheckoutAlerts';
 import { CheckoutProgress, type CheckoutStep } from '@/components/checkout/CheckoutProgress';
 import { OrderSummary } from '@/components/checkout/OrderSummary';
@@ -57,6 +57,17 @@ export default function CheckoutPayment({
     : (paymentMethods[0]?.code ?? '');
   const [method, setMethod] = useState(initialMethod);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (method && paymentMethods.some((item) => item.code === method)) {
+      return;
+    }
+    const fallback = paymentMethods[0]?.code ?? '';
+    if (fallback) {
+      setMethod(fallback);
+    }
+  }, [method, paymentMethods]);
+
   const idempotencyKey = useMemo(() => idempotency_key || crypto.randomUUID(), [idempotency_key]);
   const items = checkout?.items ?? cart?.items ?? [];
   const address = checkout?.shipping_destination;
@@ -149,7 +160,7 @@ export default function CheckoutPayment({
             variant="gold"
             className="w-full"
             isLoading={submitting}
-            disabled={submitting || requires_acknowledgement || !method}
+            disabled={submitting || !method}
             onClick={() => {
               if (submitting) {
                 return;

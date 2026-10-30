@@ -1,6 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { Portal } from '@/components/ui/Portal';
-import { usePresence } from '@/hooks/usePresence';
 import clsx from 'clsx';
 
 export function Dialog({
@@ -19,10 +18,9 @@ export function Dialog({
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
-  const { mounted, visible } = usePresence(open, 220);
 
   useEffect(() => {
-    if (!open || !visible) {
+    if (!open) {
       return;
     }
     previousFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -64,9 +62,9 @@ export function Dialog({
       document.body.style.overflow = original;
       previousFocus.current?.focus();
     };
-  }, [open, visible, onClose]);
+  }, [open, onClose]);
 
-  if (!mounted) {
+  if (!open) {
     return null;
   }
 
@@ -75,10 +73,7 @@ export function Dialog({
       <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center">
         <button
           type="button"
-          className={clsx(
-            'absolute inset-0 bg-slate-900/40 transition-opacity duration-200',
-            visible ? 'opacity-100' : 'opacity-0',
-          )}
+          className="absolute inset-0 bg-slate-900/40"
           aria-label="Close dialog"
           onClick={onClose}
         />
@@ -88,11 +83,9 @@ export function Dialog({
           aria-modal="true"
           aria-labelledby={titleId}
           className={clsx(
-            'relative z-10 max-h-[92vh] w-full overflow-y-auto border border-slate-200 bg-white p-5 shadow-2xl transition-all ease-out sm:rounded-2xl',
-            visible ? 'translate-y-0 scale-100 opacity-100' : 'translate-y-3 scale-[0.98] opacity-0',
+            'relative z-10 max-h-[92vh] w-full overflow-y-auto border border-slate-200 bg-white p-5 shadow-2xl sm:rounded-2xl',
             size === 'full' ? 'h-full sm:h-auto sm:max-w-3xl' : size === 'md' ? 'sm:max-w-md' : 'sm:max-w-3xl',
           )}
-          style={{ transitionDuration: '220ms' }}
         >
           <div className="mb-4 flex items-start justify-between gap-4">
             <h2 id={titleId} className="text-lg font-semibold text-slate-900">

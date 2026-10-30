@@ -1,6 +1,6 @@
 import StorefrontLayout from '../../Layouts/StorefrontLayout';
 import { Link, router, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CheckoutAlerts } from '@/components/checkout/CheckoutAlerts';
 import { CheckoutProgress, type CheckoutStep } from '@/components/checkout/CheckoutProgress';
 import { OrderSummary } from '@/components/checkout/OrderSummary';
@@ -47,6 +47,17 @@ export default function CheckoutDelivery({
   const [method, setMethod] = useState(selectedShippingMethod?.code ?? availableShippingMethods[0]?.code ?? '');
   const [refreshing, setRefreshing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (method) {
+      return;
+    }
+    const fallback = selectedShippingMethod?.code ?? availableShippingMethods[0]?.code ?? '';
+    if (fallback) {
+      setMethod(fallback);
+    }
+  }, [method, selectedShippingMethod?.code, availableShippingMethods]);
+
   const address = checkout?.shipping_destination;
   const items = checkout?.items ?? cart?.items ?? [];
   const totals = {
@@ -137,7 +148,7 @@ export default function CheckoutDelivery({
             variant="gold"
             className="mt-6 w-full"
             isLoading={submitting}
-            disabled={refreshing || submitting || requires_acknowledgement || !method}
+            disabled={refreshing || submitting || !method}
             onClick={() => {
               if (submitting) {
                 return;

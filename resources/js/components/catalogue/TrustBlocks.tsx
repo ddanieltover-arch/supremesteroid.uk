@@ -13,7 +13,7 @@ export function TrustBlocks() {
   return (
     <section aria-label="Store information" className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {blocks.map((block) => (
-        <article key={block.title} className="hover-lift group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <article key={block.title} className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-brand">
               <block.icon className="h-4 w-4" aria-hidden="true" />

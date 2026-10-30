@@ -168,10 +168,12 @@ class CheckoutFlowService
                     $snapshot['expires_at'] = $session->expires_at?->toIso8601String();
                 }
             } catch (PriceChangedException $exception) {
+                // Apply the fresh snapshot immediately. Blocking every CTA behind a
+                // separate acknowledgement made checkout feel permanently locked.
                 $snapshot = $this->checkoutSessionService->refreshOpenSnapshot($session, $user);
                 $session->refresh();
-                $request->session()->put('checkout_requires_acknowledgement', true);
-                $requiresAcknowledgement = true;
+                $request->session()->forget('checkout_requires_acknowledgement');
+                $requiresAcknowledgement = false;
                 $warnings[] = $exception->getCustomerMessage();
             } catch (InsufficientInventoryException|ProductNotPurchasableException $exception) {
                 $affectedItems = $this->affectedItems($session);
@@ -303,8 +305,6 @@ class CheckoutFlowService
      */
     public function saveDelivery(Request $request, array $validated): array
     {
-        $this->assertNotAcknowledgedBlocked($request);
-
         $session = $this->openSession($request);
         if (! $session || ! $this->hasDetails($session)) {
             throw new InvalidCheckoutException('Delivery details are missing.', 'Please complete your delivery details first.');
@@ -327,8 +327,6 @@ class CheckoutFlowService
      */
     public function savePaymentMethod(Request $request, array $validated): array
     {
-        $this->assertNotAcknowledgedBlocked($request);
-
         $session = $this->openSession($request);
         if (! $session || ! $this->hasDelivery($session)) {
             throw new InvalidCheckoutException('Payment cannot start yet.', 'Please choose a delivery method first.');
@@ -823,10 +821,4 @@ class CheckoutFlowService
         return $affected;
     }
 
-    protected function assertNotAcknowledgedBlocked(Request $request): void
-    {
-        if ($request->session()->get('checkout_requires_acknowledgement')) {
-            throw new PriceChangedException();
-        }
-    }
 }
