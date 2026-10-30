@@ -16,17 +16,20 @@ class CataloguePresentation
     ) {}
 
     /**
+     * @param  array<string, mixed>|null  $pricing  Precomputed pricing; skips a second PricingService pass when provided.
      * @return list<array{code: string, label: string}>
      */
-    public function badges(Product $product, ?ProductVariant $variant = null): array
+    public function badges(Product $product, ?ProductVariant $variant = null, ?array $pricing = null): array
     {
         $badges = [];
         $stock = $this->stock($product, $variant);
 
-        try {
-            $pricing = $this->pricing->calculateProductPrice($product, $variant);
-        } catch (\Throwable) {
-            $pricing = null;
+        if ($pricing === null) {
+            try {
+                $pricing = $this->pricing->calculateProductPrice($product, $variant);
+            } catch (\Throwable) {
+                $pricing = null;
+            }
         }
 
         $publishedAt = $product->published_at ?? $product->created_at;

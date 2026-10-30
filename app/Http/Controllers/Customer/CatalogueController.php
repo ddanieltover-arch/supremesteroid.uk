@@ -315,6 +315,11 @@ class CatalogueController extends Controller
         ]);
     }
 
+    public function navigation(): JsonResponse
+    {
+        return response()->json($this->discovery->navigation());
+    }
+
     public function navigationHighlights(): JsonResponse
     {
         return response()->json($this->discovery->navigationHighlights());

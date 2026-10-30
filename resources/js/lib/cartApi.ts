@@ -40,65 +40,12 @@ function recountCart(items: CartItem[], currency: string): CartPayload {
   };
 }
 
-/** Instant local cart update used before the server round-trip finishes. */
-export function optimisticAddToCart(
-  current: CartPayload | null | undefined,
-  line: {
-    product_id: string;
-    product_name: string;
-    product_slug: string;
-    product_sku: string;
-    variant_id?: string | null;
-    variant_name?: string | null;
-    unit_price: string;
-    quantity: number;
-    image_url?: string | null;
-  },
-): CartPayload {
-  const currency = current?.totals?.currency ?? 'GBP';
-  const quantity = Math.max(1, line.quantity);
-  const items = [...(current?.items ?? [])];
-  const existingIndex = items.findIndex(
-    (item) => item.product_id === line.product_id && (item.variant_id ?? null) === (line.variant_id ?? null),
-  );
-
-  if (existingIndex >= 0) {
-    const existing = items[existingIndex];
-    const nextQty = existing.quantity + quantity;
-    items[existingIndex] = {
-      ...existing,
-      quantity: nextQty,
-      subtotal: moneyTimes(existing.unit_price, nextQty),
-      line_total: moneyTimes(existing.unit_price, nextQty),
-      is_eligible: true,
-      ineligibility_reasons: [],
-    };
-  } else {
-    items.push({
-      id: `optimistic-${line.product_id}-${line.variant_id ?? 'base'}`,
-      product_id: line.product_id,
-      product_name: line.product_name,
-      product_slug: line.product_slug,
-      product_sku: line.product_sku,
-      variant_id: line.variant_id ?? null,
-      variant_name: line.variant_name ?? null,
-      unit_price: line.unit_price,
-      quantity,
-      subtotal: moneyTimes(line.unit_price, quantity),
-      line_total: moneyTimes(line.unit_price, quantity),
-      image_url: line.image_url ?? null,
-      is_eligible: true,
-      ineligibility_reasons: [],
-    });
-  }
-
-  return publishCart(recountCart(items, currency));
-}
-
 type CartListener = (cart: CartPayload) => void;
 type SyncListener = (syncing: boolean) => void;
 
 let cartOverride: CartPayload | null = null;
+/** Cart state before the latest optimistic add — restored if the server mutation fails. */
+let optimisticRollback: CartPayload | null | undefined = undefined;
 const listeners = new Set<CartListener>();
 const syncListeners = new Set<SyncListener>();
 let cartSync: Promise<void> = Promise.resolve();
@@ -142,6 +89,75 @@ export function clearCartOverride(): void {
   cartOverride = null;
 }
 
+function restoreOptimisticRollback(): void {
+  if (optimisticRollback === undefined) {
+    return;
+  }
+  const previous = optimisticRollback;
+  optimisticRollback = undefined;
+  publishCart(previous ?? recountCart([], 'GBP'));
+}
+
+/** Instant local cart update used before the server round-trip finishes. */
+export function optimisticAddToCart(
+  current: CartPayload | null | undefined,
+  line: {
+    product_id: string;
+    product_name: string;
+    product_slug: string;
+    product_sku: string;
+    variant_id?: string | null;
+    variant_name?: string | null;
+    unit_price: string;
+    quantity: number;
+    image_url?: string | null;
+  },
+): CartPayload {
+  // Only snapshot once per optimistic burst so chained adds keep the pre-burst cart.
+  if (optimisticRollback === undefined) {
+    optimisticRollback = cartOverride ?? (current ? { ...current } : null);
+  }
+
+  const currency = current?.totals?.currency ?? 'GBP';
+  const quantity = Math.max(1, line.quantity);
+  const items = [...(current?.items ?? [])];
+  const existingIndex = items.findIndex(
+    (item) => item.product_id === line.product_id && (item.variant_id ?? null) === (line.variant_id ?? null),
+  );
+
+  if (existingIndex >= 0) {
+    const existing = items[existingIndex];
+    const nextQty = existing.quantity + quantity;
+    items[existingIndex] = {
+      ...existing,
+      quantity: nextQty,
+      subtotal: moneyTimes(existing.unit_price, nextQty),
+      line_total: moneyTimes(existing.unit_price, nextQty),
+      is_eligible: true,
+      ineligibility_reasons: [],
+    };
+  } else {
+    items.push({
+      id: `optimistic-${line.product_id}-${line.variant_id ?? 'base'}`,
+      product_id: line.product_id,
+      product_name: line.product_name,
+      product_slug: line.product_slug,
+      product_sku: line.product_sku,
+      variant_id: line.variant_id ?? null,
+      variant_name: line.variant_name ?? null,
+      unit_price: line.unit_price,
+      quantity,
+      subtotal: moneyTimes(line.unit_price, quantity),
+      line_total: moneyTimes(line.unit_price, quantity),
+      image_url: line.image_url ?? null,
+      is_eligible: true,
+      ineligibility_reasons: [],
+    });
+  }
+
+  return publishCart(recountCart(items, currency));
+}
+
 export function subscribeCart(listener: CartListener): () => void {
   listeners.add(listener);
   return () => {
@@ -166,21 +182,55 @@ export async function awaitCartSync(): Promise<void> {
   await cartSync;
 }
 
+/**
+ * Wait for cart mutations, then confirm the server basket has items.
+ * Throws when the basket cannot be confirmed (failed optimistic add, empty cart, etc.).
+ */
+export async function checkoutWhenReady(): Promise<CartPayload> {
+  await awaitCartSync();
+
+  const local = getCartOverride();
+  const localCount = local?.totals?.items_count ?? 0;
+  const hasOnlyOptimistic =
+    (local?.items?.length ?? 0) > 0 &&
+    (local?.items ?? []).every((item) => String(item.id).startsWith('optimistic-'));
+
+  if (localCount > 0 && !hasOnlyOptimistic) {
+    return local as CartPayload;
+  }
+
+  const serverCart = await jsonFetch<CartPayload>('/cart');
+  if (!serverCart || (serverCart.totals?.items_count ?? 0) <= 0) {
+    if (hasOnlyOptimistic) {
+      restoreOptimisticRollback();
+    }
+    throw new Error('Basket could not be confirmed — try again.');
+  }
+
+  return publishCart(serverCart);
+}
+
 export async function addCartItem(input: {
   product_id: string;
   product_variant_id?: string | null;
   quantity?: number;
 }): Promise<CartPayload> {
   return enqueueCartMutation(async () => {
-    const payload = await jsonFetch<CartMutationResponse>('/cart/items', {
-      method: 'POST',
-      body: JSON.stringify({
-        product_id: input.product_id,
-        product_variant_id: input.product_variant_id ?? null,
-        quantity: input.quantity ?? 1,
-      }),
-    });
-    return publishCart(payload.cart);
+    try {
+      const payload = await jsonFetch<CartMutationResponse>('/cart/items', {
+        method: 'POST',
+        body: JSON.stringify({
+          product_id: input.product_id,
+          product_variant_id: input.product_variant_id ?? null,
+          quantity: input.quantity ?? 1,
+        }),
+      });
+      optimisticRollback = undefined;
+      return publishCart(payload.cart);
+    } catch (error) {
+      restoreOptimisticRollback();
+      throw error;
+    }
   });
 }
 

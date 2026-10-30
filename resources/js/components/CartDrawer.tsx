@@ -5,7 +5,7 @@ import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Portal } from '@/components/ui/Portal';
 import { useCart } from '@/hooks/useCart';
-import { awaitCartSync, clearCart, isCartSyncing, publishCart, removeCartItem, subscribeCartSync, updateCartItemQuantity } from '@/lib/cartApi';
+import { checkoutWhenReady, clearCart, isCartSyncing, publishCart, removeCartItem, subscribeCartSync, updateCartItemQuantity } from '@/lib/cartApi';
 import { jsonFetch } from '@/lib/http';
 import { formatMoney } from '@/lib/money';
 import type { CartPayload } from '@/types';
@@ -21,6 +21,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(() => isCartSyncing());
   const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const serverItemsCount = page.props.cart?.totals?.items_count ?? 0;
   const canCheckout = (cart?.totals?.items_count ?? 0) > 0 || serverItemsCount > 0;
 
@@ -236,6 +237,9 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 <span className="text-slate-500">Basket subtotal</span>
                 <span className="text-lg font-extrabold text-slate-900">{formatMoney(cart.totals.subtotal_amount, currency)}</span>
               </div>
+              {checkoutError ? (
+                <Alert type="warning">{checkoutError}</Alert>
+              ) : null}
               <button
                 type="button"
                 disabled={!canCheckout || syncing || checkingOut || pendingId !== null}
@@ -244,11 +248,17 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   if (checkingOut || syncing) {
                     return;
                   }
+                  setCheckoutError(null);
                   setCheckingOut(true);
-                  void awaitCartSync()
+                  void checkoutWhenReady()
                     .then(() => {
                       onClose();
                       router.visit('/checkout');
+                    })
+                    .catch((error: unknown) => {
+                      setCheckoutError(
+                        error instanceof Error ? error.message : 'Basket could not be confirmed — try again.',
+                      );
                     })
                     .finally(() => setCheckingOut(false));
                 }}

@@ -170,7 +170,15 @@ export default function CatalogueShow({
         }),
       })
         .then(() => {
-          router.visit('/checkout', buyNowInstantProps(product, variantId, quantity));
+          const params = new URLSearchParams({
+            buy_now: '1',
+            product_id: product.id,
+            quantity: String(quantity),
+          });
+          if (variantId) {
+            params.set('product_variant_id', variantId);
+          }
+          router.visit(`/checkout?${params.toString()}`, buyNowInstantProps(product, variantId, quantity));
         })
         .catch(() => {
           setCartError('This item could not be checked out right now.');

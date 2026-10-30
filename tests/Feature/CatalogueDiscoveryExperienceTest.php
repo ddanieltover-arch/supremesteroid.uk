@@ -69,7 +69,7 @@ class CatalogueDiscoveryExperienceTest extends TestCase
                 ->where('filters.collection', 'featured')
                 ->where('filters.sort', 'newest')
                 ->has('breadcrumbs')
-                ->has('catalogueNav.categories')
+                ->missing('catalogueNav')
             );
 
         $this->get('/category/'.$product->category->slug)
@@ -254,12 +254,10 @@ class CatalogueDiscoveryExperienceTest extends TestCase
         $hidden = $this->makeCategory('Hidden Lab');
         $hidden->update(['is_visible' => false]);
 
-        $this->get('/shop')
+        $this->getJson('/catalogue/nav')
             ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page
-                ->where('catalogueNav.categories', fn ($categories) => collect($categories)->every(
-                    fn ($category) => ($category['slug'] ?? null) !== $hidden->slug
-                ))
-            );
+            ->assertJsonPath('categories', fn ($categories) => collect($categories)->every(
+                fn ($category) => ($category['slug'] ?? null) !== $hidden->slug
+            ));
     }
 }

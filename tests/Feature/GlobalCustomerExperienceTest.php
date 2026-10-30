@@ -41,7 +41,7 @@ class GlobalCustomerExperienceTest extends TestCase
                 ->component('Home')
                 ->has('auth')
                 ->has('cart.totals.items_count')
-                ->has('catalogueNav.categories')
+                ->missing('catalogueNav')
                 ->has('store.name')
                 ->has('wishlistCount')
                 ->missing('auth.user.role_label')
@@ -54,12 +54,10 @@ class GlobalCustomerExperienceTest extends TestCase
     {
         $product = $this->makeProduct(['name' => 'Nav Product']);
 
-        $this->get('/')
+        $this->getJson('/catalogue/nav')
             ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page
-                ->where('catalogueNav.categories', fn ($categories) => collect($categories)->contains('id', $product->category_id))
-                ->where('catalogueNav.brands', fn ($brands) => collect($brands)->contains('id', $product->brand_id))
-            );
+            ->assertJsonPath('categories', fn ($categories) => collect($categories)->contains('id', $product->category_id))
+            ->assertJsonPath('brands', fn ($brands) => collect($brands)->contains('id', $product->brand_id));
     }
 
     public function test_announcement_can_be_dismissed_for_the_session(): void

@@ -6,7 +6,6 @@ namespace App\Http\Middleware;
 
 use App\Services\Account\WishlistService;
 use App\Services\Cart\CartService;
-use App\Services\Catalogue\CatalogueDiscoveryService;
 use App\Services\Storefront\HomepageService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -27,7 +26,7 @@ class HandleInertiaRequests extends Middleware
     {
         $cartService = app(CartService::class);
         $wishlistCount = $request->user()
-            ? count(app(WishlistService::class)->productIds($request->user()))
+            ? app(WishlistService::class)->count($request->user())
             : 0;
         $chrome = app(HomepageService::class)->chrome();
         $announcement = $chrome['announcement'] ?? null;
@@ -62,7 +61,7 @@ class HandleInertiaRequests extends Middleware
             // Shell omits line items / eligibility; full cart comes from cart page + JSON mutations.
             'cart' => $cartService->summarizeShell($cartService->findRequestCart($request)),
             'wishlistCount' => $wishlistCount,
-            'catalogueNav' => app(CatalogueDiscoveryService::class)->navigation(),
+            // catalogueNav is fetched on demand when the mobile drawer opens (/catalogue/nav).
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

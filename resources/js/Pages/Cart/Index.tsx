@@ -3,7 +3,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { useCart } from '@/hooks/useCart';
-import { awaitCartSync, isCartSyncing, removeCartItem, subscribeCartSync } from '@/lib/cartApi';
+import { checkoutWhenReady, isCartSyncing, removeCartItem, subscribeCartSync } from '@/lib/cartApi';
 import { formatMoney } from '@/lib/money';
 import type { CartPayload } from '@/types';
 
@@ -15,6 +15,7 @@ export default function CartIndex({ cart: initialCart }: { cart: CartPayload }) 
   const [pending, setPending] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(() => isCartSyncing());
   const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const currency = cart.totals?.currency ?? 'GBP';
   const eligibility = cart.shipping_eligibility;
   const serverItemsCount = page.props.cart?.totals?.items_count ?? initialCart.totals?.items_count ?? 0;
@@ -25,6 +26,7 @@ export default function CartIndex({ cart: initialCart }: { cart: CartPayload }) 
   return (
     <StorefrontLayout seo={{ title: 'Cart', description: 'Review your Supreme Steroids basket.', robots: 'noindex,nofollow' }}>
       <h1 className="text-3xl font-semibold text-slate-900">Cart</h1>
+      {checkoutError ? <p className="mt-3 text-sm text-rose-600">{checkoutError}</p> : null}
       {eligibility ? (
         <p className="mt-3 text-sm text-slate-500">
           {eligibility.free_shipping_eligible
@@ -70,9 +72,15 @@ export default function CartIndex({ cart: initialCart }: { cart: CartPayload }) 
           if (checkingOut || syncing) {
             return;
           }
+          setCheckoutError(null);
           setCheckingOut(true);
-          void awaitCartSync()
+          void checkoutWhenReady()
             .then(() => router.visit('/checkout'))
+            .catch((error: unknown) => {
+              setCheckoutError(
+                error instanceof Error ? error.message : 'Basket could not be confirmed — try again.',
+              );
+            })
             .finally(() => setCheckingOut(false));
         }}
       >

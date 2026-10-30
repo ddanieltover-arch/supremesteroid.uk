@@ -70,13 +70,18 @@ class CartController extends Controller
             sessionId: $sessionId
         );
 
-        // A normal cart add cancels any pending express buy-now basket.
-        $this->checkoutFlowService->clearBuyNow($request);
+        $summarized = $this->cartService->summarize($cart->fresh('items'));
+
+        // Only cancel express buy-now after a successful add that leaves a shopping cart.
+        // Failed adds never reach here; empty carts must not wipe buy-now into a double-empty gate.
+        if (((int) ($summarized['totals']['items_count'] ?? 0)) > 0) {
+            $this->checkoutFlowService->clearBuyNow($request);
+        }
 
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Item added to cart.',
-                'cart' => $this->cartService->summarize($cart->fresh('items')),
+                'cart' => $summarized,
             ]);
         }
 

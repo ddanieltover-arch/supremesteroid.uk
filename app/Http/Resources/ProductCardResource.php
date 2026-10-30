@@ -6,7 +6,6 @@ namespace App\Http\Resources;
 
 use App\Models\Product;
 use App\Services\Catalogue\CataloguePresentation;
-use App\Services\Catalogue\ProductPurchaseEligibilityService;
 use App\Services\Pricing\PricingService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -31,15 +30,17 @@ class ProductCardResource extends JsonResource
             $pricing = null;
         }
 
-        $eligibility = app(ProductPurchaseEligibilityService::class)
-            ->checkEligibility($product, null, 1, true);
-
         $presentation = app(CataloguePresentation::class);
+        $stock = $presentation->stock($product);
         $primaryImage = null;
         if ($product->relationLoaded('images')) {
             $primaryImage = $product->images
                 ->first(fn ($image) => $presentation->isUsableCatalogueImageUrl($image->publicUrl() ?? $image->url ?? null));
         }
+
+        // Listing cards skip full eligibility (compliance scan + re-pricing).
+        // Purchasable listings already pass Product::purchasable(); stock covers image/inventory.
+        $isPurchasable = in_array($stock['code'], ['IN_STOCK', 'LOW_STOCK'], true);
 
         return [
             'id' => $product->id,
@@ -68,12 +69,12 @@ class ProductCardResource extends JsonResource
                 'is_on_sale' => $pricing['is_on_sale'],
                 'discount_percent' => $pricing['discount_percent'] ?? null,
             ] : null,
-            'is_purchasable' => $eligibility['is_eligible'],
+            'is_purchasable' => $isPurchasable,
             'is_featured' => (bool) $product->is_featured,
             'variant_count' => (int) ($product->variant_count ?? 0),
             'has_variants' => (int) ($product->variant_count ?? 0) > 0,
-            'badges' => $presentation->badges($product),
-            'stock' => $presentation->stock($product),
+            'badges' => $presentation->badges($product, null, $pricing),
+            'stock' => $stock,
         ];
     }
 }

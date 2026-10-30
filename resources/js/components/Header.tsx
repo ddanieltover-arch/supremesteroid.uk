@@ -6,6 +6,7 @@ import { AccountMenu } from '@/components/navigation/AccountMenu';
 import { CountBadge } from '@/components/navigation/CountBadge';
 import { HeaderSearch } from '@/components/navigation/HeaderSearch';
 import { MobileDrawer } from '@/components/navigation/MobileDrawer';
+import { jsonFetch } from '@/lib/http';
 import type { CatalogueNav } from '@/types';
 
 type HeaderProps = {
@@ -21,17 +22,34 @@ const navLinkClass =
 const iconButtonClass =
   'rounded-lg border border-slate-200 p-2 text-slate-800 transition-all duration-200 hover:border-brand/40 hover:bg-slate-50 hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand';
 
+let catalogueNavCache: CatalogueNav | null = null;
+
 export function Header({ cartCount, wishlistCount = 0, onOpenCart, compact = false }: HeaderProps) {
   const page = usePage<{
     store?: { name?: string; logo_url?: string };
-    catalogueNav?: CatalogueNav;
     auth?: { user?: { name: string; email?: string } | null };
   }>();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const nav = page.props.catalogueNav;
+  const [nav, setNav] = useState<CatalogueNav | undefined>(() => catalogueNavCache ?? undefined);
   const logoUrl = page.props.store?.logo_url ?? '/assets/branding/supreme-steroids-logo.jpg';
   const storeName = page.props.store?.name ?? 'Supreme Steroids';
+
+  const openMobileMenu = () => {
+    setMobileOpen(true);
+    if (catalogueNavCache) {
+      setNav(catalogueNavCache);
+      return;
+    }
+    void jsonFetch<CatalogueNav>('/catalogue/nav')
+      .then((payload) => {
+        catalogueNavCache = payload;
+        setNav(payload);
+      })
+      .catch(() => {
+        // Drawer still opens with Shop / Account links; categories load on retry.
+      });
+  };
 
   return (
     <header className="h-16 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90">
@@ -113,7 +131,7 @@ export function Header({ cartCount, wishlistCount = 0, onOpenCart, compact = fal
               className={`${iconButtonClass} shrink-0 lg:hidden`}
               aria-expanded={mobileOpen}
               aria-label="Open menu"
-              onClick={() => setMobileOpen(true)}
+              onClick={openMobileMenu}
             >
               <Menu className="h-5 w-5" />
             </button>
