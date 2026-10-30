@@ -1,6 +1,12 @@
 import { Link } from '@inertiajs/react';
-import { useEffect, useId, useRef } from 'react';
-import type { CatalogueNav } from '@/types';
+import { useEffect, useId, useRef, useState } from 'react';
+import { jsonFetch } from '@/lib/http';
+import type { CatalogueNav, ProductCard } from '@/types';
+
+type NavHighlights = {
+  featured: ProductCard[];
+  new_arrivals: ProductCard[];
+};
 
 export function MegaMenu({
   open,
@@ -16,8 +22,9 @@ export function MegaMenu({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const categories = nav?.categories ?? [];
   const brands = (nav?.brands ?? []).slice(0, 8);
-  const featured = nav?.featured ?? [];
-  const arrivals = nav?.new_arrivals ?? [];
+  const [highlights, setHighlights] = useState<NavHighlights | null>(null);
+  const featured = highlights?.featured ?? nav?.featured ?? [];
+  const arrivals = highlights?.new_arrivals ?? nav?.new_arrivals ?? [];
 
   useEffect(() => {
     if (!open) {
@@ -41,6 +48,28 @@ export function MegaMenu({
       document.removeEventListener('mousedown', onPointer);
     };
   }, [open, onOpenChange]);
+
+  useEffect(() => {
+    if (!open || highlights) {
+      return;
+    }
+    let cancelled = false;
+    void jsonFetch<NavHighlights>('/catalogue/nav-highlights')
+      .then((payload) => {
+        if (!cancelled) {
+          setHighlights({
+            featured: payload.featured ?? [],
+            new_arrivals: payload.new_arrivals ?? [],
+          });
+        }
+      })
+      .catch(() => {
+        // Categories/brands still work without highlight rails.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, highlights]);
 
   return (
     <div className="relative" ref={wrapRef}>

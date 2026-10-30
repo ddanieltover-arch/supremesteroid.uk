@@ -16,13 +16,13 @@ use Illuminate\Support\Facades\Cache;
 class CatalogueDiscoveryService
 {
     /**
+     * Lightweight shared nav shell (no product cards — those load on MegaMenu open).
+     *
      * @return array{categories: list<array<string, mixed>>, brands: list<array<string, mixed>>, featured: list<array<string, mixed>>, new_arrivals: list<array<string, mixed>>}
      */
     public function navigation(): array
     {
-        return Cache::remember('catalogue.navigation.v3', 300, function () {
-            $variantCount = fn ($query) => $query->where('is_active', true);
-
+        return Cache::remember('catalogue.navigation.v4', 300, function () {
             $categories = Category::query()
                 ->where('is_visible', true)
                 ->whereNull('parent_id')
@@ -36,6 +36,39 @@ class CatalogueDiscoveryService
                 ->orderBy('name')
                 ->limit(16)
                 ->get(['id', 'name', 'slug', 'logo_url']);
+
+            return [
+                'categories' => $categories->map(fn (Category $category) => [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'slug' => $category->slug,
+                    'children' => $category->children->map(fn (Category $child) => [
+                        'id' => $child->id,
+                        'name' => $child->name,
+                        'slug' => $child->slug,
+                    ])->values()->all(),
+                ])->values()->all(),
+                'brands' => $brands->map(fn (Brand $brand) => [
+                    'id' => $brand->id,
+                    'name' => $brand->name,
+                    'slug' => $brand->slug,
+                    'logo_url' => $brand->logo_url,
+                ])->values()->all(),
+                'featured' => [],
+                'new_arrivals' => [],
+            ];
+        });
+    }
+
+    /**
+     * Featured / new product cards for MegaMenu (fetched when the menu opens).
+     *
+     * @return array{featured: list<array<string, mixed>>, new_arrivals: list<array<string, mixed>>}
+     */
+    public function navigationHighlights(): array
+    {
+        return Cache::remember('catalogue.navigation.highlights.v1', 300, function () {
+            $variantCount = fn ($query) => $query->where('is_active', true);
 
             $featured = Product::query()
                 ->purchasable()
@@ -63,22 +96,6 @@ class CatalogueDiscoveryService
                 ->values();
 
             return [
-                'categories' => $categories->map(fn (Category $category) => [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'slug' => $category->slug,
-                    'children' => $category->children->map(fn (Category $child) => [
-                        'id' => $child->id,
-                        'name' => $child->name,
-                        'slug' => $child->slug,
-                    ])->values()->all(),
-                ])->values()->all(),
-                'brands' => $brands->map(fn (Brand $brand) => [
-                    'id' => $brand->id,
-                    'name' => $brand->name,
-                    'slug' => $brand->slug,
-                    'logo_url' => $brand->logo_url,
-                ])->values()->all(),
                 'featured' => ProductCardResource::collection($featured)->resolve(),
                 'new_arrivals' => ProductCardResource::collection($newArrivals)->resolve(),
             ];

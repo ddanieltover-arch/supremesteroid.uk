@@ -1,4 +1,4 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight, ShoppingBag, Trash2, Truck, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Alert } from '@/components/ui/Alert';
@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/Button';
 import { Portal } from '@/components/ui/Portal';
 import { useCart } from '@/hooks/useCart';
 import { usePresence } from '@/hooks/usePresence';
-import { clearCart, removeCartItem, updateCartItemQuantity } from '@/lib/cartApi';
+import { awaitCartSync, clearCart, isCartSyncing, publishCart, removeCartItem, subscribeCartSync, updateCartItemQuantity } from '@/lib/cartApi';
+import { jsonFetch } from '@/lib/http';
 import { formatMoney } from '@/lib/money';
+import type { CartPayload } from '@/types';
 import clsx from 'clsx';
 
 type CartDrawerProps = {
@@ -16,9 +18,41 @@ type CartDrawerProps = {
 };
 
 export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  const page = usePage<{ auth?: { user?: unknown } }>();
+  const page = usePage<{ auth?: { user?: unknown }; cart?: { totals?: { items_count?: number } } }>();
   const cart = useCart();
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(() => isCartSyncing());
+  const [checkingOut, setCheckingOut] = useState(false);
+  const serverItemsCount = page.props.cart?.totals?.items_count ?? 0;
+  const canCheckout = (cart?.totals?.items_count ?? 0) > 0 || serverItemsCount > 0;
+
+  useEffect(() => subscribeCartSync(setSyncing), []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    if ((cart?.items?.length ?? 0) > 0) {
+      return;
+    }
+    if ((cart?.totals?.items_count ?? 0) <= 0 && serverItemsCount <= 0) {
+      return;
+    }
+    let cancelled = false;
+    void jsonFetch<CartPayload>('/cart')
+      .then((payload) => {
+        if (!cancelled && payload) {
+          publishCart(payload);
+        }
+      })
+      .catch(() => {
+        // Drawer still shows empty state; mutations will refill.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, cart?.items?.length, cart?.totals?.items_count, serverItemsCount]);
+
   const panelRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
   const currency = cart?.totals?.currency ?? 'GBP';
@@ -212,14 +246,26 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 <span className="text-slate-500">Basket subtotal</span>
                 <span className="text-lg font-extrabold text-slate-900">{formatMoney(cart.totals.subtotal_amount, currency)}</span>
               </div>
-              <Link
-                href="/checkout"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white transition-transform duration-200 active:scale-[0.98] motion-reduce:active:scale-100"
-                onClick={onClose}
+              <button
+                type="button"
+                disabled={!canCheckout || syncing || checkingOut || pendingId !== null}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white transition-transform duration-200 active:scale-[0.98] motion-reduce:active:scale-100 disabled:cursor-not-allowed disabled:opacity-60"
+                onClick={() => {
+                  if (checkingOut || syncing) {
+                    return;
+                  }
+                  setCheckingOut(true);
+                  void awaitCartSync()
+                    .then(() => {
+                      onClose();
+                      router.visit('/checkout');
+                    })
+                    .finally(() => setCheckingOut(false));
+                }}
               >
-                Proceed to secure checkout
+                {syncing || checkingOut ? 'Preparing checkout…' : 'Proceed to secure checkout'}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
+              </button>
               <Link href="/shop" className="inline-flex w-full min-h-11 items-center justify-center text-sm text-slate-800 transition-colors hover:text-brand" onClick={onClose}>
                 Continue shopping
               </Link>

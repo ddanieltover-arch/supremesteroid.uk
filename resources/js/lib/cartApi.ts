@@ -96,9 +96,34 @@ export function optimisticAddToCart(
 }
 
 type CartListener = (cart: CartPayload) => void;
+type SyncListener = (syncing: boolean) => void;
 
 let cartOverride: CartPayload | null = null;
 const listeners = new Set<CartListener>();
+const syncListeners = new Set<SyncListener>();
+let cartSync: Promise<void> = Promise.resolve();
+let pendingMutations = 0;
+
+function notifySync(): void {
+  const syncing = pendingMutations > 0;
+  syncListeners.forEach((listener) => listener(syncing));
+}
+
+function enqueueCartMutation<T>(run: () => Promise<T>): Promise<T> {
+  pendingMutations += 1;
+  notifySync();
+
+  const next = cartSync.catch(() => undefined).then(run);
+  cartSync = next.then(
+    () => undefined,
+    () => undefined,
+  );
+
+  return next.finally(() => {
+    pendingMutations = Math.max(0, pendingMutations - 1);
+    notifySync();
+  });
+}
 
 export function getCartOverride(): CartPayload | null {
   return cartOverride;
@@ -124,40 +149,65 @@ export function subscribeCart(listener: CartListener): () => void {
   };
 }
 
+export function isCartSyncing(): boolean {
+  return pendingMutations > 0;
+}
+
+export function subscribeCartSync(listener: SyncListener): () => void {
+  syncListeners.add(listener);
+  listener(isCartSyncing());
+  return () => {
+    syncListeners.delete(listener);
+  };
+}
+
+/** Wait until every in-flight cart mutation has settled. */
+export async function awaitCartSync(): Promise<void> {
+  await cartSync;
+}
+
 export async function addCartItem(input: {
   product_id: string;
   product_variant_id?: string | null;
   quantity?: number;
 }): Promise<CartPayload> {
-  const payload = await jsonFetch<CartMutationResponse>('/cart/items', {
-    method: 'POST',
-    body: JSON.stringify({
-      product_id: input.product_id,
-      product_variant_id: input.product_variant_id ?? null,
-      quantity: input.quantity ?? 1,
-    }),
+  return enqueueCartMutation(async () => {
+    const payload = await jsonFetch<CartMutationResponse>('/cart/items', {
+      method: 'POST',
+      body: JSON.stringify({
+        product_id: input.product_id,
+        product_variant_id: input.product_variant_id ?? null,
+        quantity: input.quantity ?? 1,
+      }),
+    });
+    return publishCart(payload.cart);
   });
-  return publishCart(payload.cart);
 }
 
 export async function updateCartItemQuantity(itemId: string, quantity: number): Promise<CartPayload> {
-  const payload = await jsonFetch<CartMutationResponse>(`/cart/items/${itemId}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ quantity }),
+  return enqueueCartMutation(async () => {
+    const payload = await jsonFetch<CartMutationResponse>(`/cart/items/${itemId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ quantity }),
+    });
+    return publishCart(payload.cart);
   });
-  return publishCart(payload.cart);
 }
 
 export async function removeCartItem(itemId: string): Promise<CartPayload> {
-  const payload = await jsonFetch<CartMutationResponse>(`/cart/items/${itemId}`, {
-    method: 'DELETE',
+  return enqueueCartMutation(async () => {
+    const payload = await jsonFetch<CartMutationResponse>(`/cart/items/${itemId}`, {
+      method: 'DELETE',
+    });
+    return publishCart(payload.cart);
   });
-  return publishCart(payload.cart);
 }
 
 export async function clearCart(): Promise<CartPayload> {
-  const payload = await jsonFetch<CartMutationResponse>('/cart', {
-    method: 'DELETE',
+  return enqueueCartMutation(async () => {
+    const payload = await jsonFetch<CartMutationResponse>('/cart', {
+      method: 'DELETE',
+    });
+    return publishCart(payload.cart);
   });
-  return publishCart(payload.cart);
 }

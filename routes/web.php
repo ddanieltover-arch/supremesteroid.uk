@@ -41,6 +41,7 @@ Route::get('/catalogue', [CatalogueController::class, 'index'])->name('catalogue
 Route::get('/search', [CatalogueController::class, 'search'])->name('search');
 Route::get('/search/suggest', [CatalogueController::class, 'suggest'])->middleware('throttle:30,1')->name('search.suggest');
 Route::get('/catalogue/cards', [CatalogueController::class, 'cards'])->middleware('throttle:30,1')->name('catalogue.cards');
+Route::get('/catalogue/nav-highlights', [CatalogueController::class, 'navigationHighlights'])->middleware('throttle:30,1')->name('catalogue.nav-highlights');
 Route::get('/compare', [CatalogueController::class, 'compare'])->name('catalogue.compare');
 Route::get('/category/{slug}', [CatalogueController::class, 'category'])->name('category.show');
 Route::get('/brand/{slug}', [CatalogueController::class, 'brand'])->name('brand.show');

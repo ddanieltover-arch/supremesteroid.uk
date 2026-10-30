@@ -1,18 +1,26 @@
 import StorefrontLayout from '../../Layouts/StorefrontLayout';
-import { Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { Link, router, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { useCart } from '@/hooks/useCart';
-import { removeCartItem } from '@/lib/cartApi';
+import { awaitCartSync, isCartSyncing, removeCartItem, subscribeCartSync } from '@/lib/cartApi';
 import { formatMoney } from '@/lib/money';
 import type { CartPayload } from '@/types';
 
 export default function CartIndex({ cart: initialCart }: { cart: CartPayload }) {
+  const page = usePage<{ cart?: { totals?: { items_count?: number } } }>();
   const liveCart = useCart();
-  const cart = liveCart.items.length > 0 || liveCart.id ? liveCart : initialCart;
+  // Prefer local/JSON cart only when it has line items (shared props are a count shell).
+  const cart = (liveCart.items?.length ?? 0) > 0 ? liveCart : initialCart;
   const [pending, setPending] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(() => isCartSyncing());
+  const [checkingOut, setCheckingOut] = useState(false);
   const currency = cart.totals?.currency ?? 'GBP';
   const eligibility = cart.shipping_eligibility;
+  const serverItemsCount = page.props.cart?.totals?.items_count ?? initialCart.totals?.items_count ?? 0;
+  const canCheckout = (cart.totals?.items_count ?? 0) > 0 || serverItemsCount > 0;
+
+  useEffect(() => subscribeCartSync(setSyncing), []);
 
   return (
     <StorefrontLayout seo={{ title: 'Cart', description: 'Review your Supreme Steroids basket.', robots: 'noindex,nofollow' }}>
@@ -54,9 +62,22 @@ export default function CartIndex({ cart: initialCart }: { cart: CartPayload }) 
         ))}
       </div>
       <p className="mt-8 text-lg text-slate-900">Subtotal {formatMoney(cart.totals?.subtotal_amount, currency)}</p>
-      <Link href="/checkout" className="mt-4 inline-flex rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white">
-        Continue to checkout
-      </Link>
+      <Button
+        className="mt-4"
+        disabled={!canCheckout || syncing || checkingOut || pending !== null}
+        isLoading={syncing || checkingOut}
+        onClick={() => {
+          if (checkingOut || syncing) {
+            return;
+          }
+          setCheckingOut(true);
+          void awaitCartSync()
+            .then(() => router.visit('/checkout'))
+            .finally(() => setCheckingOut(false));
+        }}
+      >
+        {syncing || checkingOut ? 'Preparing checkout…' : 'Continue to checkout'}
+      </Button>
     </StorefrontLayout>
   );
 }

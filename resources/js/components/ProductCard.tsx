@@ -85,10 +85,9 @@ function productInstantProps(product: ProductCardType) {
 function productShowLinkProps(product: ProductCardType) {
   return {
     href: `/product/${product.slug}`,
-    // Hover-prefetch the Inertia payload; Catalogue/Show is eager-loaded in app.tsx
-    // so Instant Visits can paint the product page on click without waiting on a chunk.
-    prefetch: true,
-    cacheFor: '60s',
+    // Listing hover-prefetch storms the server (full product show + shared props).
+    // Instant Visit pageProps still paint the product page immediately on click.
+    prefetch: false,
     ...productInstantProps(product),
   };
 }

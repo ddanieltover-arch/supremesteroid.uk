@@ -9,6 +9,8 @@ use App\Models\Address;
 use App\Models\CheckoutSession;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\Product;
+use App\Models\ProductImage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -24,6 +26,59 @@ class CheckoutJourneyTest extends TestCase
     public function test_empty_cart_redirects_from_checkout_to_basket(): void
     {
         $this->get('/checkout')->assertRedirect('/cart');
+    }
+
+    public function test_checkout_after_add_to_cart_does_not_bounce_to_basket(): void
+    {
+        $product = $this->makeCheckoutProduct('Race Safe Item', 40.00);
+
+        $this->postJson('/cart/items', ['product_id' => $product->id, 'quantity' => 1])
+            ->assertOk()
+            ->assertJsonPath('cart.totals.items_count', 1);
+
+        $this->get('/checkout')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page->component('Checkout/Index')->where('checkout_step', 'details'));
+    }
+
+    public function test_buy_now_query_opens_checkout_without_cart(): void
+    {
+        $product = $this->makeCheckoutProduct('Buy Now Query Item', 42.00);
+
+        $this->get('/checkout?buy_now=1&product_id='.$product->id.'&quantity=1')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page->component('Checkout/Index')->where('checkout_step', 'details'));
+    }
+
+    public function test_buy_now_post_establishes_session_then_checkout_works(): void
+    {
+        $product = $this->makeCheckoutProduct('Buy Now Post Item', 44.00);
+
+        $this->postJson('/checkout/buy-now', [
+            'product_id' => $product->id,
+            'quantity' => 1,
+        ])
+            ->assertOk()
+            ->assertJsonPath('redirect', route('checkout.show'));
+
+        $this->get('/checkout')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page->component('Checkout/Index')->where('checkout_step', 'details'));
+    }
+
+    protected function makeCheckoutProduct(string $name, float $price): Product
+    {
+        $product = $this->makeProduct(['name' => $name, 'price_amount' => $price]);
+
+        ProductImage::query()->create([
+            'product_id' => $product->id,
+            'url' => '/storage/product_images/'.$product->id.'/primary.jpg',
+            'alt_text' => $product->name,
+            'display_order' => 0,
+            'is_primary' => true,
+        ]);
+
+        return $product->fresh(['inventory', 'images']);
     }
 
     public function test_guest_can_complete_checkout_without_an_account(): void

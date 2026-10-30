@@ -132,6 +132,9 @@ class CatalogueController extends Controller
                     'complementary' => ProductCardResource::collection($grouped['complementary'])->resolve(),
                 ];
             }),
+            'wishlistProductIds' => $request->user()
+                ? app(\App\Services\Account\WishlistService::class)->productIds($request->user())
+                : [],
             'preview' => false,
             'seo' => $this->seoService->forPage(
                 $request,
@@ -198,6 +201,9 @@ class CatalogueController extends Controller
 
         return Inertia::render('Catalogue/Show', [
             'product' => $payload,
+            'wishlistProductIds' => $request->user()
+                ? app(\App\Services\Account\WishlistService::class)->productIds($request->user())
+                : [],
             'preview' => true,
             'seo' => $this->seoService->forPage(
                 $request,
@@ -307,6 +313,11 @@ class CatalogueController extends Controller
         return response()->json([
             'products' => ProductCardResource::collection($products)->resolve(),
         ]);
+    }
+
+    public function navigationHighlights(): JsonResponse
+    {
+        return response()->json($this->discovery->navigationHighlights());
     }
 
     public function compare(Request $request): Response

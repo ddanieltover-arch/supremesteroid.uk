@@ -43,7 +43,7 @@ class HomepageService
             return $this->composePage($request);
         }
 
-        return Cache::remember(self::CACHE_PAGE, 60, fn () => $this->composePage($request));
+        return Cache::remember(self::CACHE_PAGE, 300, fn () => $this->composePage($request));
     }
 
     /**

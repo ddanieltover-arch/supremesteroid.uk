@@ -12,6 +12,7 @@ import { RecentlyViewed } from '@/components/catalogue/RecentlyViewed';
 import { TrustBlocks } from '@/components/catalogue/TrustBlocks';
 import { useCart } from '@/hooks/useCart';
 import { addCartItem, getCartOverride, optimisticAddToCart } from '@/lib/cartApi';
+import { jsonFetch } from '@/lib/http';
 import { rememberRecentlyViewed } from '@/lib/recentlyViewed';
 import { formatMoney } from '@/lib/money';
 import type { CartPayload, ProductCard as ProductCardType, ProductDetail, SeoProps } from '@/types';
@@ -19,18 +20,6 @@ import type { CartPayload, ProductCard as ProductCardType, ProductDetail, SeoPro
 function moneyTimes(amount: string | null | undefined, quantity: number): string {
   const pence = Math.round(Number(amount ?? 0) * 100) * Math.max(1, quantity);
   return (pence / 100).toFixed(2);
-}
-
-function buyNowCheckoutUrl(productId: string, variantId: string, quantity: number): string {
-  const params = new URLSearchParams({
-    buy_now: '1',
-    product_id: productId,
-    quantity: String(Math.max(1, quantity)),
-  });
-  if (variantId) {
-    params.set('product_variant_id', variantId);
-  }
-  return `/checkout?${params.toString()}`;
 }
 
 function buyNowInstantProps(product: ProductDetail, variantId: string, quantity: number) {
@@ -171,8 +160,21 @@ export default function CatalogueShow({
     setCartError(null);
 
     if (mode === 'buy') {
-      // Instant Visit: paint checkout immediately — no waiting / Processing state.
-      router.visit(buyNowCheckoutUrl(product.id, variantId, quantity), buyNowInstantProps(product, variantId, quantity));
+      // Establish buy-now session first, then Instant Visit checkout (avoids empty-cart bounce).
+      void jsonFetch<{ redirect?: string }>('/checkout/buy-now', {
+        method: 'POST',
+        body: JSON.stringify({
+          product_id: product.id,
+          product_variant_id: variantId || null,
+          quantity,
+        }),
+      })
+        .then(() => {
+          router.visit('/checkout', buyNowInstantProps(product, variantId, quantity));
+        })
+        .catch(() => {
+          setCartError('This item could not be checked out right now.');
+        });
       return;
     }
 

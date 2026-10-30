@@ -142,7 +142,7 @@ createInertiaApp({
     }
     return /supreme\s*steroids/i.test(title) ? title : `${title} | Supreme Steroids`;
   },
-  progress: false,
+  progress: true,
   resolve: (name) => resolvePage(name),
   setup({ el, App, props }) {
     if (!el) {

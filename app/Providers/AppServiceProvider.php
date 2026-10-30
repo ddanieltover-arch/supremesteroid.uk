@@ -107,6 +107,8 @@ class AppServiceProvider extends ServiceProvider
             Cache::forget('catalogue.brands.active');
             Cache::forget('catalogue.brands.active.v2');
             Cache::forget('catalogue.navigation');
+            Cache::forget('catalogue.navigation.v4');
+            Cache::forget('catalogue.navigation.highlights.v1');
             app(HomepageService::class)->flush();
         });
 
@@ -114,12 +116,16 @@ class AppServiceProvider extends ServiceProvider
             Cache::forget('catalogue.categories.visible');
             Cache::forget('catalogue.categories.visible.v2');
             Cache::forget('catalogue.navigation');
+            Cache::forget('catalogue.navigation.v4');
+            Cache::forget('catalogue.navigation.highlights.v1');
             app(HomepageService::class)->flush();
         });
         Brand::saved(function () {
             Cache::forget('catalogue.brands.active');
             Cache::forget('catalogue.brands.active.v2');
             Cache::forget('catalogue.navigation');
+            Cache::forget('catalogue.navigation.v4');
+            Cache::forget('catalogue.navigation.highlights.v1');
             app(HomepageService::class)->flush();
         });
 

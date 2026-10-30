@@ -460,6 +460,8 @@ class QualityAssuranceFixtureService
         Cache::forget(HomepageService::CACHE_CHROME);
         Cache::forget('catalogue.navigation');
         Cache::forget('catalogue.navigation.v2');
+        Cache::forget('catalogue.navigation.v4');
+        Cache::forget('catalogue.navigation.highlights.v1');
         Cache::forget('catalogue.categories.visible');
         Cache::forget('catalogue.categories.visible.v2');
         Cache::forget('catalogue.brands.active');

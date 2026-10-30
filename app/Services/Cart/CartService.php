@@ -420,6 +420,49 @@ class CartService
     }
 
     /**
+     * Lightweight shared cart for header badge / every Inertia visit.
+     * Full line items stay on cart page / drawer mutations (JSON summarize).
+     *
+     * @return array{id: string|null, items: list<mixed>, totals: array<string, mixed>, is_checkout_ready: bool}
+     */
+    public function summarizeShell(?Cart $cart): array
+    {
+        if (! $cart) {
+            return [
+                'id' => null,
+                'items' => [],
+                'totals' => [
+                    'subtotal_amount' => '0.00',
+                    'discount_amount' => '0.00',
+                    'shipping_amount' => '0.00',
+                    'tax_amount' => '0.00',
+                    'grand_total_amount' => '0.00',
+                    'items_count' => 0,
+                    'currency' => 'GBP',
+                ],
+                'is_checkout_ready' => false,
+            ];
+        }
+
+        $itemsCount = (int) $cart->items()->sum('quantity');
+
+        return [
+            'id' => $cart->id,
+            'items' => [],
+            'totals' => [
+                'subtotal_amount' => '0.00',
+                'discount_amount' => '0.00',
+                'shipping_amount' => '0.00',
+                'tax_amount' => '0.00',
+                'grand_total_amount' => '0.00',
+                'items_count' => $itemsCount,
+                'currency' => 'GBP',
+            ],
+            'is_checkout_ready' => $itemsCount > 0,
+        ];
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function summarize(?Cart $cart): array

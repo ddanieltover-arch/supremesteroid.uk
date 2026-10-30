@@ -27,12 +27,13 @@ const emptyCart: CartPayload = {
 };
 
 function cartSignature(cart: CartPayload): string {
-  return `${cart.id ?? ''}:${cart.totals?.items_count ?? 0}:${cart.totals?.grand_total_amount ?? '0.00'}`;
+  // Shared props use a light shell (no line items / money). Compare count only.
+  return `${cart.id ?? ''}:${cart.totals?.items_count ?? 0}`;
 }
 
 /**
  * Prefers a JSON-mutation cart snapshot when present, otherwise Inertia shared props.
- * Keeps the snapshot across Instant Visits until the server-shared cart changes.
+ * Keeps the snapshot across Instant Visits until the server-shared cart count changes.
  */
 export function useCart(): CartPayload {
   const page = usePage<{ cart?: CartPayload }>();
@@ -51,6 +52,11 @@ export function useCart(): CartPayload {
     clearCartOverride();
     setLocal(null);
   }, [shared, seenSignature]);
+
+  // Shared cart is a shell without line items — keep local detail for the drawer.
+  if (local && (local.items?.length ?? 0) > 0 && (shared.items?.length ?? 0) === 0) {
+    return local;
+  }
 
   return local ?? shared;
 }

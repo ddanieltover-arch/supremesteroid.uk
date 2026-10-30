@@ -119,6 +119,8 @@ class CataloguePublicationService
         Cache::forget('catalogue.brands.active');
         Cache::forget('catalogue.brands.active.v2');
         Cache::forget('catalogue.navigation');
+        Cache::forget('catalogue.navigation.v4');
+        Cache::forget('catalogue.navigation.highlights.v1');
         Cache::forget('catalogue.facets');
         Cache::forget('catalogue.search.facets');
         $this->homepageService->flush();

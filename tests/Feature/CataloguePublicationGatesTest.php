@@ -164,6 +164,8 @@ class CataloguePublicationGatesTest extends TestCase
     public function test_publish_requires_checklist_and_invalidates_catalogue_caches(): void
     {
         Cache::put('catalogue.navigation', ['x'], 60);
+        Cache::put('catalogue.navigation.v4', ['x'], 60);
+        Cache::put('catalogue.navigation.highlights.v1', ['x'], 60);
         Cache::put('catalogue.facets', ['y'], 60);
 
         $product = $this->makeProduct([
@@ -186,6 +188,8 @@ class CataloguePublicationGatesTest extends TestCase
         $this->assertSame(ProductStatus::ACTIVE, $published->status);
         $this->assertNotNull($published->seoMetadata?->meta_title);
         $this->assertNull(Cache::get('catalogue.navigation'));
+        $this->assertNull(Cache::get('catalogue.navigation.v4'));
+        $this->assertNull(Cache::get('catalogue.navigation.highlights.v1'));
         $this->assertNull(Cache::get('catalogue.facets'));
     }
 
