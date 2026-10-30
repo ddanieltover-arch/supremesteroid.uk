@@ -62,20 +62,23 @@ class QualityAssuranceFixtureService
         $customerA = $this->user(self::CUSTOMER_A_EMAIL, 'QA Customer A', UserRole::CUSTOMER, $password);
         $customerB = $this->user(self::CUSTOMER_B_EMAIL, 'QA Customer B', UserRole::CUSTOMER, $password);
 
-        $address = Address::query()->updateOrCreate(
-            ['user_id' => $customerA->id, 'address_line_1' => '10 QA Sample Street'],
-            [
-                'type' => 'shipping',
-                'full_name' => 'QA Customer A',
-                'address_line_2' => 'Fixture Suite',
-                'city' => 'London',
-                'state_county' => 'Greater London',
-                'postal_code' => 'W6 9HW',
-                'country_code' => 'GB',
-                'phone' => '+440000000000',
-                'is_default' => true,
-            ]
-        );
+        $address = Address::query()
+            ->where('user_id', $customerA->id)
+            ->where('address_line_1', '10 QA Sample Street')
+            ->first() ?? new Address;
+        $address->forceFill([
+            'user_id' => $customerA->id,
+            'type' => 'shipping',
+            'full_name' => 'QA Customer A',
+            'address_line_1' => '10 QA Sample Street',
+            'address_line_2' => 'Fixture Suite',
+            'city' => 'London',
+            'state_county' => 'Greater London',
+            'postal_code' => 'W6 9HW',
+            'country_code' => 'GB',
+            'phone' => '+440000000000',
+            'is_default' => true,
+        ])->save();
 
         $brand = Brand::query()->updateOrCreate(
             ['slug' => self::BRAND_SLUG],
@@ -366,16 +369,16 @@ class QualityAssuranceFixtureService
 
     protected function user(string $email, string $name, UserRole $role, string $password): User
     {
-        return User::query()->updateOrCreate(
-            ['email' => $email],
-            [
-                'name' => $name,
-                'password' => $password,
-                'role' => $role,
-                'is_active' => true,
-                'email_verified_at' => now(),
-            ]
-        );
+        $user = User::query()->firstOrNew(['email' => $email]);
+        $user->forceFill([
+            'name' => $name,
+            'password' => $password,
+            'role' => $role,
+            'is_active' => true,
+            'email_verified_at' => now(),
+        ])->save();
+
+        return $user;
     }
 
     /**

@@ -108,10 +108,9 @@ class AccountController extends Controller
             Address::query()->where('user_id', $request->user()->id)->update(['is_default' => false]);
         }
 
-        Address::create([
-            ...$validated,
-            'user_id' => $request->user()->id,
-        ]);
+        $address = new Address($validated);
+        $address->user_id = $request->user()->id;
+        $address->save();
 
         return back()->with('success', 'Address saved.');
     }

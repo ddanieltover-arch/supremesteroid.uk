@@ -11,6 +11,9 @@ The customer storefront is Laravel + Inertia + React. `laravel-vite-plugin` comp
 - `APP_KEY`, `APP_URL`, `APP_ENV=production`, `APP_DEBUG=false`
 - `DATABASE_URL` (Neon **pooled** connection string) and `DB_SSLMODE=require`
 - `SESSION_DRIVER=database`, `CACHE_STORE=database` (or Redis)
+- `SESSION_SECURE_COOKIE=true` (defaults true in production when unset)
+- `HSTS_ENABLED=true` (defaults true in production when unset)
+- `TRUSTED_PROXIES=*` for the FrankenPHP container behind Vercel’s edge (Vercel sets `X-Forwarded-For`; do not expose the container directly to the public internet). For Linux FrankenPHP behind local Caddy, use `TRUSTED_PROXIES=127.0.0.1`.
 - `FILESYSTEM_DISK` / `OBJECT_STORAGE_DISK` = `s3` or `r2`
 - `CRON_SECRET` — Vercel Cron sends `Authorization: Bearer $CRON_SECRET`
 - Bank/crypto instruction env vars if those methods should display account details

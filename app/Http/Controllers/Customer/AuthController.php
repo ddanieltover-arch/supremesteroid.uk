@@ -39,8 +39,20 @@ class AuthController extends Controller
         $guestSessionId = $request->session()->getId();
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $user = $request->user();
+
+            if (! $user || ! $user->is_active) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors([
+                    'email' => 'The provided credentials do not match our records.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
-            app(CartService::class)->mergeGuestCartBySession($guestSessionId, $request->user());
+            app(CartService::class)->mergeGuestCartBySession($guestSessionId, $user);
 
             return redirect()->intended(route('shop.index'));
         }
@@ -69,7 +81,7 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        $user = User::create([
+        $user = User::forceCreate([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),

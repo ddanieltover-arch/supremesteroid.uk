@@ -165,7 +165,7 @@ class GlobalCustomerExperienceTest extends TestCase
         $user = $this->makeCustomer('empty@customer.test');
         $other = $this->makeCustomer('other-address@customer.test');
 
-        Address::query()->create([
+        Address::forceCreate([
             'user_id' => $other->id,
             'type' => 'shipping',
             'full_name' => 'Other Person',

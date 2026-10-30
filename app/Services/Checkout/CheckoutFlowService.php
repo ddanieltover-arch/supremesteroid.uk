@@ -768,7 +768,7 @@ class CheckoutFlowService
      */
     protected function persistOwnedAddress(User $user, array $destination): void
     {
-        Address::query()->create([
+        Address::forceCreate([
             'user_id' => $user->id,
             'type' => 'shipping',
             'full_name' => $destination['full_name'] ?? $user->name,

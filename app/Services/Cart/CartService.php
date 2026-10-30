@@ -136,14 +136,16 @@ class CartService
         }
 
         if ($cart->session_id !== null) {
-            if ($user) {
-                // An authenticated user can access their unattached guest session prior to merge
-                return;
-            }
+            // Guest carts always require the owning session, even for authenticated actors.
+            // Login/register merge transfers ownership onto the user cart.
             if (! $sessionId || $cart->session_id !== $sessionId) {
                 throw new AuthorizationException('Unauthorized access to guest cart.');
             }
+
+            return;
         }
+
+        throw new AuthorizationException('Unauthorized access to cart.');
     }
 
     /**

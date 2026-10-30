@@ -30,11 +30,12 @@ class AdminReportingTest extends TestCase
         $brand = Brand::create(['name' => 'Brand A', 'slug' => 'brand-a', 'is_active' => true]);
         $category = Category::create(['name' => 'Category A', 'slug' => 'cat-a', 'is_visible' => true]);
 
-        $customer = User::create([
+        $customer = User::forceCreate([
             'name' => 'Customer Test',
             'email' => 'customer@test.com',
             'password' => bcrypt('Secret123!'),
             'role' => 'CUSTOMER',
+            'is_active' => true,
         ]);
 
         // Product 1: Low stock (on_hand 5 - reserved 1 = 4 <= safety threshold 5)
@@ -151,5 +152,27 @@ class AdminReportingTest extends TestCase
         $this->assertEquals(1, $metrics['low_stock_count']);
         $this->assertEquals(1, $metrics['out_of_stock_count']);
         $this->assertEquals(1, $metrics['compliance_review_backlog']);
+
+        $this->assertIsArray($metrics['orders_last_14_days']);
+        $this->assertCount(14, $metrics['orders_last_14_days']['labels']);
+        $this->assertCount(14, $metrics['orders_last_14_days']['data']);
+        $this->assertSame(2, end($metrics['orders_last_14_days']['data']));
+
+        $this->assertIsArray($metrics['revenue_last_14_days']);
+        $this->assertCount(14, $metrics['revenue_last_14_days']['labels']);
+        $this->assertCount(14, $metrics['revenue_last_14_days']['data']);
+        $this->assertEquals(110.0, end($metrics['revenue_last_14_days']['data']));
+    }
+
+    public function test_orders_and_revenue_series_helpers_match_get_metrics(): void
+    {
+        $service = app(AdminMetricsService::class);
+
+        $orders = $service->ordersPerDay(14);
+        $revenue = $service->revenuePerDay(14);
+        $metrics = $service->getMetrics();
+
+        $this->assertSame($orders, $metrics['orders_last_14_days']);
+        $this->assertSame($revenue, $metrics['revenue_last_14_days']);
     }
 }

@@ -53,10 +53,10 @@ Route::middleware(['auth', 'role:MANAGER,SUPER_ADMIN'])->group(function () {
         ->name('admin.catalogue.preview');
 });
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/items', [CartController::class, 'addItem'])->name('cart.items.add');
-Route::patch('/cart/items/{id}', [CartController::class, 'updateQuantity'])->name('cart.items.update');
-Route::delete('/cart/items/{id}', [CartController::class, 'removeItem'])->name('cart.items.remove');
-Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
+Route::post('/cart/items', [CartController::class, 'addItem'])->middleware('throttle:60,1')->name('cart.items.add');
+Route::patch('/cart/items/{id}', [CartController::class, 'updateQuantity'])->middleware('throttle:60,1')->name('cart.items.update');
+Route::delete('/cart/items/{id}', [CartController::class, 'removeItem'])->middleware('throttle:60,1')->name('cart.items.remove');
+Route::delete('/cart', [CartController::class, 'clear'])->middleware('throttle:60,1')->name('cart.clear');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -80,14 +80,14 @@ Route::get('/checkout/payment', [CheckoutController::class, 'payment'])->name('c
 Route::post('/checkout/payment', [CheckoutController::class, 'savePayment'])->middleware('throttle:30,1')->name('checkout.payment.save');
 Route::post('/checkout/acknowledge', [CheckoutController::class, 'acknowledge'])->middleware('throttle:30,1')->name('checkout.acknowledge');
 Route::get('/checkout/confirmation', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
-Route::post('/checkout/prepare', [CheckoutController::class, 'prepare'])->name('checkout.prepare');
+Route::post('/checkout/prepare', [CheckoutController::class, 'prepare'])->middleware('throttle:30,1')->name('checkout.prepare');
 Route::post('/checkout', [CheckoutController::class, 'store'])->middleware('throttle:30,1')->name('checkout.store');
 
 Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
 Route::get('/orders/{orderId}/payments/{paymentId}/proof', [OrderController::class, 'downloadPaymentProof'])->name('orders.payment.proof.download');
-Route::post('/orders/{orderId}/payments/{paymentId}/proof', [OrderController::class, 'submitPaymentProof'])->name('orders.payment.proof');
-Route::post('/orders/{orderId}/payments/{paymentId}/proof/bank', [OrderController::class, 'submitBankTransferProof'])->name('orders.payment.proof.bank');
-Route::post('/orders/{orderId}/payments/{paymentId}/proof/crypto', [OrderController::class, 'submitCryptoProof'])->name('orders.payment.proof.crypto');
+Route::post('/orders/{orderId}/payments/{paymentId}/proof', [OrderController::class, 'submitPaymentProof'])->middleware('throttle:10,1')->name('orders.payment.proof');
+Route::post('/orders/{orderId}/payments/{paymentId}/proof/bank', [OrderController::class, 'submitBankTransferProof'])->middleware('throttle:10,1')->name('orders.payment.proof.bank');
+Route::post('/orders/{orderId}/payments/{paymentId}/proof/crypto', [OrderController::class, 'submitCryptoProof'])->middleware('throttle:10,1')->name('orders.payment.proof.crypto');
 
 Route::middleware('auth')->group(function () {
     Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
@@ -101,7 +101,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/account/addresses/{id}', [AccountController::class, 'updateAddress'])->name('account.addresses.update');
     Route::delete('/account/addresses/{id}', [AccountController::class, 'destroyAddress'])->name('account.addresses.destroy');
     Route::get('/account/wishlist', [WishlistController::class, 'index'])->name('account.wishlist');
-    Route::post('/wishlist', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::post('/wishlist', [WishlistController::class, 'toggle'])->middleware('throttle:30,1')->name('wishlist.toggle');
     Route::post('/product/{slug}/reviews', [CatalogueController::class, 'storeReview'])->name('catalogue.reviews.store');
 
     Route::get('/account/orders', [OrderController::class, 'index'])->name('account.orders');

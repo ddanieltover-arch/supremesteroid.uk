@@ -108,7 +108,7 @@ class OrderCreationService
                 $orderNumber = $this->generateSequentialOrderNumber();
 
                 $shippingDest = $checkoutSnapshot['shipping_destination'];
-                $shippingAddress = Address::create([
+                $shippingAddress = Address::forceCreate([
                     'user_id' => $user->id,
                     'type' => 'shipping',
                     'full_name' => $shippingDest['full_name'],
@@ -122,7 +122,7 @@ class OrderCreationService
                 ]);
 
                 $billingDest = $checkoutSnapshot['billing_destination'] ?? $shippingDest;
-                $billingAddress = Address::create([
+                $billingAddress = Address::forceCreate([
                     'user_id' => $user->id,
                     'type' => 'billing',
                     'full_name' => $billingDest['full_name'],

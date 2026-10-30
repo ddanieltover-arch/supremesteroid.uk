@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\PaymentResource;
+use App\Filament\Resources\ProductResource;
 use App\Services\Reporting\AdminMetricsService;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class AdminStatsOverview extends BaseWidget
 {
+    protected static ?int $sort = 1;
+
     protected ?string $pollingInterval = '30s';
+
+    protected int | string | array $columnSpan = 'full';
 
     protected function getStats(): array
     {
-        $metricsService = app(AdminMetricsService::class);
-        $metrics = $metricsService->getMetrics();
+        $metrics = app(AdminMetricsService::class)->getMetrics();
 
         return [
             Stat::make('Orders today', (string) $metrics['orders_today'])
@@ -26,7 +31,14 @@ class AdminStatsOverview extends BaseWidget
             Stat::make('Pending payments', (string) $metrics['pending_payments'])
                 ->description('Awaiting transfer or transaction reference')
                 ->descriptionIcon('heroicon-m-clock')
-                ->color('warning'),
+                ->color('warning')
+                ->url(PaymentResource::getUrl('index', ['activeTab' => 'pending'])),
+
+            Stat::make('Payments under review', (string) $metrics['payments_under_review'])
+                ->description('Submissions ready for staff approval')
+                ->descriptionIcon('heroicon-m-check-badge')
+                ->color('info')
+                ->url(PaymentResource::getUrl('index', ['activeTab' => 'needs_approval'])),
 
             Stat::make('Awaiting fulfilment', (string) $metrics['paid_awaiting_fulfillment'])
                 ->description('Paid or processing, not yet shipped')
@@ -38,15 +50,16 @@ class AdminStatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color('danger'),
 
-            Stat::make('Paid revenue', '£' . $metrics['revenue_paid_amount'])
+            Stat::make('Compliance backlog', (string) $metrics['compliance_review_backlog'])
+                ->description('Products needing compliance review')
+                ->descriptionIcon('heroicon-m-shield-exclamation')
+                ->color('warning')
+                ->url(ProductResource::getUrl('index')),
+
+            Stat::make('Paid revenue', '£'.$metrics['revenue_paid_amount'])
                 ->description('Sum of verified payments')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
-
-            Stat::make('Payments under review', (string) $metrics['payments_under_review'])
-                ->description('Submissions ready for staff approval')
-                ->descriptionIcon('heroicon-m-check-badge')
-                ->color('info'),
         ];
     }
 }

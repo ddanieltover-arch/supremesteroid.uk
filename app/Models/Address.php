@@ -14,7 +14,6 @@ class Address extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'user_id',
         'type', // shipping or billing
         'full_name',
         'address_line_1',

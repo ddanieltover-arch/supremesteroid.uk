@@ -179,6 +179,10 @@ class OrderController extends Controller
         if ($request->user()) {
             $this->authorize('submitPaymentProof', $order);
             $this->authorize('submitProof', $payment);
+        } else {
+            // Guest checkout: session ownership is enforced by ownedOrder();
+            // still apply the same status gate as OrderPolicy::submitPaymentProof.
+            abort_unless($order->acceptsPaymentProof(), 403);
         }
 
         return [$order, $payment];

@@ -30,11 +30,20 @@ This document lists configuration by **name only**. Do not commit secret values.
 
 Future work that should not stay on `sync`: bulk customer email, image derivatives, large exports, and any job that must survive a container restart.
 
-## Mail
+## Mail (Resend)
 
-`MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME` stay in the environment.
+Production uses Resend:
+
+- `MAIL_MAILER=resend`
+- `RESEND_API_KEY` (Vercel secret)
+- `MAIL_FROM_ADDRESS=info@supremesteroid.uk`
+- `MAIL_FROM_NAME="Supreme Steroids"`
+
+Verify the `supremesteroid.uk` domain in the Resend dashboard (SPF + DKIM) before sending. SMTP keys (`MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`) are only needed if you temporarily set `MAIL_MAILER=smtp`.
 
 Application mail covers order placement, payment submission acknowledgement, payment approval/rejection, and shipping. Password reset and email verification use framework notifications once mail is configured. Tests use `MAIL_MAILER=array` and must not send real email.
+
+Smoke-test after deploy: place a test order → submit payment proof → approve → mark shipped; confirm four deliveries in the Resend dashboard. Also trigger password reset and email verification once each.
 
 ## Cron
 
@@ -60,7 +69,7 @@ Responses set `nosniff`, `DENY` framing, referrer policy, permissions policy, an
 
 `CRON_SECRET`
 
-`MAIL_MAILER` `MAIL_HOST` `MAIL_PORT` `MAIL_USERNAME` `MAIL_PASSWORD` `MAIL_FROM_ADDRESS` `MAIL_FROM_NAME`
+`MAIL_MAILER` `RESEND_API_KEY` `MAIL_FROM_ADDRESS` `MAIL_FROM_NAME` (`MAIL_HOST` `MAIL_PORT` `MAIL_USERNAME` `MAIL_PASSWORD` only if using SMTP)
 
 `APP_KEY` must be generated once and reused. Changing it invalidates encrypted cookies, sessions, and encrypted columns. Never commit it.
 
@@ -90,10 +99,13 @@ Use a test product, test customer, and test payment data. Do not use a real cust
 10. Confirm a payment record exists
 11. Submit a payment proof using test data
 12. Confirm an admin can review that proof
-13. Confirm another customer cannot open the order or proof
-14. Confirm inventory is reserved
-15. Run `inventory:release-expired` against expired test reservations
-16. Confirm the cron endpoint rejects a bad secret
-17. Confirm the cron endpoint accepts the correct secret
-18. Check the mobile layout
-19. Confirm the browser console has no critical errors
+13. Confirm Resend delivered order-placed and payment-submission emails
+14. Approve the payment and mark the order shipped; confirm those emails in Resend
+15. Confirm another customer cannot open the order or proof
+16. Confirm inventory is reserved
+17. Run `inventory:release-expired` against expired test reservations
+18. Confirm the cron endpoint rejects a bad secret
+19. Confirm the cron endpoint accepts the correct secret
+20. Smoke-test password reset and email verification once each
+21. Check the mobile layout
+22. Confirm the browser console has no critical errors

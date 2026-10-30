@@ -18,6 +18,21 @@ type Payment = {
 
 type TimelineItem = { key: string; label: string; reached: boolean; at?: string | null };
 
+function safeTrackingHref(url: string | null | undefined): string | null {
+  if (!url) {
+    return null;
+  }
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+      return parsed.toString();
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
 type Order = {
   id: string;
   order_number: string;
@@ -107,11 +122,19 @@ export default function OrdersShow({ order, paymentInstructions }: { order: Orde
               <p className="mt-2 text-sm text-slate-600">
                 {order.tracking.carrier ? `${order.tracking.carrier}: ` : ''}
                 {order.tracking.number}
-                {order.tracking.url ? (
-                  <a href={order.tracking.url} className="mt-2 block text-blue-600" rel="noreferrer">
-                    Track shipment
-                  </a>
-                ) : null}
+                {(() => {
+                  const trackingHref = safeTrackingHref(order.tracking.url);
+                  if (trackingHref) {
+                    return (
+                      <a href={trackingHref} className="mt-2 block text-blue-600" rel="noopener noreferrer" target="_blank">
+                        Track shipment
+                      </a>
+                    );
+                  }
+                  return order.tracking.url ? (
+                    <span className="mt-2 block text-slate-500">Tracking link unavailable</span>
+                  ) : null;
+                })()}
               </p>
             ) : (
               <p className="mt-2 text-sm text-slate-500">{order.tracking?.message}</p>

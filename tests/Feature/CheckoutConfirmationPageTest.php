@@ -158,9 +158,14 @@ class CheckoutConfirmationPageTest extends TestCase
         app(CustomerMailer::class)->orderPlaced($order);
 
         Mail::assertSent(CustomerMessage::class, function (CustomerMessage $mail) use ($order) {
+            $combined = strtolower($mail->bodyText.' '.implode(' ', $mail->bodyLines));
+
             return str_contains($mail->subjectLine, $order->order_number)
-                && str_contains($mail->bodyText, 'pending review')
-                && ! str_contains(strtolower($mail->bodyText), 'has been paid');
+                && str_contains($combined, 'pending review')
+                && ! str_contains($combined, 'has been paid')
+                && $mail->orderNumber === $order->order_number
+                && is_string($mail->actionUrl)
+                && str_contains($mail->actionUrl, '/orders/'.$order->id);
         });
     }
 

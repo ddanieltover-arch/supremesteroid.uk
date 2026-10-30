@@ -39,7 +39,7 @@ class GuestCustomerService
             return $existing;
         }
 
-        return User::query()->create([
+        return User::forceCreate([
             'name' => $name,
             'email' => $email,
             'password' => Hash::make(Str::password(32)),

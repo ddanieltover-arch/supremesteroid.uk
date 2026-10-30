@@ -119,7 +119,7 @@ class CartPipelineTest extends TestCase
         $guestCart = $this->cartService->getOrCreateCart(user: null, sessionId: $guestSessionId);
         $this->cartService->addItem($guestCart, $product, null, 3, null, $guestSessionId);
 
-        $user = User::create([
+        $user = User::forceCreate([
             'name' => 'John Customer',
             'email' => 'john@customer.test',
             'password' => bcrypt('Secret123!'),
@@ -142,7 +142,7 @@ class CartPipelineTest extends TestCase
 
     public function test_authenticated_cart_persists_on_the_server(): void
     {
-        $user = User::create([
+        $user = User::forceCreate([
             'name' => 'Persisted Customer',
             'email' => 'persist@customer.test',
             'password' => bcrypt('Secret123!'),
@@ -171,13 +171,13 @@ class CartPipelineTest extends TestCase
 
     public function test_unauthorized_user_cannot_mutate_another_customers_cart(): void
     {
-        $owner = User::create([
+        $owner = User::forceCreate([
             'name' => 'Owner',
             'email' => 'owner@customer.test',
             'password' => bcrypt('Secret123!'),
             'role' => 'CUSTOMER',
         ]);
-        $intruder = User::create([
+        $intruder = User::forceCreate([
             'name' => 'Intruder',
             'email' => 'intruder@customer.test',
             'password' => bcrypt('Secret123!'),

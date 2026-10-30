@@ -35,7 +35,7 @@ trait CreatesCatalogueFixtures
 
     protected function makeCustomer(string $email = 'alice@customer.test', string $name = 'Alice Customer'): User
     {
-        return User::create([
+        return User::forceCreate([
             'name' => $name,
             'email' => $email,
             'password' => bcrypt('Secret123!'),
@@ -46,7 +46,7 @@ trait CreatesCatalogueFixtures
 
     protected function makeAdmin(string $email = 'admin@supreme.test'): User
     {
-        return User::create([
+        return User::forceCreate([
             'name' => 'Admin Boss',
             'email' => $email,
             'password' => bcrypt('AdminSecret123!'),

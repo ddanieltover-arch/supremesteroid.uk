@@ -104,7 +104,7 @@ class StorefrontQualityAssuranceTest extends TestCase
     {
         $owner = $this->makeCustomer('addr-owner@test.com', 'Owner');
         $intruder = $this->makeCustomer('addr-intruder@test.com', 'Intruder');
-        $address = Address::query()->create([
+        $address = Address::forceCreate([
             'user_id' => $owner->id,
             'type' => 'shipping',
             'full_name' => 'Owner',

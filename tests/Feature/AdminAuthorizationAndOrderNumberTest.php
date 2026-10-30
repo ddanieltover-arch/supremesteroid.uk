@@ -48,7 +48,7 @@ class AdminAuthorizationAndOrderNumberTest extends TestCase
 
     public function test_staff_cannot_publish_products_without_catalogue_permission(): void
     {
-        $staff = User::create([
+        $staff = User::forceCreate([
             'name' => 'Staffer',
             'email' => 'staff-auth@test.com',
             'password' => bcrypt('Secret123!'),

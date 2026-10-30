@@ -59,6 +59,14 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function acceptsPaymentProof(): bool
+    {
+        return in_array($this->status, [
+            OrderStatus::PENDING_PAYMENT,
+            OrderStatus::PAYMENT_REVIEW,
+        ], true);
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);

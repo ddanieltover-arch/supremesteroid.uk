@@ -19,7 +19,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->trustProxies(at: '*');
+        $trustedProxies = env('TRUSTED_PROXIES', '*');
+        if ($trustedProxies === null || $trustedProxies === '' || $trustedProxies === '*') {
+            $middleware->trustProxies(at: '*');
+        } else {
+            $middleware->trustProxies(at: array_values(array_filter(array_map(
+                static fn (string $value): string => trim($value),
+                explode(',', (string) $trustedProxies),
+            ), static fn (string $value): bool => $value !== '')));
+        }
 
         $middleware->append([
             SecurityHeaders::class,

@@ -89,7 +89,7 @@ class CheckoutJourneyTest extends TestCase
         $owner = $this->makeCustomer('owner@test.com', 'Owner');
         $intruder = $this->makeCustomer('intruder@test.com', 'Intruder');
         $product = $this->makeProduct();
-        $address = Address::query()->create([
+        $address = Address::forceCreate([
             'user_id' => $owner->id,
             'type' => 'shipping',
             'full_name' => 'Owner',

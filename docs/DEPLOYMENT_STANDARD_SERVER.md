@@ -69,9 +69,11 @@ Do not use `file` for sessions or cache when more than one app instance is runni
 
 Later candidates for a queue: bulk customer email, image derivatives, and large exports. Do not claim those run in the background now.
 
-### Mail
+### Mail (Resend)
 
-`MAIL_MAILER` `MAIL_HOST` `MAIL_PORT` `MAIL_USERNAME` `MAIL_PASSWORD` `MAIL_FROM_ADDRESS` `MAIL_FROM_NAME`
+`MAIL_MAILER=resend` `RESEND_API_KEY` `MAIL_FROM_ADDRESS` `MAIL_FROM_NAME`
+
+Verify `supremesteroid.uk` in Resend (SPF/DKIM). SMTP host/port/username/password are only required if `MAIL_MAILER=smtp`.
 
 Covers order placement, payment acknowledgement, approval/rejection, shipping, password reset, and email verification. Tests use `MAIL_MAILER=array`.
 
@@ -107,7 +109,9 @@ No analytics provider is configured. Do not add a vendor key until one is chosen
 
 ### Security
 
-`SESSION_ENCRYPT` `SESSION_SECURE_COOKIE` `BCRYPT_ROUNDS`
+`SESSION_ENCRYPT` `SESSION_SECURE_COOKIE` `BCRYPT_ROUNDS` `HSTS_ENABLED` `TRUSTED_PROXIES`
+
+For FrankenPHP behind local Caddy, set `TRUSTED_PROXIES=127.0.0.1`. Do not leave the app reachable without a reverse proxy while `TRUSTED_PROXIES=*`. Production defaults enable secure cookies and HSTS when those env vars are unset.
 
 ## Filesystem
 

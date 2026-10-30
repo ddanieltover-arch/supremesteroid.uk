@@ -97,6 +97,46 @@ class AdminMetricsService
             'compliance_review_backlog' => $complianceReviewBacklog,
             'revenue_paid_amount' => number_format($revenuePence / 100, 2, '.', ''),
             'recent_payment_submissions' => $recentSubmissions,
+            'orders_last_14_days' => $this->ordersPerDay(14),
+            'revenue_last_14_days' => $this->revenuePerDay(14),
         ];
+    }
+
+    /**
+     * @return array{labels: list<string>, data: list<int>}
+     */
+    public function ordersPerDay(int $days = 14): array
+    {
+        $labels = [];
+        $data = [];
+
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $date = now()->subDays($i)->startOfDay();
+            $labels[] = $date->format('M j');
+            $data[] = Order::query()->whereDate('created_at', $date->toDateString())->count();
+        }
+
+        return ['labels' => $labels, 'data' => $data];
+    }
+
+    /**
+     * @return array{labels: list<string>, data: list<float>}
+     */
+    public function revenuePerDay(int $days = 14): array
+    {
+        $labels = [];
+        $data = [];
+
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $date = now()->subDays($i)->startOfDay();
+            $labels[] = $date->format('M j');
+            $sum = (float) Payment::query()
+                ->where('status', PaymentStatus::PAID)
+                ->whereDate('paid_at', $date->toDateString())
+                ->sum('amount');
+            $data[] = round($sum, 2);
+        }
+
+        return ['labels' => $labels, 'data' => $data];
     }
 }

@@ -73,7 +73,13 @@ class CustomerResource extends Resource
                     ->sortable(),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make(),
+                \Filament\Actions\EditAction::make()
+                    ->using(function (User $record, array $data): User {
+                        // Privilege fields (is_active) are not mass-assignable.
+                        $record->forceFill($data)->save();
+
+                        return $record;
+                    }),
             ]);
     }
 

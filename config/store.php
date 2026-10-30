@@ -43,7 +43,10 @@ return [
 
     'cron_secret' => env('CRON_SECRET'),
 
-    'hsts_enabled' => filter_var(env('HSTS_ENABLED', false), FILTER_VALIDATE_BOOL),
+    'hsts_enabled' => filter_var(
+        env('HSTS_ENABLED', env('APP_ENV') === 'production' ? true : false),
+        FILTER_VALIDATE_BOOL
+    ),
 
     /*
     |--------------------------------------------------------------------------

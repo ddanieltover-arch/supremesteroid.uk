@@ -34,41 +34,36 @@ class InitialFoundationSeeder extends Seeder
             }
         }
 
-        User::updateOrCreate(
-            ['email' => $adminEmail],
+        foreach ([
             [
+                'email' => $adminEmail,
                 'name' => 'Supreme Super Admin',
                 'password' => Hash::make('AdminPass123!'),
                 'role' => UserRole::SUPER_ADMIN,
                 'phone' => '+442080000001',
-                'is_active' => true,
-                'email_verified_at' => now(),
-            ]
-        );
-
-        User::updateOrCreate(
-            ['email' => 'staff@supremesteroid.uk'],
+            ],
             [
+                'email' => 'staff@supremesteroid.uk',
                 'name' => 'Fulfillment Staff',
                 'password' => Hash::make('StaffPass123!'),
                 'role' => UserRole::STAFF,
                 'phone' => '+442080000002',
-                'is_active' => true,
-                'email_verified_at' => now(),
-            ]
-        );
-
-        User::updateOrCreate(
-            ['email' => 'customer@supremesteroid.uk'],
+            ],
             [
+                'email' => 'customer@supremesteroid.uk',
                 'name' => 'Verified Retail Customer',
                 'password' => Hash::make('CustomerPass123!'),
                 'role' => UserRole::CUSTOMER,
                 'phone' => '+447911123456',
+            ],
+        ] as $account) {
+            $user = User::query()->firstOrNew(['email' => $account['email']]);
+            $user->forceFill([
+                ...$account,
                 'is_active' => true,
                 'email_verified_at' => now(),
-            ]
-        );
+            ])->save();
+        }
 
         // 2. Shipping Zones, Methods & Threshold Rules
         $ukZone = ShippingZone::updateOrCreate(

@@ -50,21 +50,21 @@ class CheckoutPipelineTest extends TestCase
             'is_visible' => true,
         ]);
 
-        $this->customerA = User::create([
+        $this->customerA = User::forceCreate([
             'name' => 'Alice Customer',
             'email' => 'alice@customer.test',
             'password' => bcrypt('Secret123!'),
             'role' => 'CUSTOMER',
         ]);
 
-        $this->customerB = User::create([
+        $this->customerB = User::forceCreate([
             'name' => 'Bob Customer',
             'email' => 'bob@customer.test',
             'password' => bcrypt('Secret123!'),
             'role' => 'CUSTOMER',
         ]);
 
-        $this->adminUser = User::create([
+        $this->adminUser = User::forceCreate([
             'name' => 'Admin Boss',
             'email' => 'admin@supreme.test',
             'password' => bcrypt('AdminSecret123!'),

@@ -46,8 +46,7 @@ class OrderPolicy
             return false;
         }
 
-        // Only allowed while awaiting payment or re-submitting under review
-        return in_array($order->status->value, ['PENDING_PAYMENT', 'PAYMENT_REVIEW'], true);
+        return $order->acceptsPaymentProof();
     }
 
     public function viewAdminNotes(User $user, Order $order): bool
