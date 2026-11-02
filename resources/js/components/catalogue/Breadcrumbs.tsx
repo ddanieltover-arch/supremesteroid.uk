@@ -16,7 +16,7 @@ export function Breadcrumbs({ items }: { items?: Array<{ name: string; url: stri
                 {crumb.name}
               </span>
             ) : (
-              <Link href={crumb.url} className="hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-blue-600">
+              <Link href={crumb.url} prefetch="hover" cacheFor="2m" className="hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-blue-600">
                 {crumb.name}
               </Link>
             )}

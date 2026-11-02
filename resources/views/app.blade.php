@@ -8,9 +8,12 @@
     <title inertia>{{ config('store.name', 'Supreme Steroids') }}</title>
     <link rel="icon" type="image/png" href="/assets/branding/favicon.png">
     <link rel="apple-touch-icon" href="/assets/branding/favicon.png">
+    <link rel="preload" as="image" href="/assets/branding/supreme-steroids-logo.jpg" fetchpriority="high">
     <meta name="description" content="{{ config('store.tagline') ?: 'Premium lawful sports nutrition, wellness, and lab-tested formulations.' }}">
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.bunny.net">
+    <link rel="dns-prefetch" href="//images.unsplash.com">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
     @viteReactRefresh

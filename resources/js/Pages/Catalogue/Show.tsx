@@ -69,6 +69,7 @@ function buyNowInstantProps(product: ProductDetail, variantId: string, quantity:
   };
 
   return {
+    instant: true,
     component: 'Checkout/Index',
     pageProps: (_current: Record<string, unknown>, shared: Record<string, unknown>) => ({
       ...shared,

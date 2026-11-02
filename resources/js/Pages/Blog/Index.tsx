@@ -165,7 +165,7 @@ export default function BlogIndex({
                 key={post.id}
                 className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
               >
-                <Link href={`/blog/${post.slug}`} className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                <Link href={`/blog/${post.slug}`} prefetch="hover" cacheFor="2m" className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                   <img
                     src={post.featured_image_url || 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&auto=format&fit=crop&q=80'}
                     alt={post.title}
@@ -188,7 +188,7 @@ export default function BlogIndex({
                   </div>
 
                   <h3 className="mt-3 text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                    <Link href={`/blog/${post.slug}`} prefetch="hover" cacheFor="2m">{post.title}</Link>
                   </h3>
 
                   <p className="mt-2.5 flex-1 text-xs leading-relaxed text-slate-600 line-clamp-3">

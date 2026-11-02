@@ -9,6 +9,7 @@ use App\Services\Catalogue\SeoService;
 use App\Services\Content\BlogPostContentFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -23,45 +24,54 @@ class BlogController extends Controller
     public function index(Request $request): Response
     {
         $search = trim((string) ($request->query('q') ?? $request->query('search') ?? ''));
+        $page = (int) $request->query('page', 1);
 
-        $query = BlogPost::query()
-            ->where('is_published', true)
-            ->with('author')
-            ->orderByDesc('published_at');
+        $fetchListing = function () use ($search) {
+            $query = BlogPost::query()
+                ->where('is_published', true)
+                ->with('author')
+                ->orderByDesc('published_at');
 
-        if ($search !== '') {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('excerpt', 'like', "%{$search}%")
-                    ->orWhere('content', 'like', "%{$search}%");
-            });
-        }
+            if ($search !== '') {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('excerpt', 'like', "%{$search}%")
+                        ->orWhere('content', 'like', "%{$search}%");
+                });
+            }
 
-        $posts = $query->paginate(9)->withQueryString()
-            ->through(function (BlogPost $post) {
-                $wordCount = str_word_count(strip_tags((string) $post->content));
-                $readingTime = max(1, (int) ceil($wordCount / 200));
+            $posts = $query->paginate(9)->withQueryString()
+                ->through(function (BlogPost $post) {
+                    $wordCount = str_word_count(strip_tags((string) $post->content));
+                    $readingTime = max(1, (int) ceil($wordCount / 200));
 
-                return [
-                    'id' => $post->id,
-                    'title' => $post->title,
-                    'slug' => $post->slug,
-                    'excerpt' => $post->excerpt ?: Str::limit(strip_tags((string) $post->content), 200),
-                    'featured_image_url' => $post->featured_image_url,
-                    'published_at' => $post->published_at?->format('d M Y') ?? $post->created_at->format('d M Y'),
-                    'reading_time' => $readingTime . ' min read',
-                    'author' => $post->author?->name ?? 'Supreme Editorial Team',
-                ];
-            });
+                    return [
+                        'id' => $post->id,
+                        'title' => $post->title,
+                        'slug' => $post->slug,
+                        'excerpt' => $post->excerpt ?: Str::limit(strip_tags((string) $post->content), 200),
+                        'featured_image_url' => $post->featured_image_url,
+                        'published_at' => $post->published_at?->format('d M Y') ?? $post->created_at->format('d M Y'),
+                        'reading_time' => $readingTime . ' min read',
+                        'author' => $post->author?->name ?? 'Supreme Editorial Team',
+                    ];
+                });
 
-        $featured = null;
-        if ($posts->currentPage() === 1 && $posts->isNotEmpty()) {
-            $featured = $posts->items()[0];
-        }
+            $featured = null;
+            if ($posts->currentPage() === 1 && $posts->isNotEmpty()) {
+                $featured = $posts->items()[0];
+            }
+
+            return ['posts' => $posts, 'featured' => $featured];
+        };
+
+        $result = ($search === '' && $page === 1)
+            ? Cache::remember('blog.index.v2.page1', 300, $fetchListing)
+            : $fetchListing();
 
         return Inertia::render('Blog/Index', [
-            'posts' => $posts,
-            'featured' => $featured,
+            'posts' => $result['posts'],
+            'featured' => $result['featured'],
             'filters' => [
                 'search' => $search,
             ],
@@ -76,53 +86,69 @@ class BlogController extends Controller
 
     public function show(Request $request, string $slug): Response
     {
-        $post = BlogPost::query()
-            ->where('slug', $slug)
-            ->where('is_published', true)
-            ->with('author')
-            ->firstOrFail();
+        $cached = Cache::remember("blog.show.v2.{$slug}", 600, function () use ($slug) {
+            $post = BlogPost::query()
+                ->where('slug', $slug)
+                ->where('is_published', true)
+                ->with('author')
+                ->first();
 
-        $wordCount = str_word_count(strip_tags((string) $post->content));
-        $readingTime = max(1, (int) ceil($wordCount / 200));
+            if (! $post) {
+                return null;
+            }
 
-        $recentPosts = BlogPost::query()
-            ->where('is_published', true)
-            ->where('id', '!=', $post->id)
-            ->orderByDesc('published_at')
-            ->limit(3)
-            ->get(['id', 'title', 'slug', 'excerpt', 'featured_image_url', 'published_at'])
-            ->map(fn (BlogPost $p) => [
-                'id' => $p->id,
-                'title' => $p->title,
-                'slug' => $p->slug,
-                'excerpt' => Str::limit(strip_tags((string) $p->excerpt ?: (string) $p->content), 120),
-                'featured_image_url' => $p->featured_image_url,
-                'published_at' => $p->published_at?->format('d M Y'),
-            ]);
+            $wordCount = str_word_count(strip_tags((string) $post->content));
+            $readingTime = max(1, (int) ceil($wordCount / 200));
 
-        $cleanContent = $this->contentFormatter->format((string) $post->content);
+            $recentPosts = BlogPost::query()
+                ->where('is_published', true)
+                ->where('id', '!=', $post->id)
+                ->orderByDesc('published_at')
+                ->limit(3)
+                ->get(['id', 'title', 'slug', 'excerpt', 'featured_image_url', 'published_at'])
+                ->map(fn (BlogPost $p) => [
+                    'id' => $p->id,
+                    'title' => $p->title,
+                    'slug' => $p->slug,
+                    'excerpt' => Str::limit(strip_tags((string) $p->excerpt ?: (string) $p->content), 120),
+                    'featured_image_url' => $p->featured_image_url,
+                    'published_at' => $p->published_at?->format('d M Y'),
+                ]);
+
+            $cleanContent = $this->contentFormatter->format((string) $post->content);
+
+            return [
+                'post' => [
+                    'id' => $post->id,
+                    'title' => $post->title,
+                    'slug' => $post->slug,
+                    'content' => $cleanContent,
+                    'excerpt' => $post->excerpt,
+                    'featured_image_url' => $post->featured_image_url,
+                    'published_at' => $post->published_at?->format('F d, Y') ?? $post->created_at->format('F d, Y'),
+                    'reading_time' => $readingTime . ' min read',
+                    'word_count' => $wordCount,
+                    'author' => $post->author?->name ?? 'Supreme Editorial Team',
+                ],
+                'recent_posts' => $recentPosts,
+                'raw_content' => (string) $post->content,
+            ];
+        });
+
+        abort_unless($cached !== null, 404);
+
+        $post = $cached['post'];
 
         return Inertia::render('Blog/Show', [
-            'post' => [
-                'id' => $post->id,
-                'title' => $post->title,
-                'slug' => $post->slug,
-                'content' => $cleanContent,
-                'excerpt' => $post->excerpt,
-                'featured_image_url' => $post->featured_image_url,
-                'published_at' => $post->published_at?->format('F d, Y') ?? $post->created_at->format('F d, Y'),
-                'reading_time' => $readingTime . ' min read',
-                'word_count' => $wordCount,
-                'author' => $post->author?->name ?? 'Supreme Editorial Team',
-            ],
-            'recent_posts' => $recentPosts,
+            'post' => $post,
+            'recent_posts' => $cached['recent_posts'],
             'seo' => $this->seoService->forPage(
                 $request,
-                $post->title . ' | Supreme Steroids UK',
-                $post->excerpt ?: Str::limit(strip_tags((string) $post->content), 160),
+                $post['title'] . ' | Supreme Steroids UK',
+                $post['excerpt'] ?: Str::limit(strip_tags($cached['raw_content']), 160),
                 [
-                    'canonical' => url('/blog/' . $post->slug),
-                    'og_image' => $post->featured_image_url,
+                    'canonical' => url('/blog/' . $post['slug']),
+                    'og_image' => $post['featured_image_url'],
                 ]
             ),
         ]);

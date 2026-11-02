@@ -92,38 +92,58 @@ class CatalogueController extends Controller
 
     public function show(Request $request, string $slug): Response
     {
-        $product = Product::query()
-            ->purchasable()
-            ->with([
-                'brand',
-                'category.parent',
-                'images',
-                'attributes',
-                'variants.inventory',
-                'variants.attributes',
-                'inventory',
-                'seoMetadata',
-                'content',
-                'reviews.user',
-            ])
-            ->where('slug', $slug)
-            ->firstOrFail();
+        $cached = Cache::remember("catalogue.product.detail.v2.{$slug}", 300, function () use ($slug) {
+            $product = Product::query()
+                ->purchasable()
+                ->with([
+                    'brand',
+                    'category.parent',
+                    'images',
+                    'attributes',
+                    'variants.inventory',
+                    'variants.attributes',
+                    'inventory',
+                    'seoMetadata',
+                    'content',
+                    'reviews.user',
+                ])
+                ->where('slug', $slug)
+                ->first();
 
-        $this->authorize('view', $product);
+            if (! $product) {
+                return null;
+            }
 
-        $payload = (new ProductDetailResource($product))->resolve();
-        $payload['shipping_methods'] = $this->shippingEngine->calculateRates('0.00', 'GB')->values();
-        $payload['breadcrumbs'] = $this->productBreadcrumbs($product);
-        $payload['structured_data'] = [
-            $this->structuredData->forProduct($product),
-            $this->structuredData->breadcrumbs($payload['breadcrumbs']),
-        ];
+            $payload = (new ProductDetailResource($product))->resolve();
+            $payload['shipping_methods'] = Cache::remember('shipping.rates.gb.zero', 600, fn () => $this->shippingEngine->calculateRates('0.00', 'GB')->values());
+            $payload['breadcrumbs'] = $this->productBreadcrumbs($product);
+            $payload['structured_data'] = [
+                $this->structuredData->forProduct($product),
+                $this->structuredData->breadcrumbs($payload['breadcrumbs']),
+            ];
+
+            return [
+                'payload' => $payload,
+                'name' => $product->name,
+                'description' => (string) ($product->short_description ?: $product->description ?: $product->name),
+                'og_image' => $product->images->firstWhere('is_primary', true)?->publicUrl()
+                    ?? $product->images->first()?->publicUrl(),
+            ];
+        });
+
+        if (! $cached) {
+            abort(404);
+        }
 
         return Inertia::render('Catalogue/Show', [
-            'product' => $payload,
+            'product' => $cached['payload'],
             // Related rails are deferred so Instant Visits get the core product
             // immediately; related cards resolve after first paint.
-            'related_groups' => Inertia::defer(function () use ($product) {
+            'related_groups' => Inertia::defer(function () use ($slug) {
+                $product = Product::query()->purchasable()->where('slug', $slug)->first();
+                if (! $product) {
+                    return ['related' => [], 'alternative' => [], 'complementary' => []];
+                }
                 $grouped = $this->relatedProducts->grouped($product, 4);
 
                 return [
@@ -138,13 +158,11 @@ class CatalogueController extends Controller
             'preview' => false,
             'seo' => $this->seoService->forPage(
                 $request,
-                $product->name,
-                (string) ($product->short_description ?: $product->description ?: $product->name),
+                $cached['name'],
+                $cached['description'],
                 [
-                    'og_image' => $product->images->firstWhere('is_primary', true)?->publicUrl()
-                        ?? $product->images->first()?->publicUrl(),
-                ],
-                $product
+                    'og_image' => $cached['og_image'],
+                ]
             ),
         ]);
     }
@@ -226,55 +244,60 @@ class CatalogueController extends Controller
             return response()->json(['results' => []]);
         }
 
-        $products = Product::query()
-            ->purchasable()
-            ->searchable($term)
-            ->with(['brand', 'category', 'images', 'inventory'])
-            ->withCount(['variants as variant_count' => fn ($query) => $query->where('is_active', true)])
-            ->limit(6)
-            ->get();
+        $cacheKey = 'catalogue.suggest.v1.' . md5(mb_strtolower($term));
+        $data = Cache::remember($cacheKey, 180, function () use ($term) {
+            $products = Product::query()
+                ->purchasable()
+                ->searchable($term)
+                ->with(['brand', 'category', 'images', 'inventory'])
+                ->withCount(['variants as variant_count' => fn ($query) => $query->where('is_active', true)])
+                ->limit(6)
+                ->get();
 
-        $brands = Brand::query()
-            ->where('is_active', true)
-            ->where('name', 'like', '%'.$term.'%')
-            ->orderBy('name')
-            ->limit(4)
-            ->get(['id', 'name', 'slug']);
+            $brands = Brand::query()
+                ->where('is_active', true)
+                ->where('name', 'like', '%'.$term.'%')
+                ->orderBy('name')
+                ->limit(4)
+                ->get(['id', 'name', 'slug']);
 
-        $categories = Category::query()
-            ->where('is_visible', true)
-            ->where('name', 'like', '%'.$term.'%')
-            ->orderBy('name')
-            ->limit(4)
-            ->get(['id', 'name', 'slug']);
+            $categories = Category::query()
+                ->where('is_visible', true)
+                ->where('name', 'like', '%'.$term.'%')
+                ->orderBy('name')
+                ->limit(4)
+                ->get(['id', 'name', 'slug']);
 
-        $productPayload = $products->map(fn (Product $product) => [
-            'id' => $product->id,
-            'name' => $product->name,
-            'slug' => $product->slug,
-            'sku' => $product->sku,
-            'url' => route('catalogue.show', $product->slug),
-            'brand' => $product->brand?->name,
-            'image_url' => $product->images->firstWhere('is_primary', true)?->publicUrl()
-                ?? $product->images->first()?->publicUrl(),
-            'pricing' => (new ProductCardResource($product))->resolve()['pricing'] ?? null,
-        ]);
+            $productPayload = $products->map(fn (Product $product) => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'sku' => $product->sku,
+                'url' => route('catalogue.show', $product->slug),
+                'brand' => $product->brand?->name,
+                'image_url' => $product->images->firstWhere('is_primary', true)?->publicUrl()
+                    ?? $product->images->first()?->publicUrl(),
+                'pricing' => (new ProductCardResource($product))->resolve()['pricing'] ?? null,
+            ]);
 
-        return response()->json([
-            'results' => $productPayload,
-            'products' => $productPayload,
-            'brands' => $brands->map(fn (Brand $brand) => [
-                'id' => $brand->id,
-                'name' => $brand->name,
-                'url' => route('brand.show', $brand->slug),
-            ]),
-            'categories' => $categories->map(fn (Category $category) => [
-                'id' => $category->id,
-                'name' => $category->name,
-                'url' => route('category.show', $category->slug),
-            ]),
-            'view_all' => route('search', ['q' => $term]),
-        ]);
+            return [
+                'results' => $productPayload,
+                'products' => $productPayload,
+                'brands' => $brands->map(fn (Brand $brand) => [
+                    'id' => $brand->id,
+                    'name' => $brand->name,
+                    'url' => route('brand.show', $brand->slug),
+                ]),
+                'categories' => $categories->map(fn (Category $category) => [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'url' => route('category.show', $category->slug),
+                ]),
+                'view_all' => route('search', ['q' => $term]),
+            ];
+        });
+
+        return response()->json($data);
     }
 
     public function quickView(string $slug): JsonResponse
@@ -317,12 +340,14 @@ class CatalogueController extends Controller
 
     public function navigation(): JsonResponse
     {
-        return response()->json($this->discovery->navigation());
+        $data = Cache::remember('catalogue.nav.v2', 300, fn () => $this->discovery->navigation());
+        return response()->json($data);
     }
 
     public function navigationHighlights(): JsonResponse
     {
-        return response()->json($this->discovery->navigationHighlights());
+        $data = Cache::remember('catalogue.nav.highlights.v2', 300, fn () => $this->discovery->navigationHighlights());
+        return response()->json($data);
     }
 
     public function compare(Request $request): Response
@@ -482,9 +507,20 @@ class CatalogueController extends Controller
             default => $query->orderByDesc('is_featured')->orderBy('sort_order')->orderByDesc('created_at'),
         };
 
-        $facetQuery = (clone $query)->reorder();
-        $visibleCategoryIds = (clone $facetQuery)->distinct()->pluck('category_id')->filter();
-        $visibleBrandIds = (clone $facetQuery)->distinct()->pluck('brand_id')->filter();
+        $isDefaultListing = empty($search) && empty($categorySlug) && empty($brandSlug) && empty($minPrice) && empty($maxPrice) && empty($attributes) && empty($collection) && empty($classification) && empty($availability);
+
+        if ($isDefaultListing) {
+            $visibleCategoryIds = Cache::remember('catalogue.facets.default_categories.v1', 300, fn () =>
+                Product::query()->purchasable()->distinct()->pluck('category_id')->filter()
+            );
+            $visibleBrandIds = Cache::remember('catalogue.facets.default_brands.v1', 300, fn () =>
+                Product::query()->purchasable()->distinct()->pluck('brand_id')->filter()
+            );
+        } else {
+            $facetQuery = (clone $query)->reorder();
+            $visibleCategoryIds = (clone $facetQuery)->distinct()->pluck('category_id')->filter();
+            $visibleBrandIds = (clone $facetQuery)->distinct()->pluck('brand_id')->filter();
+        }
 
         $perPage = (int) config('store.catalogue.products_per_page', 30);
         $products = $query->paginate($perPage)->withQueryString()

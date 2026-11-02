@@ -62,33 +62,33 @@ export function Footer() {
           <div>
             <h2 className="text-sm font-semibold text-slate-900">Shop</h2>
             <ul className="mt-3 space-y-2">
-              <li><Link href="/shop" className="hover:text-blue-600">Catalogue</Link></li>
-              <li><Link href="/shop?collection=featured" className="hover:text-blue-600">Featured</Link></li>
-              <li><Link href="/shop?collection=new" className="hover:text-blue-600">New arrivals</Link></li>
-              <li><Link href="/about-us" className="hover:text-blue-600">About Us</Link></li>
+              <li><Link href="/shop" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">Catalogue</Link></li>
+              <li><Link href="/shop?collection=featured" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">Featured</Link></li>
+              <li><Link href="/shop?collection=new" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">New arrivals</Link></li>
+              <li><Link href="/about-us" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">About Us</Link></li>
             </ul>
           </div>
 
           <div>
             <h2 className="text-sm font-semibold text-slate-900">Customer Service</h2>
             <ul className="mt-3 space-y-2">
-              <li><Link href="/contact-us" className="hover:text-blue-600">Contact Us</Link></li>
-              <li><Link href="/delivery-info" className="hover:text-blue-600">Delivery &amp; Shipping</Link></li>
-              <li><Link href="/returns-refunds" className="hover:text-blue-600">Returns &amp; Refunds</Link></li>
-              <li><Link href="/faq" className="hover:text-blue-600">FAQ</Link></li>
-              <li><Link href="/payment-methods" className="hover:text-blue-600">Payment Methods</Link></li>
-              <li><Link href="/lab-tests" className="hover:text-blue-600">Lab Tests &amp; Authenticity</Link></li>
-              <li><Link href="/reviews" className="hover:text-blue-600">Customer Reviews</Link></li>
+              <li><Link href="/contact-us" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">Contact Us</Link></li>
+              <li><Link href="/delivery-info" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">Delivery &amp; Shipping</Link></li>
+              <li><Link href="/returns-refunds" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">Returns &amp; Refunds</Link></li>
+              <li><Link href="/faq" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">FAQ</Link></li>
+              <li><Link href="/payment-methods" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">Payment Methods</Link></li>
+              <li><Link href="/lab-tests" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">Lab Tests &amp; Authenticity</Link></li>
+              <li><Link href="/reviews" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">Customer Reviews</Link></li>
             </ul>
           </div>
 
           <div>
             <h2 className="text-sm font-semibold text-slate-900">Guides & Articles</h2>
             <ul className="mt-3 space-y-2">
-              <li><Link href="/blog" className="hover:text-blue-600">Articles & Research</Link></li>
-              <li><Link href="/bpc-157-uk" className="hover:text-blue-600">BPC 157 UK Guide</Link></li>
-              <li><Link href="/thebsl24" className="hover:text-blue-600">The BSL 24 Partnership</Link></li>
-              <li><Link href="/xmas-updates" className="hover:text-blue-600">Holiday Updates</Link></li>
+              <li><Link href="/blog" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">Articles & Research</Link></li>
+              <li><Link href="/bpc-157-uk" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">BPC 157 UK Guide</Link></li>
+              <li><Link href="/thebsl24" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">The BSL 24 Partnership</Link></li>
+              <li><Link href="/xmas-updates" prefetch="hover" cacheFor="2m" className="hover:text-blue-600">Holiday Updates</Link></li>
             </ul>
           </div>
 
@@ -97,7 +97,7 @@ export function Footer() {
             <ul className="mt-3 space-y-2">
               {legal.map((item) => (
                 <li key={item.slug}>
-                  <Link href={item.url} className="hover:text-blue-600">{item.title}</Link>
+                  <Link href={item.url} prefetch="hover" cacheFor="2m" className="hover:text-blue-600">{item.title}</Link>
                 </li>
               ))}
             </ul>

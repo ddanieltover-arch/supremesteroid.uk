@@ -31,6 +31,9 @@ export function HeroSection({ hero }: { hero: HomepagePayload['hero'] }) {
           src={logoUrl}
           alt={storeName}
           className="h-20 w-auto max-w-[220px] object-contain sm:h-24 sm:max-w-[280px]"
+          fetchPriority="high"
+          loading="eager"
+          decoding="async"
         />
 
         <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-brand">
@@ -51,6 +54,8 @@ export function HeroSection({ hero }: { hero: HomepagePayload['hero'] }) {
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
             href={hero.primary_cta.url}
+            prefetch="hover"
+            cacheFor="2m"
             className={clsx(
               'inline-flex min-h-12 items-center justify-center rounded-md bg-brand px-6 text-base font-semibold text-white',
               'transition-colors duration-200 hover:bg-brand-dark',
@@ -61,6 +66,8 @@ export function HeroSection({ hero }: { hero: HomepagePayload['hero'] }) {
           </Link>
           <Link
             href={hero.secondary_cta.url}
+            prefetch="hover"
+            cacheFor="2m"
             className={clsx(
               'inline-flex min-h-12 items-center justify-center rounded-md border border-slate-300 bg-white px-6 text-base font-semibold text-slate-800',
               'transition-colors duration-200 hover:border-brand hover:text-brand',

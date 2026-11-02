@@ -54,6 +54,7 @@ function ImagePlaceholder({ label = 'Image unavailable' }: { label?: string }) {
 
 function productInstantProps(product: ProductCardType) {
   return {
+    instant: true,
     component: 'Catalogue/Show',
     pageProps: (_current: Record<string, unknown>, shared: Record<string, unknown>) => ({
       ...shared,
@@ -85,9 +86,8 @@ function productInstantProps(product: ProductCardType) {
 function productShowLinkProps(product: ProductCardType) {
   return {
     href: `/product/${product.slug}`,
-    // Listing hover-prefetch storms the server (full product show + shared props).
-    // Instant Visit pageProps still paint the product page immediately on click.
-    prefetch: false,
+    prefetch: 'hover' as const,
+    cacheFor: '1m',
     ...productInstantProps(product),
   };
 }
@@ -175,11 +175,25 @@ export function ProductCard({ product }: { product: ProductCardType }) {
   };
 
   const openProduct = () => {
-    router.visit(`/product/${product.slug}`, productInstantProps(product));
+    router.visit(`/product/${product.slug}`, {
+      ...productInstantProps(product),
+      preserveScroll: false,
+    });
+  };
+
+  const prefetchProduct = () => {
+    try {
+      router.prefetch(`/product/${product.slug}`, {}, { cacheFor: 60000 });
+    } catch {
+      // Ignore
+    }
   };
 
   return (
-    <article className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-colors duration-200 hover:border-blue-200 hover:shadow-lg">
+    <article
+      className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-colors duration-200 hover:border-blue-200 hover:shadow-lg"
+      onMouseEnter={prefetchProduct}
+    >
       <div className="relative shrink-0 overflow-hidden border-b border-slate-100 bg-white">
         <Link {...productShowLinkProps(product)} className="relative block aspect-square">
           {product.image_url && !imageFailed ? (
@@ -189,6 +203,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
               className="h-full w-full object-contain"
               loading="lazy"
               decoding="async"
+              sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
               onError={() => setImageFailed(true)}
             />
           ) : (

@@ -55,30 +55,30 @@ export function Header({ cartCount, wishlistCount = 0, onOpenCart, compact = fal
     <header className="h-16 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-3 sm:px-6 lg:px-8">
         <div className="flex min-w-0 shrink-0 items-center gap-3 lg:gap-8">
-          <Link href="/" className="flex min-w-0 items-center rounded-lg transition-opacity duration-200 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-brand">
-            <img src={logoUrl} alt={storeName} className="h-11 w-auto max-w-[140px] object-contain sm:max-w-[180px]" />
+          <Link href="/" prefetch="hover" cacheFor="2m" className="flex min-w-0 items-center rounded-lg transition-opacity duration-200 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-brand">
+            <img src={logoUrl} alt={storeName} className="h-11 w-auto max-w-[140px] object-contain sm:max-w-[180px]" fetchPriority="high" loading="eager" decoding="async" />
           </Link>
 
           {compact ? (
             <p className="hidden text-xs text-slate-500 lg:block">Secure checkout</p>
           ) : (
             <nav className="hidden items-center gap-0.5 text-xs font-bold uppercase tracking-wider lg:flex" aria-label="Primary">
-              <Link href="/" className={navLinkClass}>
+              <Link href="/" prefetch="hover" cacheFor="2m" className={navLinkClass}>
                 Home
               </Link>
-              <Link href="/shop" className={navLinkClass}>
+              <Link href="/shop" prefetch="hover" cacheFor="2m" className={navLinkClass}>
                 Shop
               </Link>
-              <Link href="/blog" className={navLinkClass}>
+              <Link href="/blog" prefetch="hover" cacheFor="2m" className={navLinkClass}>
                 Blog
               </Link>
-              <Link href="/faq" className={navLinkClass}>
+              <Link href="/faq" prefetch="hover" cacheFor="2m" className={navLinkClass}>
                 FAQ
               </Link>
-              <Link href="/about-us" className={navLinkClass}>
+              <Link href="/about-us" prefetch="hover" cacheFor="2m" className={navLinkClass}>
                 About Us
               </Link>
-              <Link href="/contact-us" className={navLinkClass}>
+              <Link href="/contact-us" prefetch="hover" cacheFor="2m" className={navLinkClass}>
                 Contact Us
               </Link>
             </nav>
@@ -87,7 +87,7 @@ export function Header({ cartCount, wishlistCount = 0, onOpenCart, compact = fal
 
         {compact ? (
           <div className="ml-auto flex shrink-0 items-center">
-            <Link href="/cart" className="rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors duration-200 hover:bg-slate-100 hover:text-brand">
+            <Link href="/cart" prefetch="hover" cacheFor="30s" className="rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors duration-200 hover:bg-slate-100 hover:text-brand">
               <span className="sm:hidden">Basket</span>
               <span className="hidden sm:inline">Return to cart</span>
             </Link>

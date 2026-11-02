@@ -46,7 +46,7 @@ export function HeaderSearch() {
           setOpen(true);
         })
         .finally(() => setLoading(false));
-    }, 200);
+    }, 120);
     return () => window.clearTimeout(handle);
   }, [searchForm.data.q]);
 

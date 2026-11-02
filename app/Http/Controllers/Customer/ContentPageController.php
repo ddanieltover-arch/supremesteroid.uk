@@ -9,6 +9,7 @@ use App\Services\Catalogue\SeoService;
 use App\Services\Content\BlogPostContentFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,27 +21,41 @@ class ContentPageController extends Controller
 
     public function __invoke(Request $request, string $slug, SeoService $seo): Response
     {
-        $page = Page::query()->where('slug', $slug)->first();
-        $allowedConfig = collect(config('homepage.policy_pages', []))->pluck('slug')->all();
-        abort_unless(($page && $page->is_published) || in_array($slug, $allowedConfig, true), 404);
+        $cached = Cache::remember("content.page.v2.{$slug}", 600, function () use ($slug) {
+            $page = Page::query()->where('slug', $slug)->first();
+            $allowedConfig = collect(config('homepage.policy_pages', []))->pluck('slug')->all();
+            if (! (($page && $page->is_published) || in_array($slug, $allowedConfig, true))) {
+                return null;
+            }
 
-        $title = $page?->title ?? collect(config('homepage.policy_pages', []))->firstWhere('slug', $slug)['title'] ?? 'Information';
-        $hasApprovedContent = (bool) $page?->is_published && filled($page?->content);
+            $title = $page?->title ?? collect(config('homepage.policy_pages', []))->firstWhere('slug', $slug)['title'] ?? 'Information';
+            $hasApprovedContent = (bool) $page?->is_published && filled($page?->content);
 
-        return Inertia::render('Content/Show', [
-            'page' => [
+            return [
                 'title' => $title,
                 'slug' => $slug,
                 'content' => $hasApprovedContent ? $this->contentFormatter->format((string) $page->content) : null,
                 'is_placeholder' => ! $hasApprovedContent,
+                'raw_content' => (string) ($page?->content ?? ''),
+            ];
+        });
+
+        abort_unless($cached !== null, 404);
+
+        return Inertia::render('Content/Show', [
+            'page' => [
+                'title' => $cached['title'],
+                'slug' => $cached['slug'],
+                'content' => $cached['content'],
+                'is_placeholder' => $cached['is_placeholder'],
             ],
             'seo' => $seo->forPage(
                 $request,
-                $title.' | '.config('store.name', 'Supreme Steroids'),
-                $hasApprovedContent
-                    ? strip_tags((string) $page->content)
-                    : $title.' information will appear here once the store publishes approved content.',
-                ['robots' => $hasApprovedContent ? 'index,follow' : 'noindex,nofollow']
+                $cached['title'].' | '.config('store.name', 'Supreme Steroids'),
+                ! $cached['is_placeholder']
+                    ? strip_tags($cached['raw_content'])
+                    : $cached['title'].' information will appear here once the store publishes approved content.',
+                ['robots' => ! $cached['is_placeholder'] ? 'index,follow' : 'noindex,nofollow']
             ),
         ]);
     }

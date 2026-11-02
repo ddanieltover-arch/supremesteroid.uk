@@ -1,15 +1,28 @@
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import type { ComponentType, ErrorInfo, ReactNode } from 'react';
 import React, { Component } from 'react';
 import '../css/app.css';
-// Eager key pages so Instant Visits swap on click without waiting for a lazy chunk.
-import CatalogueShow from './Pages/Catalogue/Show';
-import CheckoutIndex from './Pages/Checkout/Index';
 
-const eagerPages: Record<string, ComponentType> = {
+// Eager primary storefront pages so visits swap instantly on click with 0ms chunk latency.
+import Home from './Pages/Home';
+import CatalogueIndex from './Pages/Catalogue/Index';
+import CatalogueShow from './Pages/Catalogue/Show';
+import CartIndex from './Pages/Cart/Index';
+import CheckoutIndex from './Pages/Checkout/Index';
+import BlogIndex from './Pages/Blog/Index';
+import BlogShow from './Pages/Blog/Show';
+import ContentShow from './Pages/Content/Show';
+
+const eagerPages: Record<string, ComponentType<any>> = {
+  'Home': Home,
+  'Catalogue/Index': CatalogueIndex,
   'Catalogue/Show': CatalogueShow,
+  'Cart/Index': CartIndex,
   'Checkout/Index': CheckoutIndex,
+  'Blog/Index': BlogIndex,
+  'Blog/Show': BlogShow,
+  'Content/Show': ContentShow,
 };
 
 const pageModules = import.meta.glob('./Pages/**/*.tsx');
@@ -42,6 +55,60 @@ function resolvePage(name: string): ComponentType | Promise<ComponentType> {
 
   resolvingPages.set(name, pending);
   return pending;
+}
+
+// Background pre-warm remaining secondary pages (Account, Auth, Orders) on idle
+if (typeof window !== 'undefined') {
+  const warmSecondaryPages = () => {
+    Object.entries(pageModules).forEach(([path, loader]) => {
+      const pageName = path.replace(/^\.\/Pages\//, '').replace(/\.tsx$/, '');
+      if (!resolvedPages.has(pageName)) {
+        void loader().then((module) => {
+          const resolved = module as { default?: ComponentType } & ComponentType;
+          resolvedPages.set(pageName, resolved.default ?? resolved);
+        }).catch(() => {
+          // Ignore idle prewarm errors
+        });
+      }
+    });
+  };
+
+  if ('requestIdleCallback' in window) {
+    (window as unknown as { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(warmSecondaryPages);
+  } else {
+    setTimeout(warmSecondaryPages, 1000);
+  }
+
+  // Fast link interaction listener: prefetch Inertia payload on hover / touchstart
+  const prefetchedLinks = new Set<string>();
+  const triggerPrefetch = (target: EventTarget | null) => {
+    if (!(target instanceof Element)) return;
+    const anchor = target.closest('a');
+    if (!anchor) return;
+    const href = anchor.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) {
+      return;
+    }
+    if (href.startsWith('/logout') || href.startsWith('/internal') || href.includes('download')) {
+      return;
+    }
+
+    const isInternal = href.startsWith('/') || href.startsWith(window.location.origin);
+    if (!isInternal) return;
+
+    const cleanPath = href.startsWith(window.location.origin) ? href.slice(window.location.origin.length) : href;
+    if (prefetchedLinks.has(cleanPath)) return;
+    prefetchedLinks.add(cleanPath);
+
+    try {
+      router.prefetch(cleanPath, {}, { cacheFor: 60000 });
+    } catch {
+      // Ignore prefetch failures
+    }
+  };
+
+  document.addEventListener('mouseover', (e) => triggerPrefetch(e.target), { passive: true });
+  document.addEventListener('touchstart', (e) => triggerPrefetch(e.target), { passive: true });
 }
 
 interface ErrorBoundaryProps {
@@ -142,7 +209,11 @@ createInertiaApp({
     }
     return /supreme\s*steroids/i.test(title) ? title : `${title} | Supreme Steroids`;
   },
-  progress: true,
+  progress: {
+    color: '#1e6fd9',
+    showSpinner: false,
+    delay: 60,
+  },
   resolve: (name) => resolvePage(name),
   setup({ el, App, props }) {
     if (!el) {
@@ -157,4 +228,3 @@ createInertiaApp({
     );
   },
 });
-

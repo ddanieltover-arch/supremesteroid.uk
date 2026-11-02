@@ -42,7 +42,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
           setFailed(true);
         })
         .finally(() => setLoading(false));
-    }, 200);
+    }, 120);
     return () => window.clearTimeout(handle);
   }, [open, searchForm.data.q]);
 

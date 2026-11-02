@@ -39,12 +39,12 @@ export function MobileBottomNav({ cartCount, wishlistCount = 0, onOpenCart }: Mo
       className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_rgba(15,23,42,0.06)] backdrop-blur supports-[backdrop-filter]:bg-white/90 lg:hidden print:hidden"
     >
       <div className="mx-auto flex h-14 max-w-7xl items-stretch">
-        <Link href="/" className={itemClass(isActivePath(current, '/'))} aria-current={isActivePath(current, '/') ? 'page' : undefined}>
+        <Link href="/" prefetch="hover" cacheFor="2m" className={itemClass(isActivePath(current, '/'))} aria-current={isActivePath(current, '/') ? 'page' : undefined}>
           <Home className="h-5 w-5" aria-hidden="true" />
           <span>Home</span>
         </Link>
 
-        <Link href="/shop" className={itemClass(isActivePath(current, '/shop'))} aria-current={isActivePath(current, '/shop') ? 'page' : undefined}>
+        <Link href="/shop" prefetch="hover" cacheFor="2m" className={itemClass(isActivePath(current, '/shop'))} aria-current={isActivePath(current, '/shop') ? 'page' : undefined}>
           <Store className="h-5 w-5" aria-hidden="true" />
           <span>Shop</span>
         </Link>
@@ -75,7 +75,7 @@ export function MobileBottomNav({ cartCount, wishlistCount = 0, onOpenCart }: Mo
           <span>Cart</span>
         </button>
 
-        <Link href={accountHref} className={itemClass(accountActive)} aria-current={accountActive ? 'page' : undefined}>
+        <Link href={accountHref} prefetch="hover" cacheFor="1m" className={itemClass(accountActive)} aria-current={accountActive ? 'page' : undefined}>
           <UserRound className="h-5 w-5" aria-hidden="true" />
           <span>Account</span>
         </Link>
