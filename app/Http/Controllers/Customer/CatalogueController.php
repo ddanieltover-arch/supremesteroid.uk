@@ -509,6 +509,10 @@ class CatalogueController extends Controller
 
         $isDefaultListing = empty($search) && empty($categorySlug) && empty($brandSlug) && empty($minPrice) && empty($maxPrice) && empty($attributes) && empty($collection) && empty($classification) && empty($availability);
 
+        // Always build a reusable facet base query — attribute facets below
+        // require it on both default and filtered listings.
+        $facetQuery = (clone $query)->reorder();
+
         if ($isDefaultListing) {
             $visibleCategoryIds = Cache::remember('catalogue.facets.default_categories.v1', 300, fn () =>
                 Product::query()->purchasable()->distinct()->pluck('category_id')->filter()
@@ -517,7 +521,6 @@ class CatalogueController extends Controller
                 Product::query()->purchasable()->distinct()->pluck('brand_id')->filter()
             );
         } else {
-            $facetQuery = (clone $query)->reorder();
             $visibleCategoryIds = (clone $facetQuery)->distinct()->pluck('category_id')->filter();
             $visibleBrandIds = (clone $facetQuery)->distinct()->pluck('brand_id')->filter();
         }
