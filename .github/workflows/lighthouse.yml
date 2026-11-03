@@ -1,0 +1,23 @@
+﻿name: Lighthouse CI
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  lighthouse:
+    name: Storefront budgets
+    runs-on: ubuntu-latest
+    if: ${{ vars.LHCI_BASE_URL != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run Lighthouse CI
+        env:
+          LHCI_BASE_URL: ${{ vars.LHCI_BASE_URL }}
+        run: |
+          npm install -g @lhci/cli@0.14.x
+          lhci autorun --config=./.lighthouserc.cjs

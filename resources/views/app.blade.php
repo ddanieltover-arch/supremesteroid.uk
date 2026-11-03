@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title inertia>{{ config('store.name', 'Supreme Steroids') }}</title>
+    @include('partials.seo-bootstrap')
     <link rel="icon" type="image/png" href="/assets/branding/favicon.png">
     <link rel="apple-touch-icon" href="/assets/branding/favicon.png">
     <link rel="preload" as="image" href="/assets/branding/supreme-steroids-logo.jpg" fetchpriority="high">
-    <meta name="description" content="{{ config('store.tagline') ?: 'Premium lawful sports nutrition, wellness, and lab-tested formulations.' }}">
 
     <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.bunny.net">

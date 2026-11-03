@@ -228,6 +228,7 @@ export type HomepagePayload = {
   faqs: Array<{ id: string; question: string; answer: string }>;
   reviews?: Array<{ id: string; rating: number; title?: string | null; body?: string | null; display_name?: string | null; product_name?: string | null; product_url?: string | null; verified_purchase?: boolean }>;
   newsletter?: { heading: string; body: string } | null;
+  answer_capsule?: string | null;
   sections: HomepageSection[];
 };
 

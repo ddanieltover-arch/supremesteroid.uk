@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { BookOpen, Calendar, Clock, Link2 } from 'lucide-react';
 import { useState } from 'react';
 import { InfoPageChrome } from '@/components/content/InfoPageChrome';
@@ -13,6 +13,8 @@ type BlogPostDetail = {
   excerpt?: string | null;
   featured_image_url?: string | null;
   published_at: string;
+  published_at_iso?: string | null;
+  updated_at_iso?: string | null;
   reading_time: string;
   word_count: number;
   author: string;
@@ -30,10 +32,12 @@ type RecentPost = {
 export default function BlogShow({
   post,
   recent_posts = [],
+  structured_data = [],
   seo,
 }: {
   post: BlogPostDetail;
   recent_posts: RecentPost[];
+  structured_data?: Array<Record<string, unknown>>;
   seo?: SeoProps;
 }) {
   const [copied, setCopied] = useState(false);
@@ -55,6 +59,13 @@ export default function BlogShow({
 
   return (
     <StorefrontLayout seo={seo}>
+      <Head>
+        {structured_data.map((schema, index) => (
+          <script key={index} type="application/ld+json">
+            {JSON.stringify(schema)}
+          </script>
+        ))}
+      </Head>
       <InfoPageChrome
         title={post.title}
         breadcrumbParent="Articles"

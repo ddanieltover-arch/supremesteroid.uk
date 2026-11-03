@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-11-03",
+  "domain": "https://supremesteroid.uk",
+  "geography": "United Kingdom",
+  "language": "en-GB",
+  "business_model": "B2C ecommerce + educational blog",
+  "existing_seo_plumbing": {
+    "SeoService": "app/Services/Catalogue/SeoService.php",
+    "SeoHead": "resources/js/components/SeoHead.tsx",
+    "StructuredDataService": "app/Services/Catalogue/StructuredDataService.php",
+    "SeoMetadata_model": "app/Models/SeoMetadata.php"
+  },
+  "schema_types_in_use_before_phase_1": [
+    "Organization",
+    "WebSite",
+    "BreadcrumbList",
+    "Product",
+    "Brand",
+    "Offer",
+    "AggregateRating (conditional on approved reviews)"
+  ],
+  "schema_types_missing_before_phase_1": [
+    "BlogPosting",
+    "FAQPage",
+    "ItemList",
+    "LocalBusiness"
+  ],
+  "discovery_files_before_phase_1": {
+    "sitemap": false,
+    "robots_txt": false,
+    "llms_txt": false
+  },
+  "metrics": {
+    "note": "No first-party GSC/GA4/Ahrefs metrics available in repo. Baseline metrics intentionally omitted rather than invented."
+  }
+}

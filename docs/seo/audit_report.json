@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-11-03",
+  "site": "https://supremesteroid.uk",
+  "evidence": "codebase",
+  "stack": {
+    "backend": "Laravel 13",
+    "frontend": "Inertia 2 + React 19",
+    "ssr_default": false,
+    "config_inertia": "config/inertia.php INERTIA_SSR_ENABLED"
+  },
+  "indexable_surfaces": [
+    {"path": "/", "name": "home", "robots": "index,follow"},
+    {"path": "/shop", "name": "shop.index", "robots": "index,follow"},
+    {"path": "/category/{slug}", "name": "category.show", "robots": "index,follow when category visible"},
+    {"path": "/brand/{slug}", "name": "brand.show", "robots": "index,follow when brand active"},
+    {"path": "/product/{slug}", "name": "catalogue.show", "robots": "index,follow when Product::purchasable()"},
+    {"path": "/blog", "name": "blog.index", "robots": "index,follow"},
+    {"path": "/blog/{slug}", "name": "blog.show", "robots": "index,follow when published"},
+    {"path": "/{slug}", "name": "content.show", "robots": "index,follow only when non-placeholder published Page"}
+  ],
+  "noindex_surfaces": [
+    "/cart",
+    "/checkout*",
+    "/account*",
+    "/login",
+    "/register",
+    "/search",
+    "/compare",
+    "/design-system",
+    "/admin/*",
+    "/internal/*",
+    "demo / COMPLIANCE_REVIEW products"
+  ],
+  "verified_gaps": [
+    "No dynamic /sitemap.xml route",
+    "No robots.txt in public/ or routed controller",
+    "No /llms.txt",
+    "Duplicate listing URLs /shop and /catalogue share CatalogueController@index",
+    "SeoHead missing og:url, og:site_name, og:locale",
+    "Product Offer schema missing seller, itemCondition, priceValidUntil",
+    "Blog show has no BlogPosting JSON-LD",
+    "Homepage FAQs have no FAQPage JSON-LD",
+    "Inertia SSR disabled by default (meta/JSON-LD primarily client-head)"
+  ],
+  "canonical_host": {
+    "middleware": "App\\Http\\Middleware\\CanonicalHost",
+    "behavior": "www → apex 301 in production"
+  },
+  "compliance_gates": {
+    "product_scope": "Product::purchasable()",
+    "seo_service": "App\\Services\\Catalogue\\SeoService",
+    "notes": [
+      "Do not bulk-index unpublished or compliance-review products",
+      "No fabricated AggregateRating",
+      "Avoid medical/dosing claims in meta and schema copy"
+    ]
+  }
+}

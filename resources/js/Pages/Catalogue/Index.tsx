@@ -12,6 +12,7 @@ import { CatalogueFilters } from '@/components/catalogue/CatalogueFilters';
 import { RecentlyViewed } from '@/components/catalogue/RecentlyViewed';
 import { TrustBlocks } from '@/components/catalogue/TrustBlocks';
 import { ShopEditorialContent } from '@/components/catalogue/ShopEditorialContent';
+import { AnswerCapsule } from '@/components/seo/AnswerCapsule';
 import type { CatalogueFilters as FilterState, Paginated, ProductCard as ProductCardType, SeoProps } from '@/types';
 
 const sortOptions = [
@@ -79,6 +80,7 @@ export default function CatalogueIndex({
   attribute_facets = [],
   related_searches = [],
   filters,
+  answer_capsule = null,
   seo,
 }: {
   heading?: string;
@@ -95,6 +97,7 @@ export default function CatalogueIndex({
   attribute_facets?: Array<{ name: string; values: string[] }>;
   related_searches?: Array<{ name: string; url: string } | string>;
   filters: FilterState;
+  answer_capsule?: string | null;
   seo?: SeoProps;
 }) {
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -177,6 +180,11 @@ export default function CatalogueIndex({
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Catalogue</p>
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">{heading}</h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">{description}</p>
+            {listing_kind === 'shop' ? (
+              <div className="mt-4 max-w-3xl">
+                <AnswerCapsule answer={answer_capsule} />
+              </div>
+            ) : null}
           </div>
           <p className="shrink-0 text-sm text-slate-500">
             <span className="text-2xl font-bold tabular-nums text-slate-900">{total.toLocaleString('en-GB')}</span>

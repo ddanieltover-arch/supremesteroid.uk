@@ -12,6 +12,7 @@ import { ProductRail } from '@/components/home/ProductRail';
 import { ShippingInformation } from '@/components/home/ShippingInformation';
 import { TrustGrid } from '@/components/home/TrustGrid';
 import { HomeEditorialContent } from '@/components/home/HomeEditorialContent';
+import { AnswerCapsule } from '@/components/seo/AnswerCapsule';
 import type { HomepagePayload, ProductCard as ProductCardType, SeoProps } from '@/types';
 
 const DEFAULT_SECTIONS = [
@@ -60,6 +61,7 @@ export default function Home({
     shipping: { currency: 'GBP', free_shipping_threshold: '300.00', methods: [] },
     faqs: [],
     newsletter: null,
+    answer_capsule: null,
     sections: DEFAULT_SECTIONS,
   };
 
@@ -80,7 +82,14 @@ export default function Home({
       {sections.map((section) => {
         switch (section.key) {
           case 'hero':
-            return <HeroSection key={section.key} hero={data.hero} />;
+            return (
+              <div key={section.key} className="space-y-6">
+                <HeroSection hero={data.hero} />
+                <div className="px-4 sm:px-6 lg:px-8">
+                  <AnswerCapsule answer={data.answer_capsule} />
+                </div>
+              </div>
+            );
           case 'categories':
             return <CategoryShowcase key={section.key} categories={data.categories} />;
           case 'featured':

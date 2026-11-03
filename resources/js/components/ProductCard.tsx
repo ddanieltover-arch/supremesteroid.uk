@@ -74,7 +74,7 @@ function productInstantProps(product: ProductCardType) {
           : [],
         variants: [],
         breadcrumbs: [
-          { name: 'Catalogue', url: '/catalogue' },
+          { name: 'Shop', url: '/shop' },
           { name: product.name, url: `/product/${product.slug}` },
         ],
       },

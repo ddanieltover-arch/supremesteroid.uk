@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Models\BlogPost;
 use App\Services\Catalogue\SeoService;
+use App\Services\Catalogue\StructuredDataService;
 use App\Services\Content\BlogPostContentFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -18,6 +19,7 @@ class BlogController extends Controller
 {
     public function __construct(
         protected SeoService $seoService,
+        protected StructuredDataService $structuredData,
         protected BlogPostContentFormatter $contentFormatter,
     ) {}
 
@@ -86,7 +88,7 @@ class BlogController extends Controller
 
     public function show(Request $request, string $slug): Response
     {
-        $cached = Cache::remember("blog.show.v2.{$slug}", 600, function () use ($slug) {
+        $cached = Cache::remember("blog.show.v3.{$slug}", 600, function () use ($slug) {
             $post = BlogPost::query()
                 ->where('slug', $slug)
                 ->where('is_published', true)
@@ -116,6 +118,7 @@ class BlogController extends Controller
                 ]);
 
             $cleanContent = $this->contentFormatter->format((string) $post->content);
+            $publishedAt = $post->published_at ?? $post->created_at;
 
             return [
                 'post' => [
@@ -125,7 +128,9 @@ class BlogController extends Controller
                     'content' => $cleanContent,
                     'excerpt' => $post->excerpt,
                     'featured_image_url' => $post->featured_image_url,
-                    'published_at' => $post->published_at?->format('F d, Y') ?? $post->created_at->format('F d, Y'),
+                    'published_at' => $publishedAt?->format('F d, Y') ?? '',
+                    'published_at_iso' => $publishedAt?->toAtomString(),
+                    'updated_at_iso' => $post->updated_at?->toAtomString() ?? $publishedAt?->toAtomString(),
                     'reading_time' => $readingTime . ' min read',
                     'word_count' => $wordCount,
                     'author' => $post->author?->name ?? 'Supreme Editorial Team',
@@ -138,16 +143,41 @@ class BlogController extends Controller
         abort_unless($cached !== null, 404);
 
         $post = $cached['post'];
+        $canonical = url('/blog/'.$post['slug']);
+        $description = $post['excerpt'] ?: Str::limit(strip_tags($cached['raw_content']), 160);
+
+        $publishedAt = ! empty($post['published_at_iso'])
+            ? new \DateTimeImmutable((string) $post['published_at_iso'])
+            : null;
+        $updatedAt = ! empty($post['updated_at_iso'])
+            ? new \DateTimeImmutable((string) $post['updated_at_iso'])
+            : $publishedAt;
 
         return Inertia::render('Blog/Show', [
             'post' => $post,
             'recent_posts' => $cached['recent_posts'],
+            'structured_data' => [
+                $this->structuredData->breadcrumbs([
+                    ['name' => 'Home', 'url' => route('home')],
+                    ['name' => 'Articles', 'url' => route('blog.index')],
+                    ['name' => $post['title'], 'url' => $canonical],
+                ]),
+                $this->structuredData->forBlogPost(
+                    title: $post['title'],
+                    description: $description,
+                    url: $canonical,
+                    image: $post['featured_image_url'] ?? null,
+                    authorName: (string) ($post['author'] ?? 'Supreme Editorial Team'),
+                    datePublished: $publishedAt,
+                    dateModified: $updatedAt,
+                ),
+            ],
             'seo' => $this->seoService->forPage(
                 $request,
-                $post['title'] . ' | Supreme Steroids UK',
-                $post['excerpt'] ?: Str::limit(strip_tags($cached['raw_content']), 160),
+                $post['title'].' | Supreme Steroids UK',
+                $description,
                 [
-                    'canonical' => url('/blog/' . $post['slug']),
+                    'canonical' => $canonical,
                     'og_image' => $post['featured_image_url'],
                 ]
             ),

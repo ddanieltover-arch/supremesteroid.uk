@@ -83,6 +83,17 @@ npx vercel --prod
 
 Set the environment names above in the Vercel project before the production deploy. After deploy, check `/api/health` (status only), then `GET /internal/readiness` with the cron bearer token.
 
+## Catalogue image migration (first-party SEO)
+
+After object storage env is set (`OBJECT_STORAGE_DISK`, bucket credentials, `AWS_URL` / `R2_URL`), migrate BunnyCDN / `/storage` product images with:
+
+```bash
+php artisan catalogue:migrate-cdn-images-to-object-storage
+php artisan catalogue:migrate-cdn-images-to-object-storage --execute --limit=50
+```
+
+Full runbook: `docs/PRODUCT_IMAGE_OBJECT_STORAGE_MIGRATION.md`.
+
 ## Post-deploy smoke test
 
 Use a test product, test customer, and test payment data. Do not use a real customer payment.

@@ -17,6 +17,8 @@ use App\Http\Controllers\Customer\PasswordResetController;
 use App\Http\Controllers\Customer\WishlistController;
 use App\Http\Controllers\Internal\InventoryExpiryCronController;
 use App\Http\Controllers\Internal\ReadinessController;
+use App\Http\Controllers\Seo\RobotsController;
+use App\Http\Controllers\Seo\SitemapController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -29,6 +31,8 @@ Route::get('/internal/readiness', ReadinessController::class)
     ->name('internal.readiness');
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('/robots.txt', RobotsController::class)->name('robots');
 Route::post('/newsletter', NewsletterController::class)->middleware('throttle:8,1')->name('newsletter.subscribe');
 Route::post('/announcement/dismiss', [AnnouncementController::class, 'dismiss'])->middleware('throttle:20,1')->name('announcement.dismiss');
 
@@ -37,7 +41,7 @@ Route::get('/design-system', function () {
 })->name('design-system');
 
 Route::get('/shop', [CatalogueController::class, 'index'])->name('shop.index');
-Route::get('/catalogue', [CatalogueController::class, 'index'])->name('catalogue.index');
+Route::permanentRedirect('/catalogue', '/shop')->name('catalogue.index');
 Route::get('/search', [CatalogueController::class, 'search'])->name('search');
 Route::get('/search/suggest', [CatalogueController::class, 'suggest'])->middleware('throttle:30,1')->name('search.suggest');
 Route::get('/catalogue/cards', [CatalogueController::class, 'cards'])->middleware('throttle:30,1')->name('catalogue.cards');

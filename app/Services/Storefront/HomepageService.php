@@ -191,19 +191,25 @@ class HomepageService
                     ] : null,
                     'trustItems' => $defaults['trust_items'] ?? [],
                     'shipping' => $this->shipping->publicOverview(),
-                    'faqs' => HomepageFaq::query()->published()->get(['id', 'question', 'answer'])->all(),
+                    'faqs' => ($faqs = HomepageFaq::query()->published()->get(['id', 'question', 'answer'])->all()),
                     'reviews' => $reviews,
                     'newsletter' => $content->newsletter_enabled ? [
                         'heading' => $this->safeText($content->newsletter_heading, (string) ($defaults['newsletter']['heading'] ?? '')),
                         'body' => $this->safeText($content->newsletter_body, (string) ($defaults['newsletter']['body'] ?? ''), 300),
                     ] : null,
+                    'answer_capsule' => $this->safeText(
+                        null,
+                        (string) ($defaults['answer_capsules']['home'] ?? ''),
+                        320
+                    ),
                     'sections' => $this->sections($content),
                 ],
                 'featuredProducts' => ProductCardResource::collection($featured)->resolve(),
-                'structured_data' => [
+                'structured_data' => array_values(array_filter([
                     $this->structuredData->organization(),
                     $this->structuredData->website(),
-                ],
+                    $this->structuredData->faqPage($faqs),
+                ])),
                 'seo' => $this->seoService->forPage($request, $seoTitle, $seoDescription, [
                     'canonical' => route('home'),
                     'og_image' => $heroProducts->first()?->images->firstWhere('is_primary', true)?->publicUrl()

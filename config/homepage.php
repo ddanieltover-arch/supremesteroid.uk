@@ -11,6 +11,21 @@ return [
         ),
     ],
 
+    /*
+    | GEO answer capsules — short factual summaries for AI/crawler citation.
+    | Keep non-prescriptive; no medical or dosing claims.
+    */
+    'answer_capsules' => [
+        'home' => env(
+            'HOMEPAGE_ANSWER_CAPSULE',
+            'Supreme Steroids is a UK online storefront listing compliance-reviewed catalogue products, brands, and educational guides. Shop published items with clear specifications, UK shipping options, and discreet fulfilment — without medical advice or dosing protocols.'
+        ),
+        'shop' => env(
+            'SHOP_ANSWER_CAPSULE',
+            'The Supreme Steroids shop catalogues published UK-available products across brands and categories. Use filters to browse purchasable listings with server-confirmed pricing, stock status, and product details before checkout.'
+        ),
+    ],
+
     'announcement' => [
         'enabled' => true,
         'message' => 'Pay with Bitcoin to get 20% off (discount applies at checkout) | Fast & Discreet Next-Day UK Delivery',

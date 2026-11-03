@@ -628,6 +628,9 @@ class CatalogueController extends Controller
                 'classification' => is_string($classification) ? $classification : null,
                 'attributes' => is_array($attributes) ? $attributes : [],
             ],
+            'answer_capsule' => $listingKind === 'shop'
+                ? (string) config('homepage.answer_capsules.shop', '')
+                : null,
             'seo' => $this->seoService->forPage(
                 $request,
                 $listingKind === 'shop'
@@ -636,11 +639,55 @@ class CatalogueController extends Controller
                 (string) $description,
                 [
                     'canonical' => $canonical,
-                    'robots' => $listingKind === 'search' ? 'noindex,nofollow' : 'index,follow',
+                    'robots' => $this->listingRobots($listingKind, $request, $sort, $search, $categorySlug, $brandSlug, $availability, $minPrice, $maxPrice, $collection, $classification, $attributes),
                 ],
                 $context instanceof \Illuminate\Database\Eloquent\Model ? $context : null
             ),
         ]);
+    }
+
+    /**
+     * Index clean listing paths; noindex faceted/sorted/paginated variants to protect crawl budget.
+     *
+     * @param  array<string, mixed>|string|null  $attributes
+     */
+    protected function listingRobots(
+        string $listingKind,
+        Request $request,
+        string $sort,
+        mixed $search,
+        mixed $categorySlug,
+        mixed $brandSlug,
+        mixed $availability,
+        mixed $minPrice,
+        mixed $maxPrice,
+        mixed $collection,
+        mixed $classification,
+        mixed $attributes,
+    ): string {
+        if ($listingKind === 'search') {
+            return 'noindex,nofollow';
+        }
+
+        $page = max(1, (int) $request->query('page', 1));
+        $hasExtraSort = ! in_array($sort, ['featured', ''], true);
+        $hasQueryFilters = filled($search)
+            || filled($availability)
+            || filled($collection)
+            || filled($classification)
+            || is_numeric($minPrice)
+            || is_numeric($maxPrice)
+            || (is_array($attributes) && $attributes !== [])
+            || $page > 1
+            || $hasExtraSort;
+
+        // Shop root should not index ?category=&brand= duplicates (those have dedicated paths).
+        if ($listingKind === 'shop' && (filled($categorySlug) || filled($brandSlug))) {
+            $hasQueryFilters = true;
+        }
+
+        // Category/brand path pages already encode context in the URL; ignore that slug in query.
+        return $hasQueryFilters ? 'noindex,follow' : 'index,follow';
     }
 
     /**

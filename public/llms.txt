@@ -1,0 +1,25 @@
+# Supreme Steroids
+> UK online catalogue for published research and consumer sports-nutrition products, with educational guides and discreet shipping information.
+
+Supreme Steroids (supremesteroid.uk) is a United Kingdom storefront listing compliance-reviewed catalogue products, brands, and categories, plus educational articles. Product pages describe commercial specifications only and do not provide medical advice or dosing protocols.
+
+## Key Pages
+- /: Homepage — catalogue overview, trust signals, and FAQs
+- /shop: Full product catalogue
+- /blog: Educational guides and research articles
+- /product/{slug}: Individual product detail pages (purchasable listings only)
+- /category/{slug}: Category listings
+- /brand/{slug}: Brand listings
+- /sitemap.xml: Machine-readable index of public pages
+
+## Primary Topics
+- UK catalogue discovery for research and consumer products
+- Product specifications, brands, and categories
+- Shipping and fulfilment information for UK orders
+- Educational articles on peptides, recovery, and related research topics
+- Store policies and customer service information
+
+## Notes for crawlers
+- Prefer canonical URLs under https://supremesteroid.uk
+- Respect /robots.txt disallow rules for cart, checkout, account, and admin paths
+- Do not treat educational content as medical instruction
