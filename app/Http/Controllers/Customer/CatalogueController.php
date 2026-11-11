@@ -593,7 +593,11 @@ class CatalogueController extends Controller
         }
 
         $breadcrumbs = $this->listingBreadcrumbs($listingKind, $context, $heading);
-        $attributeFacets = $this->discovery->attributeFacets((clone $facetQuery)->select('products.id'));
+        $attributeFacets = $isDefaultListing
+            ? Cache::remember('catalogue.facets.default_attributes.v1', 300, fn () =>
+                $this->discovery->attributeFacets((clone $facetQuery)->select('products.id'))
+            )
+            : $this->discovery->attributeFacets((clone $facetQuery)->select('products.id'));
 
         return Inertia::render('Catalogue/Index', [
             'heading' => $heading,
