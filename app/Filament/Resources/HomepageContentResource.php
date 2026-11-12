@@ -24,6 +24,8 @@ class HomepageContentResource extends Resource
 
     protected static ?string $navigationLabel = 'Homepage';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function canCreate(): bool
     {
         return HomepageContent::query()->doesntExist();

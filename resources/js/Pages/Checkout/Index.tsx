@@ -114,7 +114,10 @@ export default function CheckoutIndex({
               save_address: false,
               shipping_destination: form.data.shipping_destination,
             },
-            { onFinish: () => setSubmitting(false) },
+            {
+              preserveScroll: true,
+              onFinish: () => setSubmitting(false),
+            },
           );
         }}
       >

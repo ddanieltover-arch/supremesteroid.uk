@@ -67,8 +67,7 @@ class CheckoutFlowService
             return redirect()->route('checkout.confirmation');
         }
 
-        $basket = $this->checkoutBasket($request);
-        $empty = ((int) ($basket['totals']['items_count'] ?? 0)) === 0;
+        $empty = $this->checkoutBasketIsEmpty($request);
 
         if ($step === 'details') {
             if ($completedOrder && $empty) {
@@ -140,7 +139,6 @@ class CheckoutFlowService
     public function pageProps(Request $request, string $step): array
     {
         $user = $this->actor($request);
-        $cartData = $this->checkoutBasket($request);
 
         $warnings = [];
         $affectedItems = [];
@@ -157,12 +155,15 @@ class CheckoutFlowService
         if ($session && $session->isOpen() && $user) {
             try {
                 if ($step === 'delivery' && $request->filled('shipping_method_code')) {
+                    // Only rebuild when the shopper changes shipping method.
                     $snapshot = $this->checkoutSessionService->refreshOpenSnapshot($session, $user, [
                         'shipping_method_code' => (string) $request->query('shipping_method_code'),
                     ]);
                     $session->refresh();
                 } else {
-                    $this->checkoutSessionService->revalidateStoredSnapshot($session, $user);
+                    // Paint from the last persisted snapshot. Full rebuild already
+                    // ran on saveDetails/saveDelivery; place-order revalidates again.
+                    // Rebuilding on every GET made "Continue to delivery" hang.
                     $snapshot = $session->snapshot;
                     $snapshot['checkout_token'] = $session->token;
                     $snapshot['expires_at'] = $session->expires_at?->toIso8601String();
@@ -184,6 +185,11 @@ class CheckoutFlowService
                 $warnings[] = $exception->getCustomerMessage();
             }
         }
+
+        // Delivery/payment already have line items in the snapshot — skip full cart summarize.
+        $cartData = ($snapshot && in_array($step, ['delivery', 'payment'], true))
+            ? $this->checkoutBasketShell($request)
+            : $this->checkoutBasket($request);
 
         $addresses = $request->user()
             ? Address::query()
@@ -596,6 +602,46 @@ class CheckoutFlowService
     }
 
     /**
+     * Fast emptiness check for checkout gates — avoids full cart summarize.
+     */
+    public function checkoutBasketIsEmpty(Request $request): bool
+    {
+        $shell = $this->checkoutBasketShell($request);
+
+        return ((int) ($shell['totals']['items_count'] ?? 0)) === 0;
+    }
+
+    /**
+     * Count-only basket for gates / delivery-payment paint.
+     *
+     * @return array<string, mixed>
+     */
+    public function checkoutBasketShell(Request $request): array
+    {
+        if ($this->hasBuyNow($request)) {
+            $payload = $request->session()->get(self::BUY_NOW_SESSION_KEY);
+            $qty = max(1, (int) ($payload['quantity'] ?? 1));
+
+            return [
+                'id' => null,
+                'items' => [],
+                'totals' => [
+                    'subtotal_amount' => '0.00',
+                    'discount_amount' => '0.00',
+                    'shipping_amount' => '0.00',
+                    'tax_amount' => '0.00',
+                    'grand_total_amount' => '0.00',
+                    'items_count' => $qty,
+                    'currency' => 'GBP',
+                ],
+                'is_checkout_ready' => true,
+            ];
+        }
+
+        return $this->cartService->summarizeShell($this->cartService->findRequestCart($request));
+    }
+
+    /**
      * @return list<array{product_id: string, variant_id: ?string, quantity: int}>
      */
     public function cartItemsPayload(Request $request): array
@@ -617,13 +663,13 @@ class CheckoutFlowService
             return [];
         }
 
-        $data = $this->cartService->calculateCart($cart);
+        $cart->loadMissing('items');
 
-        return array_map(static fn (array $item) => [
-            'product_id' => $item['product_id'],
-            'variant_id' => $item['variant_id'],
-            'quantity' => $item['quantity'],
-        ], $data['items']);
+        return $cart->items->map(static fn ($item) => [
+            'product_id' => (string) $item->product_id,
+            'variant_id' => $item->product_variant_id ? (string) $item->product_variant_id : null,
+            'quantity' => (int) $item->quantity,
+        ])->values()->all();
     }
 
     /**

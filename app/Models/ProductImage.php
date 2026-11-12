@@ -79,13 +79,17 @@ class ProductImage extends Model
                 return CataloguePresentation::encodeImageUrl($remote);
             }
 
-            $relative = ltrim(substr($value, strlen('/storage/')), '/');
-            try {
-                if (Storage::disk('public')->exists($relative)) {
-                    return $value;
+            // Never probe Storage::exists() outside local — ephemeral hosts make
+            // that a multi-second no-op on every cart/product image resolve.
+            if (app()->environment('local')) {
+                $relative = ltrim(substr($value, strlen('/storage/')), '/');
+                try {
+                    if (Storage::disk('public')->exists($relative)) {
+                        return $value;
+                    }
+                } catch (\Throwable) {
+                    // fall through
                 }
-            } catch (\Throwable) {
-                // fall through
             }
 
             return $value;

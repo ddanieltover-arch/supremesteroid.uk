@@ -233,6 +233,32 @@ class CheckoutSessionService
 
         $countryCode = IsoCountry::normalize((string) ($data['shipping_destination']['country_code'] ?? 'GB'));
 
+        $productIds = collect($rawItems)
+            ->pluck('product_id')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+        $variantIds = collect($rawItems)
+            ->pluck('variant_id')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        $products = Product::query()
+            ->with(['images', 'inventory'])
+            ->whereIn('id', $productIds)
+            ->get()
+            ->keyBy('id');
+        $variants = $variantIds === []
+            ? collect()
+            : ProductVariant::query()
+                ->with('inventory')
+                ->whereIn('id', $variantIds)
+                ->get()
+                ->keyBy('id');
+
         $preparedPricingItems = [];
         $snapshotItems = [];
 
@@ -242,15 +268,25 @@ class CheckoutSessionService
                 throw new InvalidArgumentException('Item quantity must be strictly positive.');
             }
 
-            /** @var Product $product */
-            $product = Product::query()->findOrFail($input['product_id']);
+            $productId = (string) ($input['product_id'] ?? '');
+            /** @var Product|null $product */
+            $product = $products->get($productId);
+            if (! $product) {
+                throw (new \Illuminate\Database\Eloquent\ModelNotFoundException)->setModel(Product::class, [$productId]);
+            }
 
-            /** @var ProductVariant|null $variant */
-            $variant = ! empty($input['variant_id'])
-                ? ProductVariant::query()->where('product_id', $product->id)->findOrFail($input['variant_id'])
-                : null;
+            $variant = null;
+            if (! empty($input['variant_id'])) {
+                /** @var ProductVariant|null $variant */
+                $variant = $variants->get((string) $input['variant_id']);
+                if (! $variant || $variant->product_id !== $product->id) {
+                    throw (new \Illuminate\Database\Eloquent\ModelNotFoundException)->setModel(ProductVariant::class, [(string) $input['variant_id']]);
+                }
+            }
 
-            $this->eligibilityService->assertPurchasable($product, $variant, $qty, true);
+            // Hot checkout path: status/inventory/price only. Publication already
+            // gated image + deep content compliance (those scans made details→delivery hang).
+            $this->eligibilityService->assertPurchasableForCart($product, $variant, $qty);
 
             $line = $this->pricingService->calculateLineItem($product, $variant, $qty, 0);
 
@@ -261,7 +297,6 @@ class CheckoutSessionService
                 'discount' => 0,
             ];
 
-            $product->loadMissing('images');
             $image = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
 
             $snapshotItems[] = [

@@ -33,7 +33,9 @@ class ProductPurchaseEligibilityService
         Product $product,
         ?ProductVariant $variant = null,
         int $quantity = 1,
-        bool $checkInventory = true
+        bool $checkInventory = true,
+        bool $deepCompliance = true,
+        bool $requireCatalogueImage = true,
     ): array {
         $reasons = [];
 
@@ -59,7 +61,7 @@ class ProductPurchaseEligibilityService
             $reasons[] = 'Product slug identifier is missing.';
         }
 
-        if (! $this->presentation->hasCatalogueImage($product)) {
+        if ($requireCatalogueImage && ! $this->presentation->hasCatalogueImage($product)) {
             $reasons[] = 'Product has no catalogue image and is treated as out of stock.';
         }
 
@@ -86,10 +88,12 @@ class ProductPurchaseEligibilityService
             }
         }
 
-        try {
-            $this->complianceService->validateProductCompliance($product);
-        } catch (ProductComplianceViolationException $e) {
-            $reasons[] = $e->getMessage();
+        if ($deepCompliance) {
+            try {
+                $this->complianceService->validateProductCompliance($product);
+            } catch (ProductComplianceViolationException $e) {
+                $reasons[] = $e->getMessage();
+            }
         }
 
         if ($variant !== null) {
@@ -187,9 +191,18 @@ class ProductPurchaseEligibilityService
         Product $product,
         ?ProductVariant $variant = null,
         int $quantity = 1,
-        bool $checkInventory = true
+        bool $checkInventory = true,
+        bool $deepCompliance = true,
+        bool $requireCatalogueImage = true,
     ): void {
-        $result = $this->checkEligibility($product, $variant, $quantity, $checkInventory);
+        $result = $this->checkEligibility(
+            $product,
+            $variant,
+            $quantity,
+            $checkInventory,
+            $deepCompliance,
+            $requireCatalogueImage,
+        );
 
         if (! $result['is_eligible']) {
             $reasonSummary = implode('; ', $result['reasons']);
@@ -198,5 +211,19 @@ class ProductPurchaseEligibilityService
                 $result['reasons']
             );
         }
+    }
+
+    /**
+     * Fast cart-mutation gate: trust publication-time image/compliance checks and
+     * only re-validate status, pricing, and inventory on the hot basket path.
+     *
+     * @throws ProductNotPurchasableException
+     */
+    public function assertPurchasableForCart(
+        Product $product,
+        ?ProductVariant $variant = null,
+        int $quantity = 1,
+    ): void {
+        $this->assertPurchasable($product, $variant, $quantity, true, false, false);
     }
 }

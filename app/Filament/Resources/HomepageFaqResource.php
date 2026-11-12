@@ -24,6 +24,8 @@ class HomepageFaqResource extends Resource
 
     protected static ?string $navigationLabel = 'Homepage FAQs';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([

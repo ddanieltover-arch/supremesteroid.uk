@@ -11,13 +11,18 @@ function moneyTimes(amount: string | null | undefined, quantity: number): string
   return (pence / 100).toFixed(2);
 }
 
-function recountCart(items: CartItem[], currency: string): CartPayload {
+function recountCart(items: CartItem[], currency: string, base?: CartPayload | null): CartPayload {
   const subtotal = items.reduce((sum, item) => sum + Math.round(Number(item.line_total) * 100), 0);
   const itemsCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotalAmount = (subtotal / 100).toFixed(2);
+  const threshold = Number(base?.shipping_eligibility?.free_shipping_threshold ?? 0);
+  const subtotalNumber = Number(subtotalAmount);
+  const remaining = threshold > 0 ? Math.max(0, threshold - subtotalNumber) : 0;
+  const progress =
+    threshold > 0 ? Math.min(100, Math.round((subtotalNumber / threshold) * 100)) : (base?.shipping_eligibility?.progress_percent ?? 0);
 
   return {
-    id: null,
+    id: base?.id ?? null,
     items,
     totals: {
       subtotal_amount: subtotalAmount,
@@ -29,11 +34,11 @@ function recountCart(items: CartItem[], currency: string): CartPayload {
       currency,
     },
     shipping_eligibility: {
-      free_shipping_threshold: '0.00',
+      free_shipping_threshold: base?.shipping_eligibility?.free_shipping_threshold ?? '0.00',
       current_eligible_subtotal: subtotalAmount,
-      remaining_to_threshold: '0.00',
-      free_shipping_eligible: false,
-      progress_percent: 0,
+      remaining_to_threshold: remaining.toFixed(2),
+      free_shipping_eligible: threshold > 0 ? remaining <= 0 : Boolean(base?.shipping_eligibility?.free_shipping_eligible),
+      progress_percent: progress,
       currency,
     },
     is_checkout_ready: itemsCount > 0,
@@ -155,7 +160,45 @@ export function optimisticAddToCart(
     });
   }
 
-  return publishCart(recountCart(items, currency));
+  return publishCart(recountCart(items, currency, current));
+}
+
+/** Instant local quantity change before the PATCH round-trip finishes. */
+export function optimisticUpdateCartItemQuantity(
+  current: CartPayload | null | undefined,
+  itemId: string,
+  quantity: number,
+): CartPayload {
+  if (optimisticRollback === undefined) {
+    optimisticRollback = cartOverride ?? (current ? { ...current } : null);
+  }
+
+  const currency = current?.totals?.currency ?? 'GBP';
+  const nextQty = Math.max(0, quantity);
+  const items =
+    nextQty === 0
+      ? (current?.items ?? []).filter((item) => item.id !== itemId)
+      : (current?.items ?? []).map((item) => {
+          if (item.id !== itemId) {
+            return item;
+          }
+          return {
+            ...item,
+            quantity: nextQty,
+            subtotal: moneyTimes(item.unit_price, nextQty),
+            line_total: moneyTimes(item.unit_price, nextQty),
+          };
+        });
+
+  return publishCart(recountCart(items, currency, current));
+}
+
+/** Instant local remove before the DELETE round-trip finishes. */
+export function optimisticRemoveCartItem(
+  current: CartPayload | null | undefined,
+  itemId: string,
+): CartPayload {
+  return optimisticUpdateCartItemQuantity(current, itemId, 0);
 }
 
 export function subscribeCart(listener: CartListener): () => void {
@@ -210,6 +253,16 @@ export async function checkoutWhenReady(): Promise<CartPayload> {
   return publishCart(serverCart);
 }
 
+/** Prefer the latest optimistic UI while more mutations are still queued. */
+function publishAuthoritativeCart(cart: CartPayload): CartPayload {
+  optimisticRollback = undefined;
+  // pendingMutations still includes the mutation that just finished.
+  if (pendingMutations > 1) {
+    return getCartOverride() ?? cart;
+  }
+  return publishCart(cart);
+}
+
 export async function addCartItem(input: {
   product_id: string;
   product_variant_id?: string | null;
@@ -225,8 +278,7 @@ export async function addCartItem(input: {
           quantity: input.quantity ?? 1,
         }),
       });
-      optimisticRollback = undefined;
-      return publishCart(payload.cart);
+      return publishAuthoritativeCart(payload.cart);
     } catch (error) {
       restoreOptimisticRollback();
       throw error;
@@ -235,21 +287,35 @@ export async function addCartItem(input: {
 }
 
 export async function updateCartItemQuantity(itemId: string, quantity: number): Promise<CartPayload> {
+  optimisticUpdateCartItemQuantity(getCartOverride(), itemId, quantity);
+
   return enqueueCartMutation(async () => {
-    const payload = await jsonFetch<CartMutationResponse>(`/cart/items/${itemId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ quantity }),
-    });
-    return publishCart(payload.cart);
+    try {
+      const payload = await jsonFetch<CartMutationResponse>(`/cart/items/${itemId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ quantity }),
+      });
+      return publishAuthoritativeCart(payload.cart);
+    } catch (error) {
+      restoreOptimisticRollback();
+      throw error;
+    }
   });
 }
 
 export async function removeCartItem(itemId: string): Promise<CartPayload> {
+  optimisticRemoveCartItem(getCartOverride(), itemId);
+
   return enqueueCartMutation(async () => {
-    const payload = await jsonFetch<CartMutationResponse>(`/cart/items/${itemId}`, {
-      method: 'DELETE',
-    });
-    return publishCart(payload.cart);
+    try {
+      const payload = await jsonFetch<CartMutationResponse>(`/cart/items/${itemId}`, {
+        method: 'DELETE',
+      });
+      return publishAuthoritativeCart(payload.cart);
+    } catch (error) {
+      restoreOptimisticRollback();
+      throw error;
+    }
   });
 }
 

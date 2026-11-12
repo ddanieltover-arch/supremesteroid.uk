@@ -106,8 +106,11 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   }
 
   const updateQuantity = (id: string, quantity: number) => {
+    // Optimistic cartApi updates fire before the network; only briefly mark the row.
     setPendingId(id);
-    void updateCartItemQuantity(id, quantity).finally(() => setPendingId(null));
+    void updateCartItemQuantity(id, quantity).finally(() => {
+      setPendingId((current) => (current === id ? null : current));
+    });
   };
 
   return (
@@ -178,7 +181,8 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             ) : (
               cart.items.map((item) => {
                 const isOptimistic = String(item.id).startsWith('optimistic-');
-                const rowBusy = pendingId === item.id || syncing || isOptimistic;
+                // Keep +/- usable while other lines sync; only block brand-new optimistic lines.
+                const rowBusy = isOptimistic;
 
                 return (
                 <div key={item.id} className="flex gap-3.5 rounded-xl border border-slate-200 bg-white/50 p-3">
@@ -228,7 +232,9 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         disabled={rowBusy}
                         onClick={() => {
                           setPendingId(item.id);
-                          void removeCartItem(item.id).finally(() => setPendingId(null));
+                          void removeCartItem(item.id).finally(() => {
+                            setPendingId((current) => (current === item.id ? null : current));
+                          });
                         }}
                         aria-label={`Remove ${item.product_name}`}
                       >
@@ -253,10 +259,10 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               ) : null}
               <button
                 type="button"
-                disabled={!canCheckout || syncing || checkingOut || pendingId !== null}
+                disabled={!canCheckout || checkingOut}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 onClick={() => {
-                  if (checkingOut || syncing) {
+                  if (checkingOut) {
                     return;
                   }
                   setCheckoutError(null);
@@ -274,7 +280,11 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     .finally(() => setCheckingOut(false));
                 }}
               >
-                {checkingOut ? 'Preparing checkout…' : syncing ? 'Updating basket…' : 'Proceed to secure checkout'}
+                {checkingOut
+                  ? syncing
+                    ? 'Updating basket…'
+                    : 'Preparing checkout…'
+                  : 'Proceed to secure checkout'}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </button>
               <Link href="/shop" className="inline-flex w-full min-h-11 items-center justify-center text-sm text-slate-800 transition-colors hover:text-brand" onClick={onClose}>

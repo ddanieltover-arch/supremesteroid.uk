@@ -234,8 +234,8 @@ class CartService
 
             $newQty = $existing ? $existing->quantity + $quantity : $quantity;
 
-            // Authoritatively verify purchasability and inventory
-            $this->eligibilityService->assertPurchasable($product, $variant, $newQty, true);
+            // Fast cart gate — skip deep content compliance re-scan on every add.
+            $this->eligibilityService->assertPurchasableForCart($product, $variant, $newQty);
 
             if ($existing) {
                 $existing->quantity = $newQty;
@@ -275,7 +275,7 @@ class CartService
         $product = $item->product;
         $variant = $item->variant;
 
-        $this->eligibilityService->assertPurchasable($product, $variant, $quantity, true);
+        $this->eligibilityService->assertPurchasableForCart($product, $variant, $quantity);
 
         $item->quantity = $quantity;
         $item->save();
@@ -315,8 +315,8 @@ class CartService
                 $product = $guestItem->product;
                 $variant = $guestItem->variant;
 
-                // Check eligibility
-                if (! $this->eligibilityService->isEligible($product, $variant, 1, false)) {
+                // Lightweight line check — image/compliance already gated at publication / add.
+                if (! $this->eligibilityService->checkCartLineEligibility($product, $variant, 1)['is_eligible']) {
                     continue;
                 }
 
@@ -563,7 +563,18 @@ class CartService
         }
 
         $image = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
+        if (! $image) {
+            return null;
+        }
 
-        return $image?->publicUrl();
+        // Prefer already-resolved absolute/CDN URLs; avoid Storage::exists probes.
+        $url = $image->publicUrl();
+        if (is_string($url) && $url !== '') {
+            return $url;
+        }
+
+        $raw = $image->getAttributes()['url'] ?? null;
+
+        return is_string($raw) && $raw !== '' ? $raw : null;
     }
 }

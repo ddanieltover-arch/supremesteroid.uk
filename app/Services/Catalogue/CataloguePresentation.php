@@ -105,19 +105,25 @@ class CataloguePresentation
 
     public function hasCatalogueImage(Product $product): bool
     {
+        // Use the stored URL only — avoid publicUrl()/Storage::exists probes on the
+        // hot cart and catalogue eligibility paths (slow on ephemeral filesystems).
         if ($product->relationLoaded('images')) {
-            return $product->images->contains(
-                fn ($image): bool => $this->isUsableCatalogueImageUrl($image->publicUrl() ?? $image->url ?? null)
-            );
+            return $product->images->contains(function ($image): bool {
+                $raw = $image->getAttributes()['url'] ?? null;
+
+                return $this->isUsableCatalogueImageUrl(is_string($raw) ? $raw : null);
+            });
         }
 
-        foreach ($product->images()->orderByDesc('is_primary')->orderBy('display_order')->get() as $image) {
-            if ($this->isUsableCatalogueImageUrl($image->publicUrl() ?? $image->url ?? null)) {
-                return true;
-            }
+        $query = $product->images()
+            ->whereNotNull('url')
+            ->where('url', '!=', '');
+
+        foreach ($this->unusableImageHosts() as $host) {
+            $query->where('url', 'not like', '%'.$host.'%');
         }
 
-        return false;
+        return $query->exists();
     }
 
     public function usableImageUrl(?string $url): ?string

@@ -121,6 +121,7 @@ trait CreatesCatalogueFixtures
             'address_line_1' => '10 Downing Street',
             'city' => 'London',
             'postal_code' => 'SW1A 2AA',
+            'phone' => '+447700900123',
         ];
     }
 }

@@ -22,6 +22,8 @@ class PageResource extends Resource
 
     protected static string | UnitEnum | null $navigationGroup = 'Storefront';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([

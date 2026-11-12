@@ -56,9 +56,11 @@ class CartController extends Controller
         $sessionId = $this->resolveSessionId($request);
         $cart = $this->cartService->resolveRequestCart($request);
 
-        $product = Product::query()->findOrFail($validated['product_id']);
+        $product = Product::query()
+            ->with(['inventory', 'images', 'content'])
+            ->findOrFail($validated['product_id']);
         $variant = ! empty($validated['product_variant_id'])
-            ? ProductVariant::query()->findOrFail($validated['product_variant_id'])
+            ? ProductVariant::query()->with('inventory')->findOrFail($validated['product_variant_id'])
             : null;
 
         $this->cartService->addItem(
@@ -70,7 +72,8 @@ class CartController extends Controller
             sessionId: $sessionId
         );
 
-        $summarized = $this->cartService->summarize($cart->fresh('items'));
+        $cart->unsetRelation('items');
+        $summarized = $this->cartService->summarize($cart);
 
         // Only cancel express buy-now after a successful add that leaves a shopping cart.
         // Failed adds never reach here; empty carts must not wipe buy-now into a double-empty gate.
@@ -92,12 +95,14 @@ class CartController extends Controller
     {
         $this->cartService->resolveRequestCart($request);
         $validated = $request->validated();
-        $item = CartItem::query()->with('cart')->findOrFail($itemId);
+        $item = CartItem::query()
+            ->with(['cart', 'product.inventory', 'product.images', 'variant.inventory'])
+            ->findOrFail($itemId);
         $user = $request->user();
         $sessionId = $this->resolveSessionId($request);
+        $cart = $item->cart;
 
         if ((int) $validated['quantity'] === 0) {
-            $cart = $item->cart;
             $this->cartService->removeItem($item, $user, $sessionId);
         } else {
             $this->cartService->updateQuantity(
@@ -106,13 +111,14 @@ class CartController extends Controller
                 actor: $user,
                 sessionId: $sessionId
             );
-            $cart = $item->cart()->first();
         }
+
+        $cart->unsetRelation('items');
 
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Cart updated.',
-                'cart' => $this->cartService->summarize($cart?->fresh('items') ?? $cart),
+                'cart' => $this->cartService->summarize($cart),
             ]);
         }
 
@@ -127,11 +133,12 @@ class CartController extends Controller
         $sessionId = $this->resolveSessionId($request);
         $cart = $item->cart;
         $this->cartService->removeItem($item, $user, $sessionId);
+        $cart->unsetRelation('items');
 
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Item removed.',
-                'cart' => $this->cartService->summarize($cart->fresh('items') ?? $cart),
+                'cart' => $this->cartService->summarize($cart),
             ]);
         }
 
