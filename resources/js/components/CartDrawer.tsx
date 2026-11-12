@@ -5,7 +5,7 @@ import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Portal } from '@/components/ui/Portal';
 import { useCart } from '@/hooks/useCart';
-import { checkoutWhenReady, clearCart, isCartSyncing, publishCart, removeCartItem, subscribeCartSync, updateCartItemQuantity } from '@/lib/cartApi';
+import { bumpCartItemQuantity, checkoutWhenReady, clearCart, isCartSyncing, publishCart, removeCartItem, subscribeCartSync } from '@/lib/cartApi';
 import { jsonFetch } from '@/lib/http';
 import { formatMoney } from '@/lib/money';
 import type { CartPayload } from '@/types';
@@ -105,10 +105,11 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     return null;
   }
 
-  const updateQuantity = (id: string, quantity: number) => {
-    // Optimistic cartApi updates fire before the network; only briefly mark the row.
+  const bumpQuantity = (id: string, delta: number) => {
+    // Read live qty from cartApi override inside bumpCartItemQuantity so rapid
+    // clicks do not all reuse the same React-rendered quantity.
     setPendingId(id);
-    void updateCartItemQuantity(id, quantity).finally(() => {
+    void bumpCartItemQuantity(id, delta, cart).finally(() => {
       setPendingId((current) => (current === id ? null : current));
     });
   };
@@ -210,7 +211,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           type="button"
                           className="px-2 py-0.5 text-slate-500"
                           disabled={rowBusy}
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => bumpQuantity(item.id, -1)}
                           aria-label="Decrease quantity"
                         >
                           −
@@ -220,7 +221,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           type="button"
                           className="px-2 py-0.5 text-slate-500"
                           disabled={rowBusy}
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => bumpQuantity(item.id, 1)}
                           aria-label="Increase quantity"
                         >
                           +
@@ -232,7 +233,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         disabled={rowBusy}
                         onClick={() => {
                           setPendingId(item.id);
-                          void removeCartItem(item.id).finally(() => {
+                          void removeCartItem(item.id, cart).finally(() => {
                             setPendingId((current) => (current === item.id ? null : current));
                           });
                         }}

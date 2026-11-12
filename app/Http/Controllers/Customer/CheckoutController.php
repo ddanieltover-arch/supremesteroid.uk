@@ -87,7 +87,17 @@ class CheckoutController extends Controller
 
     public function saveDetails(SaveCheckoutDetailsRequest $request): RedirectResponse
     {
-        $this->checkoutFlowService->saveDetails($request, $request->validated());
+        try {
+            $this->checkoutFlowService->saveDetails($request, $request->validated());
+        } catch (\App\Exceptions\InvalidCheckoutException|\App\Exceptions\ProductNotPurchasableException|\App\Exceptions\InsufficientInventoryException $exception) {
+            $message = method_exists($exception, 'getCustomerMessage')
+                ? (string) $exception->getCustomerMessage()
+                : 'We could not continue checkout with these details.';
+
+            return back()
+                ->withErrors(['checkout' => $message])
+                ->with('error', $message);
+        }
 
         return redirect()->route('checkout.delivery');
     }

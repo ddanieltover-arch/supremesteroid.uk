@@ -13,6 +13,10 @@ export function CheckoutAlerts({
   requiresAcknowledgement?: boolean;
 }) {
   const checkoutError = errors.checkout ?? errors.message;
+  const fieldErrors = Object.entries(errors)
+    .filter(([key, message]) => key !== 'checkout' && key !== 'message' && typeof message === 'string' && message.trim() !== '')
+    .map(([, message]) => message);
+  const uniqueFieldErrors = [...new Set(fieldErrors)];
   const expired = [...warnings, checkoutError].some((message) => message?.toLowerCase().includes('expired'));
   const stockIssue = affectedItems.length > 0 || [...warnings, checkoutError].some((message) => message?.toLowerCase().includes('no longer available'));
 
@@ -24,6 +28,16 @@ export function CheckoutAlerts({
         </Alert>
       ))}
       {checkoutError && !warnings.includes(checkoutError) ? <Alert type="warning">{checkoutError}</Alert> : null}
+      {uniqueFieldErrors.length > 0 ? (
+        <Alert type="error">
+          Please fix the highlighted details before continuing.
+          <ul className="mt-2 list-disc pl-5">
+            {uniqueFieldErrors.map((message) => (
+              <li key={message}>{message}</li>
+            ))}
+          </ul>
+        </Alert>
+      ) : null}
       {stockIssue ? (
         <Alert type="error">
           One item in your basket is no longer available in the selected quantity.

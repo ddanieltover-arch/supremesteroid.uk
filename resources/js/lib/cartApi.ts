@@ -168,17 +168,24 @@ export function optimisticUpdateCartItemQuantity(
   current: CartPayload | null | undefined,
   itemId: string,
   quantity: number,
-): CartPayload {
-  if (optimisticRollback === undefined) {
-    optimisticRollback = cartOverride ?? (current ? { ...current } : null);
+): CartPayload | null {
+  const base = cartOverride ?? current ?? null;
+  if (!base?.items?.some((item) => item.id === itemId)) {
+    // Never publish an empty cart when the live override is missing — that
+    // made +/- appear to wipe the basket.
+    return null;
   }
 
-  const currency = current?.totals?.currency ?? 'GBP';
+  if (optimisticRollback === undefined) {
+    optimisticRollback = base;
+  }
+
+  const currency = base.totals?.currency ?? 'GBP';
   const nextQty = Math.max(0, quantity);
   const items =
     nextQty === 0
-      ? (current?.items ?? []).filter((item) => item.id !== itemId)
-      : (current?.items ?? []).map((item) => {
+      ? base.items.filter((item) => item.id !== itemId)
+      : base.items.map((item) => {
           if (item.id !== itemId) {
             return item;
           }
@@ -190,14 +197,14 @@ export function optimisticUpdateCartItemQuantity(
           };
         });
 
-  return publishCart(recountCart(items, currency, current));
+  return publishCart(recountCart(items, currency, base));
 }
 
 /** Instant local remove before the DELETE round-trip finishes. */
 export function optimisticRemoveCartItem(
   current: CartPayload | null | undefined,
   itemId: string,
-): CartPayload {
+): CartPayload | null {
   return optimisticUpdateCartItemQuantity(current, itemId, 0);
 }
 
@@ -286,14 +293,52 @@ export async function addCartItem(input: {
   });
 }
 
-export async function updateCartItemQuantity(itemId: string, quantity: number): Promise<CartPayload> {
-  optimisticUpdateCartItemQuantity(getCartOverride(), itemId, quantity);
+/**
+ * Resolve the next absolute quantity from the live override (not React props),
+ * so rapid +/- clicks do not all reuse the same stale quantity.
+ */
+export function bumpCartItemQuantity(
+  itemId: string,
+  delta: number,
+  fallback?: CartPayload | null,
+): Promise<CartPayload> {
+  const current = getCartOverride() ?? fallback ?? null;
+  const item = current?.items?.find((entry) => entry.id === itemId);
+  if (!item) {
+    return Promise.reject(new Error('That item is no longer in your basket.'));
+  }
+
+  const nextQty = Math.max(0, item.quantity + delta);
+  if (nextQty === 0) {
+    return removeCartItem(itemId, current);
+  }
+
+  return updateCartItemQuantity(itemId, nextQty, current);
+}
+
+export async function updateCartItemQuantity(
+  itemId: string,
+  quantity: number,
+  fallback?: CartPayload | null,
+): Promise<CartPayload> {
+  const current = getCartOverride() ?? fallback ?? null;
+  optimisticUpdateCartItemQuantity(current, itemId, quantity);
 
   return enqueueCartMutation(async () => {
     try {
+      // Prefer the latest optimistic qty. If a later remove cleared the line,
+      // DELETE — do not fall back to this call's stale absolute quantity.
+      const latestItem = getCartOverride()?.items?.find((entry) => entry.id === itemId);
+      if (!latestItem || latestItem.quantity <= 0) {
+        const payload = await jsonFetch<CartMutationResponse>(`/cart/items/${itemId}`, {
+          method: 'DELETE',
+        });
+        return publishAuthoritativeCart(payload.cart);
+      }
+
       const payload = await jsonFetch<CartMutationResponse>(`/cart/items/${itemId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ quantity }),
+        body: JSON.stringify({ quantity: latestItem.quantity }),
       });
       return publishAuthoritativeCart(payload.cart);
     } catch (error) {
@@ -303,11 +348,25 @@ export async function updateCartItemQuantity(itemId: string, quantity: number): 
   });
 }
 
-export async function removeCartItem(itemId: string): Promise<CartPayload> {
-  optimisticRemoveCartItem(getCartOverride(), itemId);
+export async function removeCartItem(
+  itemId: string,
+  fallback?: CartPayload | null,
+): Promise<CartPayload> {
+  const current = getCartOverride() ?? fallback ?? null;
+  optimisticRemoveCartItem(current, itemId);
 
   return enqueueCartMutation(async () => {
     try {
+      // A later bump may have put the line back while we were queued.
+      const revived = getCartOverride()?.items?.find((entry) => entry.id === itemId);
+      if (revived && revived.quantity > 0) {
+        const payload = await jsonFetch<CartMutationResponse>(`/cart/items/${itemId}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ quantity: revived.quantity }),
+        });
+        return publishAuthoritativeCart(payload.cart);
+      }
+
       const payload = await jsonFetch<CartMutationResponse>(`/cart/items/${itemId}`, {
         method: 'DELETE',
       });

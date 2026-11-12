@@ -40,7 +40,9 @@ class SaveCheckoutDetailsRequest extends FormRequest
             'shipping_destination.city' => ['required_without:address_id', 'string', 'max:100'],
             'shipping_destination.state_county' => ['nullable', 'string', 'max:100'],
             'shipping_destination.postal_code' => ['required_without:address_id', 'string', 'max:20'],
-            'shipping_destination.phone' => ['required_without:address_id', 'string', 'max:30'],
+            // Always required — saved addresses may omit phone and the field was
+            // easy to miss below the fold, which made Continue appear stuck.
+            'shipping_destination.phone' => ['required', 'string', 'max:30'],
             'shipping_method_code' => ['nullable', 'string', 'max:50'],
             'customer_notes' => ['nullable', 'string', 'max:500'],
         ];

@@ -1,12 +1,12 @@
 import StorefrontLayout from '../../Layouts/StorefrontLayout';
 import { router, useForm, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { CheckoutAlerts } from '@/components/checkout/CheckoutAlerts';
 import { CheckoutProgress, type CheckoutStep } from '@/components/checkout/CheckoutProgress';
 import { OrderSummary } from '@/components/checkout/OrderSummary';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import type { CartPayload, CheckoutPreview, ShippingMethod } from '@/types';
+import type { CartPayload, CheckoutPreview } from '@/types';
 
 type Address = {
   id: string;
@@ -20,6 +20,10 @@ type Address = {
 };
 
 type Country = { code: string; name: string };
+
+function filled(value: string | null | undefined): boolean {
+  return typeof value === 'string' && value.trim() !== '';
+}
 
 export default function CheckoutIndex({
   cart,
@@ -45,9 +49,10 @@ export default function CheckoutIndex({
   requires_acknowledgement?: boolean;
 }) {
   const page = usePage<{ errors: Record<string, string>; auth?: { user?: { name?: string; email?: string } | null } }>();
-  const errors = page.props.errors ?? {};
+  const serverErrors = page.props.errors ?? {};
   const [mode, setMode] = useState<'saved' | 'new'>(addresses.length > 0 ? 'saved' : 'new');
   const [submitting, setSubmitting] = useState(false);
+  const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
   const selectedAddress = addresses[0];
   const destination = checkout && 'shipping_destination' in checkout ? (checkout as { shipping_destination?: Address }).shipping_destination : undefined;
   const form = useForm({
@@ -65,6 +70,11 @@ export default function CheckoutIndex({
     },
   });
 
+  const errors = useMemo(
+    () => ({ ...serverErrors, ...clientErrors }),
+    [serverErrors, clientErrors],
+  );
+
   const applyAddress = (address: Address) => {
     form.setData({
       ...form.data,
@@ -81,6 +91,43 @@ export default function CheckoutIndex({
     });
   };
 
+  const validateDetails = (): Record<string, string> => {
+    const next: Record<string, string> = {};
+    const dest = form.data.shipping_destination;
+    const usingSaved = mode === 'saved' && filled(form.data.address_id);
+
+    if (!page.props.auth?.user?.email && !filled(form.data.email)) {
+      next.email = 'Please enter your email.';
+    }
+
+    if (!filled(dest.full_name)) {
+      next['shipping_destination.full_name'] = 'Please enter the delivery name.';
+    }
+
+    if (!usingSaved) {
+      if (!filled(dest.address_line_1)) {
+        next['shipping_destination.address_line_1'] = 'Please enter the first line of the delivery address.';
+      }
+      if (!filled(dest.city)) {
+        next['shipping_destination.city'] = 'Please enter the delivery city.';
+      }
+      if (!filled(dest.postal_code)) {
+        next['shipping_destination.postal_code'] = 'Please enter the delivery postcode.';
+      }
+      if (!filled(dest.country_code)) {
+        next['shipping_destination.country_code'] = 'Please choose a country.';
+      }
+      if (!filled(dest.phone)) {
+        next['shipping_destination.phone'] = 'Please enter a phone number for delivery.';
+      }
+    } else if (!filled(dest.phone) && !filled(selectedAddress?.phone)) {
+      // Saved address without a phone still needs a contact number.
+      next['shipping_destination.phone'] = 'Please enter a phone number for delivery.';
+    }
+
+    return next;
+  };
+
   const items = checkout?.items ?? cart?.items ?? [];
   const totals = {
     subtotal: checkoutPreview?.items_subtotal ?? cart?.totals?.subtotal_amount,
@@ -91,11 +138,15 @@ export default function CheckoutIndex({
     currency: checkoutPreview?.currency ?? cart?.totals?.currency ?? 'GBP',
   };
 
+  const showAddressFields = mode === 'new' || addresses.length === 0;
+
   return (
     <StorefrontLayout chrome="checkout" seo={{ title: 'Checkout details', description: 'Secure checkout details.', robots: 'noindex,nofollow' }}>
       <CheckoutProgress current={checkout_step} steps={checkout_steps} />
       <h1 className="text-3xl font-semibold text-slate-900">Your details</h1>
-      <CheckoutAlerts warnings={warnings} errors={errors} affectedItems={affected_items} requiresAcknowledgement={requires_acknowledgement} />
+      <div id="checkout-details-alerts">
+        <CheckoutAlerts warnings={warnings} errors={errors} affectedItems={affected_items} requiresAcknowledgement={requires_acknowledgement} />
+      </div>
 
       <form
         className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start"
@@ -105,17 +156,34 @@ export default function CheckoutIndex({
           if (submitting) {
             return;
           }
+
+          const nextErrors = validateDetails();
+          if (Object.keys(nextErrors).length > 0) {
+            setClientErrors(nextErrors);
+            requestAnimationFrame(() => {
+              document.getElementById('checkout-details-alerts')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            return;
+          }
+
+          setClientErrors({});
           setSubmitting(true);
           router.post(
             '/checkout/details',
             {
               email: form.data.email,
-              address_id: mode === 'saved' ? form.data.address_id : null,
+              address_id: mode === 'saved' ? form.data.address_id || null : null,
               save_address: false,
               shipping_destination: form.data.shipping_destination,
             },
             {
-              preserveScroll: true,
+              preserveScroll: false,
+              onError: () => {
+                setSubmitting(false);
+                requestAnimationFrame(() => {
+                  document.getElementById('checkout-details-alerts')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+              },
               onFinish: () => setSubmitting(false),
             },
           );
@@ -141,6 +209,16 @@ export default function CheckoutIndex({
               }
               form.setData('email', event.target.value);
             }}
+          />
+          <Input
+            label="Phone"
+            type="tel"
+            autoComplete="tel"
+            required
+            value={form.data.shipping_destination.phone ?? ''}
+            error={errors['shipping_destination.phone']}
+            helperText="Required for delivery contact."
+            onChange={(event) => form.setData('shipping_destination', { ...form.data.shipping_destination, phone: event.target.value })}
           />
 
           {addresses.length > 0 ? (
@@ -193,7 +271,7 @@ export default function CheckoutIndex({
             </fieldset>
           ) : null}
 
-          {mode === 'new' || addresses.length === 0 ? (
+          {showAddressFields ? (
             <>
               <Input
                 label="Address line 1"
@@ -240,16 +318,6 @@ export default function CheckoutIndex({
                   </p>
                 ) : null}
               </div>
-              <Input
-                label="Phone"
-                type="tel"
-                autoComplete="tel"
-                required
-                value={form.data.shipping_destination.phone ?? ''}
-                error={errors['shipping_destination.phone']}
-                helperText="Required for delivery contact."
-                onChange={(event) => form.setData('shipping_destination', { ...form.data.shipping_destination, phone: event.target.value })}
-              />
             </>
           ) : null}
         </div>
