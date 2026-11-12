@@ -25,6 +25,14 @@ class ProductContent extends Model
         'shipping_information',
         'faqs',
         'important_information',
+        'why_choose',
+        'how_supplied',
+        'where_it_fits',
+        'who_its_for',
+        'what_you_get',
+        'key_differences',
+        'answer_capsule',
+        'related_reading',
     ];
 
     protected function casts(): array
@@ -33,6 +41,8 @@ class ProductContent extends Model
             'highlights' => 'array',
             'specifications' => 'array',
             'faqs' => 'array',
+            'key_differences' => 'array',
+            'related_reading' => 'array',
         ];
     }
 

@@ -9,6 +9,7 @@ use App\Enums\ProductRelationType;
 use App\Enums\ProductStatus;
 use App\Exceptions\ProductNotPurchasableException;
 use App\Filament\Resources\ProductResource\Pages;
+use App\Models\BlogPost;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -203,6 +204,65 @@ class ProductResource extends Resource
                         Forms\Components\TagsInput::make('highlights')
                             ->helperText('3–6 factual highlights. Do not add medical or performance claims.'),
                         Forms\Components\Textarea::make('overview')->rows(3),
+                        Forms\Components\Textarea::make('why_choose')->rows(3)
+                            ->label('Why choose')
+                            ->helperText('Commercial selection reasons only. No dosing, cycle, or medical claims.'),
+                        Forms\Components\Textarea::make('how_supplied')->rows(3)
+                            ->label('How supplied')
+                            ->helperText('How the listing is packaged, verified, and fulfilled — not how to use the product.'),
+                        Forms\Components\Textarea::make('where_it_fits')->rows(3)
+                            ->label('Where it fits')
+                            ->helperText('Category, brand placement, and fulfilment context.'),
+                        Forms\Components\Textarea::make('who_its_for')->rows(2)
+                            ->label('Who it is for')
+                            ->helperText('Commercial buyer intent only. No clinical indications.'),
+                        Forms\Components\Textarea::make('what_you_get')->rows(2)
+                            ->label('What you get')
+                            ->helperText('Pack format, size, and listing contents.'),
+                        Forms\Components\TagsInput::make('key_differences')
+                            ->helperText('2–4 factual bullets vs typical alternatives (brand/format/packaging only).'),
+                        Forms\Components\Textarea::make('answer_capsule')->rows(2)
+                            ->label('Answer capsule')
+                            ->helperText('One-line quick answer for GEO/search. No medical or dosing claims.')
+                            ->maxLength(320),
+                        Forms\Components\Repeater::make('related_reading')
+                            ->label('Related reading')
+                            ->schema([
+                                Forms\Components\Select::make('slug')
+                                    ->label('Blog post')
+                                    ->options(fn () => BlogPost::query()
+                                        ->where('is_published', true)
+                                        ->orderBy('title')
+                                        ->pluck('title', 'slug'))
+                                    ->searchable()
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        if (! is_string($state) || $state === '') {
+                                            return;
+                                        }
+                                        $title = BlogPost::query()
+                                            ->where('slug', $state)
+                                            ->value('title');
+                                        if (is_string($title)) {
+                                            $set('title', $title);
+                                        }
+                                    }),
+                                Forms\Components\TextInput::make('title')
+                                    ->required()
+                                    ->maxLength(200),
+                            ])
+                            ->columns(2)
+                            ->maxItems(3)
+                            ->helperText('Link up to three published blog posts. Education stays on /blog.'),
+                        Forms\Components\Repeater::make('faqs')
+                            ->label('FAQs')
+                            ->schema([
+                                Forms\Components\TextInput::make('question')->required()->maxLength(200),
+                                Forms\Components\Textarea::make('answer')->required()->rows(2)->maxLength(1000),
+                            ])
+                            ->columns(1)
+                            ->helperText('Commercial FAQs only. No dosing or medical advice.'),
                         Forms\Components\Textarea::make('composition')->rows(2),
                         Forms\Components\Textarea::make('manufacturer_information')->rows(2),
                         Forms\Components\Textarea::make('packaging_information')->rows(2),

@@ -86,7 +86,14 @@ if (typeof window !== 'undefined') {
     const anchor = target.closest('a');
     if (!anchor) return;
     const href = anchor.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) {
+    // Skip in-page hashes ("#x" / "/#x") — prefetching them triggers a full "/" visit.
+    if (
+      !href ||
+      href.includes('#') ||
+      href.startsWith('mailto:') ||
+      href.startsWith('tel:') ||
+      href.startsWith('javascript:')
+    ) {
       return;
     }
     if (href.startsWith('/logout') || href.startsWith('/internal') || href.includes('download')) {

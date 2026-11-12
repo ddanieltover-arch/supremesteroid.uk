@@ -41,6 +41,35 @@ class StorefrontInertiaPipelineTest extends TestCase
         $this->assertNull($item->cart->user_id);
     }
 
+    public function test_guest_cart_survives_session_regeneration_via_cookie(): void
+    {
+        $product = $this->makeProduct(['name' => 'Sticky Cart Product']);
+        \App\Models\ProductImage::query()->create([
+            'product_id' => $product->id,
+            'url' => 'https://cdn.example.test/sticky-cart.jpg',
+            'alt_text' => 'Sticky cart product',
+            'display_order' => 1,
+            'is_primary' => true,
+        ]);
+
+        $cartService = app(\App\Services\Cart\CartService::class);
+        $originalSession = 'guest-session-original';
+        $cart = $cartService->getOrCreateCart(null, $originalSession);
+        $cartService->addItem($cart, $product->fresh(['inventory', 'images']), null, 1, null, $originalSession);
+
+        // New session id, no session cart_id — only the durable cookie remains.
+        $request = \Illuminate\Http\Request::create('/cart', 'GET');
+        $request->setLaravelSession($this->app['session']->driver());
+        $request->session()->regenerate(true);
+        $request->session()->forget('cart_id');
+        $request->cookies->set(\App\Services\Cart\CartService::GUEST_CART_COOKIE, $cart->id);
+
+        $resolved = $cartService->resolveRequestCart($request);
+
+        $this->assertSame($cart->id, $resolved->id);
+        $this->assertSame(1, (int) $resolved->items()->sum('quantity'));
+    }
+
     public function test_authenticated_customer_can_update_and_remove_cart_item(): void
     {
         $user = $this->makeCustomer();

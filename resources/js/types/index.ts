@@ -65,7 +65,24 @@ export type ProductDetail = Omit<ProductCard, 'brand' | 'category'> & {
   shipping_methods?: ShippingMethod[];
   ineligibility_reasons?: string[];
   highlights?: string[];
-  content?: Record<string, string>;
+  answer_capsule?: string | null;
+  content?: {
+    overview?: string | null;
+    manufacturer_information?: string | null;
+    packaging_information?: string | null;
+    documentation?: string | null;
+    storage_information?: string | null;
+    shipping_information?: string | null;
+    important_information?: string | null;
+    why_choose?: string | null;
+    how_supplied?: string | null;
+    where_it_fits?: string | null;
+    who_its_for?: string | null;
+    what_you_get?: string | null;
+    answer_capsule?: string | null;
+  } | null;
+  key_differences?: string[];
+  related_reading?: Array<{ title: string; slug: string; url: string }>;
   faqs?: Array<{ question: string; answer: string }>;
   reviews?: {
     average?: number | null;

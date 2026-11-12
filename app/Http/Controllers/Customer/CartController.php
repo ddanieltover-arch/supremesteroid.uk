@@ -142,6 +142,9 @@ class CartController extends Controller
     {
         $cart = $this->cartService->resolveRequestCart($request);
         $this->cartService->clearCart($cart, $request->user(), $this->resolveSessionId($request));
+        if (! $request->user()) {
+            $this->cartService->forgetGuestCartCookie($request);
+        }
 
         if ($request->wantsJson()) {
             return response()->json([

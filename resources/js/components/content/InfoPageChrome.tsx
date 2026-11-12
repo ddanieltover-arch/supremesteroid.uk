@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, ChevronRight, Mail, MessageCircle, ShieldCheck, type LucideIcon } from 'lucide-react';
 import type { PropsWithChildren, ReactNode } from 'react';
+import { AnswerCapsule } from '@/components/seo/AnswerCapsule';
 
 const SUPPORT_EMAIL = 'info@supremesteroid.uk';
 
@@ -40,6 +41,7 @@ type InfoPageChromeProps = PropsWithChildren<{
   backLabel?: string;
   sidebarExtra?: ReactNode;
   links?: InfoNavLink[];
+  answerCapsule?: string | null;
 }>;
 
 export function InfoPageChrome({
@@ -57,6 +59,7 @@ export function InfoPageChrome({
   backLabel = 'Return to Shop',
   sidebarExtra,
   links = DEFAULT_LINKS,
+  answerCapsule = null,
   children,
 }: InfoPageChromeProps) {
   const page = usePage<{ store?: { support_email?: string } }>();
@@ -92,6 +95,12 @@ export function InfoPageChrome({
         {subtitle ? <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-300">{subtitle}</p> : null}
         {heroMeta}
       </div>
+
+      {answerCapsule ? (
+        <div className="mb-8">
+          <AnswerCapsule answer={answerCapsule} />
+        </div>
+      ) : null}
 
       <div className="grid gap-8 lg:grid-cols-4">
         <div className="lg:col-span-3">

@@ -21,6 +21,8 @@ use InvalidArgumentException;
 
 class CartService
 {
+    public const GUEST_CART_COOKIE = 'ss_cart';
+
     public function __construct(
         protected ProductPurchaseEligibilityService $eligibilityService,
         protected PricingService $pricingService,
@@ -42,6 +44,66 @@ class CartService
         }
 
         return null;
+    }
+
+    /**
+     * Durable guest cart id from session and/or cookie.
+     * Cookie survives session regeneration on some hosts (e.g. serverless cold starts).
+     */
+    protected function guestCartId(Request $request): ?string
+    {
+        $fromSession = $request->hasSession() ? $request->session()->get('cart_id') : null;
+        if (is_string($fromSession) && $fromSession !== '') {
+            return $fromSession;
+        }
+
+        $fromCookie = $request->cookie(self::GUEST_CART_COOKIE);
+        if (is_string($fromCookie) && $fromCookie !== '') {
+            return $fromCookie;
+        }
+
+        return null;
+    }
+
+    protected function rememberGuestCart(Request $request, Cart $cart): void
+    {
+        if ($request->user() || $cart->user_id !== null) {
+            return;
+        }
+
+        if ($request->hasSession()) {
+            $request->session()->put('cart_id', $cart->id);
+        }
+
+        cookie()->queue(cookie(
+            self::GUEST_CART_COOKIE,
+            (string) $cart->id,
+            60 * 24 * 30,
+            '/',
+            config('session.domain'),
+            (bool) config('session.secure', true),
+            true,
+            false,
+            config('session.same_site', 'lax')
+        ));
+    }
+
+    public function forgetGuestCartCookie(?Request $request = null): void
+    {
+        if ($request?->hasSession()) {
+            $request->session()->forget('cart_id');
+        }
+
+        cookie()->queue(cookie()->forget(self::GUEST_CART_COOKIE));
+    }
+
+    protected function findGuestCartById(?string $cartId): ?Cart
+    {
+        if (! is_string($cartId) || $cartId === '') {
+            return null;
+        }
+
+        return Cart::query()->where('id', $cartId)->whereNull('user_id')->first();
     }
 
     /**
@@ -81,13 +143,9 @@ class CartService
         }
 
         $sessionId = $request->hasSession() ? $request->session()->getId() : null;
-        $cartId = $request->hasSession() ? $request->session()->get('cart_id') : null;
-
-        if (is_string($cartId) && $cartId !== '') {
-            $existing = Cart::query()->where('id', $cartId)->whereNull('user_id')->first();
-            if ($existing) {
-                return $existing;
-            }
+        $existing = $this->findGuestCartById($this->guestCartId($request));
+        if ($existing) {
+            return $existing;
         }
 
         return $this->findCart(null, $sessionId);
@@ -100,23 +158,19 @@ class CartService
         }
 
         $sessionId = $request->hasSession() ? $request->session()->getId() : null;
-        $cartId = $request->hasSession() ? $request->session()->get('cart_id') : null;
+        $existing = $this->findGuestCartById($this->guestCartId($request));
 
-        if (is_string($cartId) && $cartId !== '') {
-            $existing = Cart::query()->where('id', $cartId)->whereNull('user_id')->first();
-            if ($existing) {
-                if ($sessionId && $existing->session_id !== $sessionId) {
-                    $existing->update(['session_id' => $sessionId]);
-                }
-
-                return $existing;
+        if ($existing) {
+            if ($sessionId && $existing->session_id !== $sessionId) {
+                $existing->update(['session_id' => $sessionId]);
             }
+            $this->rememberGuestCart($request, $existing);
+
+            return $existing;
         }
 
         $cart = $this->getOrCreateCart(null, $sessionId);
-        if ($request->hasSession()) {
-            $request->session()->put('cart_id', $cart->id);
-        }
+        $this->rememberGuestCart($request, $cart);
 
         return $cart;
     }
@@ -312,18 +366,27 @@ class CartService
     /**
      * Merge a guest cart identified by the pre-login session id into the authenticated customer cart.
      */
-    public function mergeGuestCartBySession(string $guestSessionId, User $user): Cart
+    public function mergeGuestCartBySession(string $guestSessionId, User $user, ?Request $request = null): Cart
     {
         $guestCart = Cart::query()
             ->where('session_id', $guestSessionId)
             ->whereNull('user_id')
             ->first();
 
+        if (! $guestCart && $request) {
+            $guestCart = $this->findGuestCartById($this->guestCartId($request));
+        }
+
         if (! $guestCart) {
+            $this->forgetGuestCartCookie($request);
+
             return $this->getOrCreateCart($user);
         }
 
-        return $this->mergeGuestCart($guestCart, $user);
+        $merged = $this->mergeGuestCart($guestCart, $user);
+        $this->forgetGuestCartCookie($request);
+
+        return $merged;
     }
 
     /**
@@ -501,6 +564,6 @@ class CartService
 
         $image = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
 
-        return $image?->url;
+        return $image?->publicUrl();
     }
 }

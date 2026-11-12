@@ -24,6 +24,38 @@ return [
             'SHOP_ANSWER_CAPSULE',
             'The Supreme Steroids shop catalogues published UK-available products across brands and categories. Use filters to browse purchasable listings with server-confirmed pricing, stock status, and product details before checkout.'
         ),
+        'category' => env(
+            'CATEGORY_ANSWER_CAPSULE',
+            '{name} products are listed in the Supreme Steroids UK catalogue. Browse published items in this category with clear specifications, pricing, and stock status before checkout.'
+        ),
+        'brand' => env(
+            'BRAND_ANSWER_CAPSULE',
+            '{name} products are available from Supreme Steroids UK. Shop published {name} catalogue listings with server-confirmed pricing, stock status, and product details.'
+        ),
+        'search' => env(
+            'SEARCH_ANSWER_CAPSULE',
+            'Search the Supreme Steroids UK catalogue for published products. Use filters to refine by brand, category, price, and availability before checkout.'
+        ),
+        'search_term' => env(
+            'SEARCH_TERM_ANSWER_CAPSULE',
+            'Search results for “{term}” from the Supreme Steroids UK catalogue. Refine by brand, category, price, and availability to find published purchasable listings.'
+        ),
+        'product' => env(
+            'PRODUCT_ANSWER_CAPSULE',
+            '{name} is a {category} catalogue listing from {brand} with commercial specifications shown on this page; it does not include medical or dosing advice.'
+        ),
+        'blog' => env(
+            'BLOG_ANSWER_CAPSULE',
+            'Educational guides and reference articles from Supreme Steroids UK covering catalogue topics, shipping, and store information — without medical or dosing advice.'
+        ),
+        'blog_post' => env(
+            'BLOG_POST_ANSWER_CAPSULE',
+            '{title} is an educational article from Supreme Steroids UK. It provides storefront and catalogue context without medical or dosing advice.'
+        ),
+        'content' => env(
+            'CONTENT_ANSWER_CAPSULE',
+            '{title} — official Supreme Steroids UK store information. Review published policies and guidance for shopping, shipping, and account support.'
+        ),
     ],
 
     'announcement' => [

@@ -17,6 +17,7 @@ use App\Services\Catalogue\SeoService;
 use App\Services\Catalogue\StockNotificationService;
 use App\Services\Catalogue\StructuredDataService;
 use App\Services\Shipping\ShippingEngine;
+use App\Services\Storefront\AnswerCapsuleService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -37,7 +38,8 @@ class CatalogueController extends Controller
         protected StructuredDataService $structuredData,
         protected StockNotificationService $stockNotifications,
         protected ReviewService $reviews,
-        protected CatalogueDiscoveryService $discovery
+        protected CatalogueDiscoveryService $discovery,
+        protected AnswerCapsuleService $answerCapsules,
     ) {}
 
     public function index(Request $request): Response
@@ -92,7 +94,7 @@ class CatalogueController extends Controller
 
     public function show(Request $request, string $slug): Response
     {
-        $cached = Cache::remember("catalogue.product.detail.v2.{$slug}", 300, function () use ($slug) {
+        $cached = Cache::remember("catalogue.product.detail.v3.{$slug}", 300, function () use ($slug) {
             $product = Product::query()
                 ->purchasable()
                 ->with([
@@ -115,12 +117,16 @@ class CatalogueController extends Controller
             }
 
             $payload = (new ProductDetailResource($product))->resolve();
-            $payload['shipping_methods'] = Cache::remember('shipping.rates.gb.zero', 600, fn () => $this->shippingEngine->calculateRates('0.00', 'GB')->values());
-            $payload['breadcrumbs'] = $this->productBreadcrumbs($product);
-            $payload['structured_data'] = [
+            $payload['shipping_methods'] = Cache::remember(
+                'shipping.rates.gb.zero',
+                600,
+                fn () => array_values($this->shippingEngine->calculateRates('0.00', 'GB')->values()->all())
+            );
+            $payload['breadcrumbs'] = array_values($this->productBreadcrumbs($product));
+            $payload['structured_data'] = array_values([
                 $this->structuredData->forProduct($product),
                 $this->structuredData->breadcrumbs($payload['breadcrumbs']),
-            ];
+            ]);
 
             return [
                 'payload' => $payload,
@@ -147,14 +153,14 @@ class CatalogueController extends Controller
                 $grouped = $this->relatedProducts->grouped($product, 4);
 
                 return [
-                    'related' => ProductCardResource::collection($grouped['related'])->resolve(),
-                    'alternative' => ProductCardResource::collection($grouped['alternative'])->resolve(),
-                    'complementary' => ProductCardResource::collection($grouped['complementary'])->resolve(),
+                    'related' => array_values(ProductCardResource::collection($grouped['related'])->resolve()),
+                    'alternative' => array_values(ProductCardResource::collection($grouped['alternative'])->resolve()),
+                    'complementary' => array_values(ProductCardResource::collection($grouped['complementary'])->resolve()),
                 ];
             }),
-            'wishlistProductIds' => $request->user()
+            'wishlistProductIds' => array_values($request->user()
                 ? app(\App\Services\Account\WishlistService::class)->productIds($request->user())
-                : [],
+                : []),
             'preview' => false,
             'seo' => $this->seoService->forPage(
                 $request,
@@ -197,24 +203,24 @@ class CatalogueController extends Controller
         $payload = (new ProductDetailResource($product))->resolve();
         $payload['is_purchasable'] = false;
         $payload['is_preview'] = true;
-        $payload['related_products'] = ProductCardResource::collection($related)->resolve();
+        $payload['related_products'] = array_values(ProductCardResource::collection($related)->resolve());
         $payload['related_groups'] = [
-            'related' => ProductCardResource::collection($grouped['related'])->resolve(),
-            'alternative' => ProductCardResource::collection($grouped['alternative'])->resolve(),
-            'complementary' => ProductCardResource::collection($grouped['complementary'])->resolve(),
+            'related' => array_values(ProductCardResource::collection($grouped['related'])->resolve()),
+            'alternative' => array_values(ProductCardResource::collection($grouped['alternative'])->resolve()),
+            'complementary' => array_values(ProductCardResource::collection($grouped['complementary'])->resolve()),
         ];
-        $payload['shipping_methods'] = $this->shippingEngine->calculateRates('0.00', 'GB')->values();
-        $payload['breadcrumbs'] = $this->productBreadcrumbs($product);
-        $payload['structured_data'] = [
+        $payload['shipping_methods'] = array_values($this->shippingEngine->calculateRates('0.00', 'GB')->values()->all());
+        $payload['breadcrumbs'] = array_values($this->productBreadcrumbs($product));
+        $payload['structured_data'] = array_values([
             $this->structuredData->forProduct($product),
             $this->structuredData->breadcrumbs($payload['breadcrumbs']),
-        ];
+        ]);
         if (isset($payload['variants']) && is_array($payload['variants'])) {
-            $payload['variants'] = array_map(function (array $variant): array {
+            $payload['variants'] = array_values(array_map(function (array $variant): array {
                 $variant['is_purchasable'] = false;
 
                 return $variant;
-            }, $payload['variants']);
+            }, $payload['variants']));
         }
 
         return Inertia::render('Catalogue/Show', [
@@ -632,9 +638,12 @@ class CatalogueController extends Controller
                 'classification' => is_string($classification) ? $classification : null,
                 'attributes' => is_array($attributes) ? $attributes : [],
             ],
-            'answer_capsule' => $listingKind === 'shop'
-                ? (string) config('homepage.answer_capsules.shop', '')
-                : null,
+            'answer_capsule' => $this->answerCapsules->listing(
+                $listingKind,
+                $context,
+                $heading,
+                is_string($search) ? $search : null
+            ),
             'seo' => $this->seoService->forPage(
                 $request,
                 $listingKind === 'shop'

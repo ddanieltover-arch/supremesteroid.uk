@@ -8,6 +8,7 @@ use App\Models\BlogPost;
 use App\Services\Catalogue\SeoService;
 use App\Services\Catalogue\StructuredDataService;
 use App\Services\Content\BlogPostContentFormatter;
+use App\Services\Storefront\AnswerCapsuleService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
@@ -21,6 +22,7 @@ class BlogController extends Controller
         protected SeoService $seoService,
         protected StructuredDataService $structuredData,
         protected BlogPostContentFormatter $contentFormatter,
+        protected AnswerCapsuleService $answerCapsules,
     ) {}
 
     public function index(Request $request): Response
@@ -77,6 +79,7 @@ class BlogController extends Controller
             'filters' => [
                 'search' => $search,
             ],
+            'answer_capsule' => $this->answerCapsules->blogIndex(),
             'seo' => $this->seoService->forPage(
                 $request,
                 'Educational Guides & Steroid Research Articles | Supreme Steroids',
@@ -156,6 +159,10 @@ class BlogController extends Controller
         return Inertia::render('Blog/Show', [
             'post' => $post,
             'recent_posts' => $cached['recent_posts'],
+            'answer_capsule' => $this->answerCapsules->blogPost(
+                (string) $post['title'],
+                $post['excerpt'] ?? $description
+            ),
             'structured_data' => [
                 $this->structuredData->breadcrumbs([
                     ['name' => 'Home', 'url' => route('home')],

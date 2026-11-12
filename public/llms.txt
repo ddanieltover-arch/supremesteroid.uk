@@ -1,7 +1,7 @@
 # Supreme Steroids
 > UK online catalogue for published research and consumer sports-nutrition products, with educational guides and discreet shipping information.
 
-Supreme Steroids (supremesteroid.uk) is a United Kingdom storefront listing compliance-reviewed catalogue products, brands, and categories, plus educational articles. Product pages describe commercial specifications only and do not provide medical advice or dosing protocols.
+Supreme Steroids (supremesteroid.uk) is a United Kingdom storefront listing compliance-reviewed catalogue products, brands, and categories, plus educational articles. Product pages describe commercial specifications and selection guidance (why/how/where the listing fits) only and do not provide medical advice or dosing protocols.
 
 ## Key Pages
 - /: Homepage — catalogue overview, trust signals, and FAQs

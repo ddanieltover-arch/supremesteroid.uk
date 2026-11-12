@@ -1,7 +1,13 @@
 import { useMemo, useState } from 'react';
+import { asList } from '@/lib/asList';
 import type { ProductDetail } from '@/types';
 
 function PanelBody({ product, tab }: { product: ProductDetail; tab: string }) {
+  const specifications = asList<NonNullable<ProductDetail['specifications']>[number]>(product.specifications);
+  const shippingMethods = asList<NonNullable<ProductDetail['shipping_methods']>[number]>(product.shipping_methods);
+  const faqs = asList<NonNullable<ProductDetail['faqs']>[number]>(product.faqs);
+  const reviewItems = asList<NonNullable<NonNullable<ProductDetail['reviews']>['items']>[number]>(product.reviews?.items);
+
   if (tab === 'overview') {
     return (
       <div className="prose space-y-3 text-sm leading-relaxed text-slate-600">
@@ -15,9 +21,9 @@ function PanelBody({ product, tab }: { product: ProductDetail; tab: string }) {
   }
 
   if (tab === 'specifications') {
-    return (product.specifications ?? []).length > 0 ? (
+    return specifications.length > 0 ? (
       <dl className="grid gap-3 sm:grid-cols-2">
-        {(product.specifications ?? []).map((row) => (
+        {specifications.map((row) => (
           <div key={`${row.name}-${row.value}`} className="rounded-lg border border-slate-200 px-3 py-2">
             <dt className="text-xs uppercase tracking-wider text-slate-500">{row.name}</dt>
             <dd className="mt-1 text-sm text-slate-900">{row.value}</dd>
@@ -46,7 +52,7 @@ function PanelBody({ product, tab }: { product: ProductDetail; tab: string }) {
     return (
       <div className="space-y-3 text-sm text-slate-600">
         {product.content?.shipping_information ? <p>{product.content.shipping_information}</p> : <p>Shipping options and free-delivery eligibility are confirmed from the live basket.</p>}
-        {(product.shipping_methods ?? []).map((method) => (
+        {shippingMethods.map((method) => (
           <p key={method.code}>{method.name}{method.estimated_days ? ` · ${method.estimated_days}` : ''}</p>
         ))}
         {product.content?.storage_information ? <p>{product.content.storage_information}</p> : null}
@@ -55,9 +61,9 @@ function PanelBody({ product, tab }: { product: ProductDetail; tab: string }) {
   }
 
   if (tab === 'faqs') {
-    return (product.faqs ?? []).length > 0 ? (
+    return faqs.length > 0 ? (
       <dl className="space-y-3">
-        {(product.faqs ?? []).map((item) => (
+        {faqs.map((item) => (
           <div key={item.question} className="rounded-lg border border-slate-200 p-3">
             <dt className="font-semibold text-slate-900">{item.question}</dt>
             <dd className="mt-1 text-sm text-slate-600">{item.answer}</dd>
@@ -69,14 +75,13 @@ function PanelBody({ product, tab }: { product: ProductDetail; tab: string }) {
     );
   }
 
-  const items = product.reviews?.items ?? [];
-  if (items.length === 0) {
+  if (reviewItems.length === 0) {
     return <p className="text-sm text-slate-500">No approved reviews yet.</p>;
   }
 
   return (
     <ul className="space-y-4">
-      {items.map((review) => (
+      {reviewItems.map((review) => (
         <li key={review.id} className="rounded-xl border border-slate-200 p-4">
           <p className="text-sm font-semibold text-slate-900">{review.title || 'Customer review'}</p>
           <p className="mt-1 text-xs text-slate-500">
@@ -91,6 +96,7 @@ function PanelBody({ product, tab }: { product: ProductDetail; tab: string }) {
 }
 
 export function ProductInfoPanels({ product }: { product: ProductDetail }) {
+  const faqs = asList<NonNullable<ProductDetail['faqs']>[number]>(product.faqs);
   const tabs = useMemo(() => {
     const items = [
       { id: 'overview', label: 'Overview' },
@@ -101,11 +107,11 @@ export function ProductInfoPanels({ product }: { product: ProductDetail }) {
       { id: 'reviews', label: 'Reviews' },
     ];
     return items.filter((tab) => {
-      if (tab.id === 'faqs') return (product.faqs ?? []).length > 0;
+      if (tab.id === 'faqs') return faqs.length > 0;
       if (tab.id === 'documentation') return Boolean(product.content?.documentation || product.lab_verification_reference);
       return true;
     });
-  }, [product]);
+  }, [product, faqs.length]);
 
   const [active, setActive] = useState(tabs[0]?.id ?? 'overview');
 

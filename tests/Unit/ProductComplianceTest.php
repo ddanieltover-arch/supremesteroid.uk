@@ -56,4 +56,24 @@ class ProductComplianceTest extends TestCase
         $service->validateProductCompliance($product);
         $this->assertTrue(true);
     }
+
+    public function test_prohibited_terms_in_why_choose_fail_compliance(): void
+    {
+        $service = new ProductComplianceService();
+
+        $product = new Product([
+            'name' => 'Recovery Support',
+            'description' => 'Catalogue listing.',
+            'classification' => ProductClassification::OTC_CONSUMER,
+            'batch_number' => 'BATCH-OK',
+        ]);
+
+        $content = new \App\Models\ProductContent([
+            'why_choose' => 'Includes dosage instructions for advanced users',
+        ]);
+        $product->setRelation('content', $content);
+
+        $this->expectException(ProductComplianceViolationException::class);
+        $service->validateProductCompliance($product);
+    }
 }

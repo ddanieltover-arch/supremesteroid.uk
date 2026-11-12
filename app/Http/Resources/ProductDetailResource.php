@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\BlogPost;
 use App\Models\Product;
 use App\Services\Catalogue\CataloguePresentation;
 use App\Services\Catalogue\ProductPurchaseEligibilityService;
 use App\Services\Pricing\PricingService;
+use App\Services\Storefront\AnswerCapsuleService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\URL;
 
 /**
  * @mixin Product
@@ -33,11 +36,21 @@ class ProductDetailResource extends JsonResource
         $highlights = collect($content?->highlights ?? [])
             ->filter(fn ($item) => is_string($item) && trim($item) !== '')
             ->take(6)
-            ->values();
+            ->values()
+            ->all();
 
         $faqs = collect($content?->faqs ?? [])
             ->filter(fn ($item) => is_array($item) && filled($item['question'] ?? null) && filled($item['answer'] ?? null))
-            ->values();
+            ->values()
+            ->all();
+
+        $keyDifferences = collect($content?->key_differences ?? [])
+            ->filter(fn ($item) => is_string($item) && trim($item) !== '')
+            ->take(4)
+            ->values()
+            ->all();
+
+        $relatedReading = $this->resolveRelatedReading($content?->related_reading ?? []);
 
         $approvedReviews = $product->relationLoaded('reviews')
             ? $product->reviews
@@ -80,7 +93,7 @@ class ProductDetailResource extends JsonResource
                         'is_primary' => (bool) $image->is_primary,
                         'variant_id' => $image->product_variant_id,
                     ];
-                })->values(),
+                })->values()->all(),
             'variants' => $product->variants->map(function ($variant) use ($product, $presentation) {
                 $variantPricing = app(PricingService::class)->calculateProductPrice($product, $variant);
                 $variantEligibility = app(ProductPurchaseEligibilityService::class)
@@ -99,9 +112,9 @@ class ProductDetailResource extends JsonResource
                     'attributes' => $variant->attributes->map(fn ($attribute) => [
                         'name' => $attribute->attribute_name,
                         'value' => $attribute->attribute_value,
-                    ])->values(),
+                    ])->values()->all(),
                 ];
-            })->values(),
+            })->values()->all(),
             'pricing' => [
                 'currency' => $pricing['currency'],
                 'base_price' => $pricing['base_price_amount'],
@@ -114,8 +127,12 @@ class ProductDetailResource extends JsonResource
             'is_purchasable' => $eligibility['is_eligible'],
             'ineligibility_reasons' => $eligibility['reasons'] ?? [],
             'stock' => $presentation->stock($product),
-            'badges' => $presentation->badges($product),
+            'badges' => array_values($presentation->badges($product)),
             'highlights' => $highlights,
+            'answer_capsule' => app(AnswerCapsuleService::class)->product(
+                $product,
+                filled($content?->answer_capsule) ? trim((string) $content->answer_capsule) : null
+            ),
             'content' => $content ? array_filter([
                 'overview' => $content->overview,
                 'manufacturer_information' => $content->manufacturer_information,
@@ -124,7 +141,15 @@ class ProductDetailResource extends JsonResource
                 'storage_information' => $content->storage_information,
                 'shipping_information' => $content->shipping_information,
                 'important_information' => $content->important_information,
-            ]) : [],
+                'why_choose' => $content->why_choose,
+                'how_supplied' => $content->how_supplied,
+                'where_it_fits' => $content->where_it_fits,
+                'who_its_for' => $content->who_its_for,
+                'what_you_get' => $content->what_you_get,
+                'answer_capsule' => $content->answer_capsule,
+            ], fn ($value) => filled($value)) : [],
+            'key_differences' => $keyDifferences,
+            'related_reading' => $relatedReading,
             'faqs' => $faqs,
             'reviews' => [
                 'average' => $approvedReviews->avg('rating'),
@@ -137,7 +162,7 @@ class ProductDetailResource extends JsonResource
                     'display_name' => $review->user?->name,
                     'verified_purchase' => (bool) $review->is_verified_purchase,
                     'created_at' => $review->created_at?->toDateString(),
-                ])->values(),
+                ])->values()->all(),
             ],
             'specifications' => collect([
                 ['name' => 'Brand', 'value' => $product->brand?->name],
@@ -151,10 +176,67 @@ class ProductDetailResource extends JsonResource
                         'name' => $attribute->attribute_name,
                         'value' => $attribute->attribute_value,
                     ])
-            )->filter(fn ($row) => filled($row['value'] ?? null))->values(),
+            )->filter(fn ($row) => filled($row['value'] ?? null))->values()->all(),
             'batch_number' => $product->batch_number,
             'lab_verification_reference' => $product->compliance_verified_at ? $product->lab_verification_reference : null,
             'allow_stock_notification' => (bool) config('store.catalogue.allow_stock_notifications', true),
         ];
+    }
+
+    /**
+     * @param  mixed  $raw
+     * @return list<array{title: string, slug: string, url: string}>
+     */
+    protected function resolveRelatedReading(mixed $raw): array
+    {
+        $entries = collect(is_array($raw) ? $raw : [])
+            ->map(function ($item) {
+                if (! is_array($item)) {
+                    return null;
+                }
+
+                $slug = trim((string) ($item['slug'] ?? ''));
+                $title = trim((string) ($item['title'] ?? ''));
+
+                if ($slug === '') {
+                    return null;
+                }
+
+                return [
+                    'slug' => $slug,
+                    'title' => $title,
+                ];
+            })
+            ->filter()
+            ->take(3)
+            ->values();
+
+        if ($entries->isEmpty()) {
+            return [];
+        }
+
+        $slugs = $entries->pluck('slug')->all();
+        $published = BlogPost::query()
+            ->where('is_published', true)
+            ->whereIn('slug', $slugs)
+            ->get(['slug', 'title'])
+            ->keyBy('slug');
+
+        return $entries
+            ->map(function (array $item) use ($published) {
+                $post = $published->get($item['slug']);
+                if (! $post) {
+                    return null;
+                }
+
+                return [
+                    'title' => $item['title'] !== '' ? $item['title'] : (string) $post->title,
+                    'slug' => (string) $post->slug,
+                    'url' => URL::to('/blog/'.$post->slug),
+                ];
+            })
+            ->filter()
+            ->values()
+            ->all();
     }
 }

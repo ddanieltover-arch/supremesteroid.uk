@@ -5,9 +5,11 @@ import type { SeoProps } from '@/types';
 
 export default function ContentShow({
   page,
+  answer_capsule = null,
   seo,
 }: {
   page: { title: string; slug: string; content?: string | null; is_placeholder: boolean };
+  answer_capsule?: string | null;
   seo?: SeoProps;
 }) {
   const isFaq = page.slug === 'faq';
@@ -18,6 +20,7 @@ export default function ContentShow({
       <InfoPageChrome
         title={page.title}
         activeSlug={page.slug}
+        answerCapsule={answer_capsule}
         extraBadges={
           <>
             {isFaq ? (

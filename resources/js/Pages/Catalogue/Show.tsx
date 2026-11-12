@@ -7,10 +7,13 @@ import { ProductCard } from '@/components/ProductCard';
 import { Breadcrumbs } from '@/components/catalogue/Breadcrumbs';
 import { PriceDisplay } from '@/components/catalogue/PriceDisplay';
 import { ProductGallery } from '@/components/catalogue/ProductGallery';
+import { ProductGuidance, ProductRelatedReading } from '@/components/catalogue/ProductGuidance';
 import { ProductInfoPanels } from '@/components/catalogue/ProductInfoPanels';
 import { RecentlyViewed } from '@/components/catalogue/RecentlyViewed';
 import { TrustBlocks } from '@/components/catalogue/TrustBlocks';
+import { AnswerCapsule } from '@/components/seo/AnswerCapsule';
 import { useCart } from '@/hooks/useCart';
+import { asList } from '@/lib/asList';
 import { addCartItem, getCartOverride, optimisticAddToCart } from '@/lib/cartApi';
 import { jsonFetch } from '@/lib/http';
 import { rememberRecentlyViewed } from '@/lib/recentlyViewed';
@@ -23,11 +26,13 @@ function moneyTimes(amount: string | null | undefined, quantity: number): string
 }
 
 function buyNowInstantProps(product: ProductDetail, variantId: string, quantity: number) {
-  const variant = product.variants?.find((item) => item.id === variantId);
+  const variants = asList<NonNullable<ProductDetail['variants']>[number]>(product.variants);
+  const images = asList<NonNullable<ProductDetail['images']>[number]>(product.images);
+  const variant = variants.find((item) => item.id === variantId);
   const currency = product.pricing?.currency ?? 'GBP';
   const unit = variant?.effective_price ?? product.pricing?.effective_price ?? '0.00';
   const line = moneyTimes(unit, quantity);
-  const image = product.images?.find((item) => item.is_primary)?.url ?? product.image_url ?? null;
+  const image = images.find((item) => item.is_primary)?.url ?? product.image_url ?? null;
   const cart: CartPayload = {
     id: null,
     items: [
@@ -127,14 +132,16 @@ export default function CatalogueShow({
 }) {
   const page = usePage<{ auth?: { user?: unknown }; wishlistProductIds?: string[]; cart?: CartPayload }>();
   const cart = useCart();
-  const saved = product ? (page.props.wishlistProductIds ?? []).includes(product.id) : false;
+  const wishlistIds = asList<string>(page.props.wishlistProductIds);
+  const initialVariants = asList<NonNullable<ProductDetail['variants']>[number]>(product?.variants);
+  const saved = product ? wishlistIds.includes(product.id) : false;
   const isPreview = Boolean(preview || product?.is_preview);
-  const [variantId, setVariantId] = useState(product?.variants?.[0]?.id ?? '');
+  const [variantId, setVariantId] = useState(initialVariants[0]?.id ?? '');
   const [quantity, setQuantity] = useState(1);
   const [cartError, setCartError] = useState<string | null>(null);
   const notify = useForm({
     email: '',
-    product_variant_id: product?.variants?.[0]?.id ?? '',
+    product_variant_id: initialVariants[0]?.id ?? '',
   });
   const review = useForm({
     rating: 5,
@@ -143,7 +150,8 @@ export default function CatalogueShow({
   });
 
   useEffect(() => {
-    setVariantId(product?.variants?.[0]?.id ?? '');
+    const nextVariants = asList<NonNullable<ProductDetail['variants']>[number]>(product?.variants);
+    setVariantId(nextVariants[0]?.id ?? '');
     setQuantity(1);
     setCartError(null);
   }, [product?.id]);
@@ -187,9 +195,14 @@ export default function CatalogueShow({
       return;
     }
 
-    const selected = product.variants?.find((variant) => variant.id === variantId);
+    const selected = asList<NonNullable<ProductDetail['variants']>[number]>(product.variants).find(
+      (variant) => variant.id === variantId,
+    );
     const unit = selected?.effective_price ?? product.pricing?.effective_price ?? '0.00';
-    const image = product.images?.find((item) => item.is_primary)?.url ?? product.image_url ?? null;
+    const image =
+      asList<NonNullable<ProductDetail['images']>[number]>(product.images).find((item) => item.is_primary)?.url ??
+      product.image_url ??
+      null;
 
     // Optimistic: update badge + open drawer on the same click, sync server in background.
     optimisticAddToCart(getCartOverride() ?? cart, {
@@ -230,10 +243,18 @@ export default function CatalogueShow({
     );
   }
 
-  const selectedVariant = product.variants?.find((variant) => variant.id === variantId);
+  const variants = asList<NonNullable<ProductDetail['variants']>[number]>(product.variants);
+  const images = asList<NonNullable<ProductDetail['images']>[number]>(product.images);
+  const badges = asList<NonNullable<ProductDetail['badges']>[number]>(product.badges);
+  const highlights = asList<string>(product.highlights);
+  const structuredData = asList<Record<string, unknown>>(product.structured_data);
+  const breadcrumbs = asList<NonNullable<ProductDetail['breadcrumbs']>[number]>(product.breadcrumbs);
+  const relatedProducts = asList<ProductCardType>(product.related_products);
+
+  const selectedVariant = variants.find((variant) => variant.id === variantId);
   const stock = selectedVariant?.stock ?? product.stock;
   const canBuy = ! isPreview && (selectedVariant ? selectedVariant.is_purchasable : product.is_purchasable);
-  const useButtons = (product.variants?.length ?? 0) > 0 && (product.variants?.length ?? 0) <= 6;
+  const useButtons = variants.length > 0 && variants.length <= 6;
   const selectedPricing = selectedVariant
     ? {
         currency: product.pricing?.currency ?? 'GBP',
@@ -248,7 +269,7 @@ export default function CatalogueShow({
   return (
     <StorefrontLayout seo={seo}>
       <Head>
-        {(product.structured_data ?? []).map((schema, index) => (
+        {structuredData.map((schema, index) => (
           <script key={index} type="application/ld+json">
             {JSON.stringify(schema)}
           </script>
@@ -261,14 +282,14 @@ export default function CatalogueShow({
         </div>
       ) : null}
 
-      <Breadcrumbs items={product.breadcrumbs} />
+      <Breadcrumbs items={breadcrumbs} />
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <ProductGallery images={product.images ?? []} variantId={selectedVariant?.id} />
+        <ProductGallery images={images} variantId={selectedVariant?.id} />
 
         <div>
           <div className="flex flex-wrap gap-2">
-            {(product.badges ?? [])
+            {badges
               .filter((badge) => badge.code !== 'VERIFIED_DOCUMENTATION' || Boolean(product.lab_verification_reference))
               .map((badge) => (
                 <Badge key={badge.code} variant={badge.code === 'SALE' ? 'gold' : 'neutral'}>
@@ -295,13 +316,16 @@ export default function CatalogueShow({
           </div>
           <p className="mt-2 text-sm text-emerald-600">{stock?.label ?? 'Availability confirmed at checkout'}</p>
           <p className="mt-4 text-slate-600">{product.short_description}</p>
+          <div className="mt-4">
+            <AnswerCapsule answer={product.answer_capsule || product.content?.answer_capsule} />
+          </div>
 
-          {product.variants?.length ? (
+          {variants.length ? (
             <div className="mt-6">
               <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Choose option</p>
               {useButtons ? (
                 <div className="flex flex-wrap gap-2">
-                  {product.variants.map((variant) => (
+                  {variants.map((variant) => (
                     <button
                       key={variant.id}
                       type="button"
@@ -327,7 +351,7 @@ export default function CatalogueShow({
                     notify.setData('product_variant_id', event.target.value);
                   }}
                 >
-                  {product.variants.map((variant) => (
+                  {variants.map((variant) => (
                     <option key={variant.id} value={variant.id}>
                       {variant.name} — {formatMoney(variant.effective_price, product.pricing?.currency)}
                     </option>
@@ -403,9 +427,9 @@ export default function CatalogueShow({
             </div>
           )}
 
-          {product.highlights && product.highlights.length > 0 ? (
+          {highlights.length > 0 ? (
             <ul className="mt-8 list-disc space-y-1 pl-5 text-slate-600">
-              {product.highlights.map((item) => (
+              {highlights.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
@@ -413,7 +437,9 @@ export default function CatalogueShow({
         </div>
       </div>
 
+      <ProductGuidance product={product} />
       <ProductInfoPanels product={product} />
+      <ProductRelatedReading product={product} />
 
       {page.props.auth?.user ? (
         <section className="mt-8 max-w-xl">
@@ -438,11 +464,15 @@ export default function CatalogueShow({
       <Deferred data="related_groups" fallback={<></>}>
         {() => {
           const groups = related_groups ?? product.related_groups;
+          const related = asList<ProductCardType>(groups?.related);
+          const alternative = asList<ProductCardType>(groups?.alternative);
+          const complementary = asList<ProductCardType>(groups?.complementary);
           const rails = [
-            { title: 'Related products', items: groups?.related ?? [] },
-            { title: 'Alternative products', items: groups?.alternative ?? [] },
-            { title: 'Complementary products', items: groups?.complementary ?? [] },
+            { title: 'Related products', items: related },
+            { title: 'Alternative products', items: alternative },
+            { title: 'Complementary products', items: complementary },
           ];
+          const hasGroupedRails = related.length + alternative.length + complementary.length > 0;
 
           return (
             <>
@@ -451,22 +481,20 @@ export default function CatalogueShow({
                   <section key={group.title} className="mt-12">
                     <h2 className="mb-6 text-xl font-semibold text-slate-900">{group.title}</h2>
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                      {group.items.map((related) => (
-                        <ProductCard key={related.id} product={related} />
+                      {group.items.map((relatedItem) => (
+                        <ProductCard key={relatedItem.id} product={relatedItem} />
                       ))}
                     </div>
                   </section>
                 ) : null,
               )}
 
-              {(!groups || Object.values(groups).every((group) => !group || group.length === 0)) &&
-              product.related_products &&
-              product.related_products.length > 0 ? (
+              {!hasGroupedRails && relatedProducts.length > 0 ? (
                 <section className="mt-12">
                   <h2 className="mb-6 text-xl font-semibold text-slate-900">Related products</h2>
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    {product.related_products.map((related) => (
-                      <ProductCard key={related.id} product={related} />
+                    {relatedProducts.map((relatedItem) => (
+                      <ProductCard key={relatedItem.id} product={relatedItem} />
                     ))}
                   </div>
                 </section>

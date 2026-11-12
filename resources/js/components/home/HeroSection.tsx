@@ -1,20 +1,77 @@
 import { Link, usePage } from '@inertiajs/react';
 import clsx from 'clsx';
+import type { MouseEvent } from 'react';
 import type { HomepagePayload } from '@/types';
+
+const ctaBaseClass =
+  'inline-flex min-h-12 items-center justify-center rounded-md px-6 text-base font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2';
+
+function inPageHash(url: string): string | null {
+  if (url.startsWith('#')) {
+    return url;
+  }
+
+  // Same-document anchors like "/#categories" must not go through Inertia —
+  // Link would XHR-reload "/" and often never scroll to the target.
+  if (url.startsWith('/#')) {
+    return url.slice(1);
+  }
+
+  try {
+    const parsed = new URL(url, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
+    if (typeof window !== 'undefined' && parsed.pathname === window.location.pathname && parsed.hash) {
+      return parsed.hash;
+    }
+  } catch {
+    // Fall through
+  }
+
+  return null;
+}
+
+function scrollToHash(hash: string) {
+  const id = decodeURIComponent(hash.replace(/^#/, ''));
+  if (!id) {
+    return;
+  }
+
+  const target = document.getElementById(id);
+  if (!target) {
+    return;
+  }
+
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (window.location.hash !== hash) {
+    history.pushState(null, '', hash);
+  }
+}
 
 export function HeroSection({ hero }: { hero: HomepagePayload['hero'] }) {
   const page = usePage<{ store?: { name?: string; logo_url?: string } }>();
   const logoUrl = page.props.store?.logo_url ?? '/assets/branding/supreme-steroids-logo.jpg';
   const storeName = page.props.store?.name ?? 'Supreme Steroids';
+  const secondaryHash = inPageHash(hero.secondary_cta.url);
+
+  const onSecondaryClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!secondaryHash) {
+      return;
+    }
+
+    event.preventDefault();
+    scrollToHash(secondaryHash);
+  };
 
   return (
     <section
       aria-labelledby="hero-heading"
       className="relative left-1/2 w-screen -translate-x-1/2 -mt-8 mb-4 overflow-hidden sm:-mt-10 sm:mb-8"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-[#eef5ff] via-[#f7fafc] to-[#f9f9f9]" aria-hidden="true" />
       <div
-        className="absolute inset-0 opacity-[0.45]"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#eef5ff] via-[#f7fafc] to-[#f9f9f9]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.45]"
         aria-hidden="true"
         style={{
           backgroundImage:
@@ -26,7 +83,7 @@ export function HeroSection({ hero }: { hero: HomepagePayload['hero'] }) {
         aria-hidden="true"
       />
 
-      <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 py-14 text-center sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+      <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 py-14 text-center sm:px-6 sm:py-20 lg:px-8 lg:py-24">
         <img
           src={logoUrl}
           alt={storeName}
@@ -54,28 +111,39 @@ export function HeroSection({ hero }: { hero: HomepagePayload['hero'] }) {
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
             href={hero.primary_cta.url}
-            prefetch="hover"
+            prefetch="mount"
             cacheFor="2m"
             className={clsx(
-              'inline-flex min-h-12 items-center justify-center rounded-md bg-brand px-6 text-base font-semibold text-white',
-              'transition-colors duration-200 hover:bg-brand-dark',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
+              ctaBaseClass,
+              'bg-brand text-white hover:bg-brand-dark',
             )}
           >
             {hero.primary_cta.label}
           </Link>
-          <Link
-            href={hero.secondary_cta.url}
-            prefetch="hover"
-            cacheFor="2m"
-            className={clsx(
-              'inline-flex min-h-12 items-center justify-center rounded-md border border-slate-300 bg-white px-6 text-base font-semibold text-slate-800',
-              'transition-colors duration-200 hover:border-brand hover:text-brand',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
-            )}
-          >
-            {hero.secondary_cta.label}
-          </Link>
+          {secondaryHash ? (
+            <a
+              href={secondaryHash}
+              onClick={onSecondaryClick}
+              className={clsx(
+                ctaBaseClass,
+                'border border-slate-300 bg-white text-slate-800 hover:border-brand hover:text-brand',
+              )}
+            >
+              {hero.secondary_cta.label}
+            </a>
+          ) : (
+            <Link
+              href={hero.secondary_cta.url}
+              prefetch="hover"
+              cacheFor="2m"
+              className={clsx(
+                ctaBaseClass,
+                'border border-slate-300 bg-white text-slate-800 hover:border-brand hover:text-brand',
+              )}
+            >
+              {hero.secondary_cta.label}
+            </Link>
+          )}
         </div>
       </div>
     </section>

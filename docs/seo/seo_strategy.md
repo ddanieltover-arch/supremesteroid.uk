@@ -18,7 +18,8 @@ Technical and AI-crawler foundations on Laravel + Inertia:
 1. Server-rendered SEO bootstrap in Blade (`resources/views/partials/seo-bootstrap.blade.php`) so crawlers see title/meta/OG/JSON-LD without Inertia SSR
 2. Faceted/paginated/sorted catalogue URLs → `noindex,follow` (clean `/shop`, `/category/*`, `/brand/*` stay indexable)
 3. GEO answer capsules on home + shop (`config/homepage.php` → `answer_capsules`)
-4. Lighthouse CI stubs: `.lighthouserc.cjs` + `.github/workflows/lighthouse.yml` (runs when `vars.LHCI_BASE_URL` is set)
+4. Per-product answer capsules + Why/How/Where selection guidance on PDPs (`product_contents`; still no medical/dosing claims)
+5. Lighthouse CI stubs: `.lighthouserc.cjs` + `.github/workflows/lighthouse.yml` (runs when `vars.LHCI_BASE_URL` is set)
 
 ## Phase 3+ (still deferred)
 

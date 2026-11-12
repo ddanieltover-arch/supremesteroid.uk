@@ -33,11 +33,13 @@ export default function BlogShow({
   post,
   recent_posts = [],
   structured_data = [],
+  answer_capsule = null,
   seo,
 }: {
   post: BlogPostDetail;
   recent_posts: RecentPost[];
   structured_data?: Array<Record<string, unknown>>;
+  answer_capsule?: string | null;
   seo?: SeoProps;
 }) {
   const [copied, setCopied] = useState(false);
@@ -76,6 +78,7 @@ export default function BlogShow({
         activeHref="/blog"
         backHref="/blog"
         backLabel="Back to Articles"
+        answerCapsule={answer_capsule}
         heroMeta={
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/10 pt-5 text-xs text-slate-300">
             <span className="inline-flex items-center gap-1.5">

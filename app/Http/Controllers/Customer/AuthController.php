@@ -52,7 +52,7 @@ class AuthController extends Controller
             }
 
             $request->session()->regenerate();
-            app(CartService::class)->mergeGuestCartBySession($guestSessionId, $user);
+            app(CartService::class)->mergeGuestCartBySession($guestSessionId, $user, $request);
 
             return redirect()->intended(route('shop.index'));
         }
@@ -92,7 +92,7 @@ class AuthController extends Controller
         $guestSessionId = $request->session()->getId();
         Auth::login($user);
         $request->session()->regenerate();
-        app(CartService::class)->mergeGuestCartBySession($guestSessionId, $user);
+        app(CartService::class)->mergeGuestCartBySession($guestSessionId, $user, $request);
 
         return redirect()->route('shop.index')->with('success', 'Account created successfully.');
     }

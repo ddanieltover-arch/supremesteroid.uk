@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { PriceDisplay } from '@/components/catalogue/PriceDisplay';
+import { asList } from '@/lib/asList';
 import { addCartItem } from '@/lib/cartApi';
 import { formatMoney } from '@/lib/money';
 import type { ProductDetail } from '@/types';
@@ -31,13 +32,16 @@ export function QuickView({ slug, open, onClose }: { slug: string | null; open: 
       })
       .then((payload: { product: ProductDetail }) => {
         setProduct(payload.product);
-        setVariantId(payload.product.variants?.[0]?.id ?? '');
+        const variants = asList<NonNullable<ProductDetail['variants']>[number]>(payload.product.variants);
+        setVariantId(variants[0]?.id ?? '');
       })
       .catch(() => setError('This product is unavailable right now.'))
       .finally(() => setLoading(false));
   }, [open, slug]);
 
-  const selectedVariant = product?.variants?.find((variant) => variant.id === variantId);
+  const variants = asList<NonNullable<ProductDetail['variants']>[number]>(product?.variants);
+  const images = asList<NonNullable<ProductDetail['images']>[number]>(product?.images);
+  const selectedVariant = variants.find((variant) => variant.id === variantId);
   const canBuy = selectedVariant ? selectedVariant.is_purchasable : Boolean(product?.is_purchasable);
   const pricing = selectedVariant
     ? {
@@ -69,10 +73,10 @@ export function QuickView({ slug, open, onClose }: { slug: string | null; open: 
       {product ? (
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="aspect-square overflow-hidden rounded-xl border border-slate-200 bg-white">
-            {product.images?.[0]?.url ? (
+            {images[0]?.url ? (
               <img
-                src={product.images[0].url}
-                alt={product.images[0].alt_text || product.name}
+                src={images[0].url}
+                alt={images[0].alt_text || product.name}
                 className="h-full w-full object-contain"
               />
             ) : (
@@ -88,11 +92,11 @@ export function QuickView({ slug, open, onClose }: { slug: string | null; open: 
             <p className="mt-2 text-sm text-emerald-600">{selectedVariant?.stock?.label ?? product.stock?.label}</p>
             <p className="mt-4 text-sm text-slate-600">{product.short_description}</p>
 
-            {product.variants?.length ? (
+            {variants.length ? (
               <div className="mt-4">
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Choose option</p>
                 <div className="flex flex-wrap gap-2">
-                  {product.variants.map((variant) => (
+                  {variants.map((variant) => (
                     <button
                       key={variant.id}
                       type="button"

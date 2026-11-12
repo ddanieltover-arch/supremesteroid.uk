@@ -180,7 +180,7 @@ export default function CatalogueIndex({
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Catalogue</p>
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">{heading}</h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">{description}</p>
-            {listing_kind === 'shop' ? (
+            {answer_capsule ? (
               <div className="mt-4 max-w-3xl">
                 <AnswerCapsule answer={answer_capsule} />
               </div>

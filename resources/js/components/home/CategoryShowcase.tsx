@@ -40,7 +40,7 @@ export function CategoryShowcase({ categories }: { categories: HomepagePayload['
   }
 
   return (
-    <section id="categories" aria-labelledby="categories-heading" className="mt-16">
+    <section id="categories" aria-labelledby="categories-heading" className="mt-16 scroll-mt-28">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600/80">Browse</p>
       <h2 id="categories-heading" className="mt-2 text-2xl font-semibold text-slate-900">
         Shop by category

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\InventoryResource;
+use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\PaymentResource;
 use App\Filament\Resources\ProductResource;
 use App\Services\Reporting\AdminMetricsService;
@@ -26,7 +28,8 @@ class AdminStatsOverview extends BaseWidget
             Stat::make('Orders today', (string) $metrics['orders_today'])
                 ->description('Placed since midnight')
                 ->descriptionIcon('heroicon-m-calendar-days')
-                ->color('primary'),
+                ->color('primary')
+                ->url(OrderResource::getUrl('index', ['activeTab' => 'today'])),
 
             Stat::make('Pending payments', (string) $metrics['pending_payments'])
                 ->description('Awaiting transfer or transaction reference')
@@ -43,23 +46,26 @@ class AdminStatsOverview extends BaseWidget
             Stat::make('Awaiting fulfilment', (string) $metrics['paid_awaiting_fulfillment'])
                 ->description('Paid or processing, not yet shipped')
                 ->descriptionIcon('heroicon-m-truck')
-                ->color('success'),
+                ->color('success')
+                ->url(OrderResource::getUrl('index', ['activeTab' => 'awaiting_fulfilment'])),
 
             Stat::make('Low stock', (string) $metrics['low_stock_count'])
                 ->description('Items at or below safety stock')
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
-                ->color('danger'),
+                ->color('danger')
+                ->url(InventoryResource::getUrl('index', ['activeTab' => 'low_stock'])),
 
             Stat::make('Compliance backlog', (string) $metrics['compliance_review_backlog'])
                 ->description('Products needing compliance review')
                 ->descriptionIcon('heroicon-m-shield-exclamation')
                 ->color('warning')
-                ->url(ProductResource::getUrl('index')),
+                ->url(ProductResource::getUrl('index', ['activeTab' => 'compliance_backlog'])),
 
             Stat::make('Paid revenue', '£'.$metrics['revenue_paid_amount'])
                 ->description('Sum of verified payments')
                 ->descriptionIcon('heroicon-m-banknotes')
-                ->color('success'),
+                ->color('success')
+                ->url(PaymentResource::getUrl('index', ['activeTab' => 'paid'])),
         ];
     }
 }

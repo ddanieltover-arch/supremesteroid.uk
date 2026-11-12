@@ -22,6 +22,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const [syncing, setSyncing] = useState(() => isCartSyncing());
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [brokenImages, setBrokenImages] = useState<Record<string, true>>({});
   const serverItemsCount = page.props.cart?.totals?.items_count ?? 0;
   const canCheckout = (cart?.totals?.items_count ?? 0) > 0 || serverItemsCount > 0;
 
@@ -175,10 +176,19 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 <p className="text-sm font-semibold text-slate-800">Your basket is empty</p>
               </div>
             ) : (
-              cart.items.map((item) => (
+              cart.items.map((item) => {
+                const isOptimistic = String(item.id).startsWith('optimistic-');
+                const rowBusy = pendingId === item.id || syncing || isOptimistic;
+
+                return (
                 <div key={item.id} className="flex gap-3.5 rounded-xl border border-slate-200 bg-white/50 p-3">
-                  {item.image_url ? (
-                    <img src={item.image_url} alt="" className="h-16 w-16 shrink-0 rounded-lg object-cover bg-slate-50" />
+                  {item.image_url && !brokenImages[item.id] ? (
+                    <img
+                      src={item.image_url}
+                      alt=""
+                      className="h-16 w-16 shrink-0 rounded-lg object-contain bg-slate-50"
+                      onError={() => setBrokenImages((prev) => ({ ...prev, [item.id]: true }))}
+                    />
                   ) : (
                     <div className="h-16 w-16 shrink-0 rounded-lg bg-slate-100" />
                   )}
@@ -195,7 +205,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         <button
                           type="button"
                           className="px-2 py-0.5 text-slate-500"
-                          disabled={pendingId === item.id}
+                          disabled={rowBusy}
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
                           aria-label="Decrease quantity"
                         >
@@ -205,7 +215,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         <button
                           type="button"
                           className="px-2 py-0.5 text-slate-500"
-                          disabled={pendingId === item.id}
+                          disabled={rowBusy}
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           aria-label="Increase quantity"
                         >
@@ -215,7 +225,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       <button
                         type="button"
                         className="p-1 text-slate-500 transition-colors hover:text-rose-400"
-                        disabled={pendingId === item.id}
+                        disabled={rowBusy}
                         onClick={() => {
                           setPendingId(item.id);
                           void removeCartItem(item.id).finally(() => setPendingId(null));
@@ -227,7 +237,8 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     </div>
                   </div>
                 </div>
-              ))
+                );
+              })
             )}
           </div>
 
@@ -263,7 +274,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     .finally(() => setCheckingOut(false));
                 }}
               >
-                {syncing || checkingOut ? 'Preparing checkout…' : 'Proceed to secure checkout'}
+                {checkingOut ? 'Preparing checkout…' : syncing ? 'Updating basket…' : 'Proceed to secure checkout'}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </button>
               <Link href="/shop" className="inline-flex w-full min-h-11 items-center justify-center text-sm text-slate-800 transition-colors hover:text-brand" onClick={onClose}>

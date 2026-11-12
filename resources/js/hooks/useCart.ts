@@ -49,6 +49,16 @@ export function useCart(): CartPayload {
       return;
     }
     setSeenSignature(next);
+
+    const sharedIsShell = (shared.items?.length ?? 0) === 0;
+    const sharedCount = shared.totals?.items_count ?? 0;
+
+    // Shared Inertia cart is a shell without line items. Keep the detailed JSON
+    // override so the drawer does not flash empty after Instant Visits.
+    if (sharedIsShell && sharedCount > 0) {
+      return;
+    }
+
     clearCartOverride();
     setLocal(null);
   }, [shared, seenSignature]);

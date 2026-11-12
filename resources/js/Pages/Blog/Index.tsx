@@ -1,6 +1,7 @@
 import { Link, router } from '@inertiajs/react';
 import { BookOpen, Calendar, ChevronRight, Clock, Search, Sparkles, User } from 'lucide-react';
 import { useState } from 'react';
+import { AnswerCapsule } from '@/components/seo/AnswerCapsule';
 import StorefrontLayout from '../../Layouts/StorefrontLayout';
 import type { SeoProps } from '@/types';
 
@@ -28,11 +29,13 @@ export default function BlogIndex({
   posts,
   featured,
   filters,
+  answer_capsule = null,
   seo,
 }: {
   posts: PaginatedPosts;
   featured?: BlogPostCard | null;
   filters?: { search?: string };
+  answer_capsule?: string | null;
   seo?: SeoProps;
 }) {
   const [searchTerm, setSearchTerm] = useState(filters?.search ?? '');
@@ -82,6 +85,12 @@ export default function BlogIndex({
             </button>
           </form>
         </div>
+
+        {answer_capsule ? (
+          <div className="mb-8">
+            <AnswerCapsule answer={answer_capsule} />
+          </div>
+        ) : null}
 
         {/* Featured Post (if on page 1 and no search filter) */}
         {featured && !filters?.search && (

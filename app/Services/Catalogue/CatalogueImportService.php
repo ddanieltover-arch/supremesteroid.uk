@@ -428,6 +428,14 @@ class CatalogueImportService
                 'documentation' => $copy['documentation'],
                 'shipping_information' => $copy['shipping_information'],
                 'important_information' => $copy['important_information'],
+                'why_choose' => $copy['why_choose'],
+                'how_supplied' => $copy['how_supplied'],
+                'where_it_fits' => $copy['where_it_fits'],
+                'who_its_for' => $copy['who_its_for'],
+                'what_you_get' => $copy['what_you_get'],
+                'key_differences' => $copy['key_differences'],
+                'answer_capsule' => $copy['answer_capsule'],
+                'related_reading' => $copy['related_reading'],
             ]);
         } else {
             $product->content()->create([
@@ -435,6 +443,14 @@ class CatalogueImportService
                 'highlights' => [],
                 'specifications' => [],
                 'important_information' => 'This record is held for compliance review and must not be sold until lawful status is confirmed.',
+                'why_choose' => null,
+                'how_supplied' => null,
+                'where_it_fits' => null,
+                'who_its_for' => null,
+                'what_you_get' => null,
+                'key_differences' => [],
+                'answer_capsule' => null,
+                'related_reading' => [],
             ]);
         }
 

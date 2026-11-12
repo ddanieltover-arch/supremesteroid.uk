@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { asList } from '@/lib/asList';
 
 type GalleryImage = {
   id: string;
@@ -10,28 +11,30 @@ type GalleryImage = {
   variant_id?: string | null;
 };
 
-export function ProductGallery({ images, variantId }: { images: GalleryImage[]; variantId?: string }) {
+export function ProductGallery({ images, variantId }: { images: GalleryImage[] | unknown; variantId?: string }) {
+  const imageList = asList<GalleryImage>(images);
+
   const visible = useMemo(() => {
     if (variantId) {
-      const matched = images.filter((image) => image.variant_id === variantId && Boolean(image.url));
+      const matched = imageList.filter((image) => image.variant_id === variantId && Boolean(image.url));
       if (matched.length > 0) {
         return matched;
       }
     }
 
     // Fallback: product-level gallery only (exclude unrelated variant media).
-    const productLevel = images.filter((image) => ! image.variant_id && Boolean(image.url));
+    const productLevel = imageList.filter((image) => ! image.variant_id && Boolean(image.url));
     if (productLevel.length > 0) {
       return productLevel;
     }
 
     // Final fallback when no product-level images exist and no variant was selected.
     if (! variantId) {
-      return images.filter((image) => Boolean(image.url));
+      return imageList.filter((image) => Boolean(image.url));
     }
 
     return [];
-  }, [images, variantId]);
+  }, [imageList, variantId]);
 
   const [active, setActive] = useState(0);
   const [failed, setFailed] = useState(false);

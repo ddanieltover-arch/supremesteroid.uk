@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Customer;
 use App\Models\Page;
 use App\Services\Catalogue\SeoService;
 use App\Services\Content\BlogPostContentFormatter;
+use App\Services\Storefront\AnswerCapsuleService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +18,7 @@ class ContentPageController extends Controller
 {
     public function __construct(
         protected BlogPostContentFormatter $contentFormatter,
+        protected AnswerCapsuleService $answerCapsules,
     ) {}
 
     public function __invoke(Request $request, string $slug, SeoService $seo): Response
@@ -49,6 +51,10 @@ class ContentPageController extends Controller
                 'content' => $cached['content'],
                 'is_placeholder' => $cached['is_placeholder'],
             ],
+            'answer_capsule' => $this->answerCapsules->contentPage(
+                (string) $cached['title'],
+                ! $cached['is_placeholder'] ? (string) $cached['raw_content'] : null
+            ),
             'seo' => $seo->forPage(
                 $request,
                 $cached['title'].' | '.config('store.name', 'Supreme Steroids'),
