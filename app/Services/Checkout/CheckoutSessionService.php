@@ -155,11 +155,10 @@ class CheckoutSessionService
             $session = null;
         }
 
+        // Expired / closed tokens must not block re-entry on the details step —
+        // drop them and mint a fresh OPEN session instead.
         if ($session && ! $session->isOpen()) {
-            throw new InvalidCheckoutException(
-                'Checkout session is expired or already converted.',
-                'Your checkout session has expired.'
-            );
+            $session = null;
         }
 
         $existing = $session?->snapshot ?? [];

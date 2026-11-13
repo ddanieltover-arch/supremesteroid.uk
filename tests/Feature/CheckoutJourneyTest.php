@@ -299,21 +299,58 @@ class CheckoutJourneyTest extends TestCase
             'status' => CheckoutSession::STATUS_EXPIRED,
         ]);
 
+        // Expired tokens are cleared; shopper is sent back to details to continue.
         $this->actingAs($user)
             ->get('/checkout/delivery')
-            ->assertRedirect('/cart')
-            ->assertSessionHas('error', 'Your checkout session has expired.');
+            ->assertRedirect('/checkout');
+
+        $this->assertNull(session('checkout_token'));
 
         $this->actingAs($user)
             ->from('/checkout/payment')
             ->post('/checkout', [
                 'checkout_token' => $token,
-                'payment_method' => PaymentMethodType::BANK_TRANSFER->value,
+                'payment_method' => PaymentMethodType::CRYPTOCURRENCY->value,
             ])
             ->assertRedirect()
             ->assertSessionHasErrors('checkout');
 
         $this->assertSame(0, Order::query()->count());
+    }
+
+    public function test_expired_token_on_details_save_mints_fresh_session(): void
+    {
+        $user = $this->makeCustomer('expire-details@test.com');
+        $product = $this->makeProduct(['name' => 'Fresh Session Item']);
+        $this->actingAs($user)->post('/cart/items', ['product_id' => $product->id, 'quantity' => 1]);
+
+        $this->actingAs($user)->post('/checkout/details', [
+            'shipping_destination' => $this->shippingDestination($user->name),
+        ])->assertRedirect();
+
+        $stale = session('checkout_token');
+        $this->assertNotEmpty($stale);
+
+        CheckoutSession::query()->where('token', $stale)->update([
+            'expires_at' => now()->subMinute(),
+            'status' => CheckoutSession::STATUS_EXPIRED,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->withCookie('ss_checkout_token', (string) $stale)
+            ->post('/checkout/details', [
+                'shipping_destination' => $this->shippingDestination($user->name),
+            ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('/checkout/delivery', (string) $response->headers->get('Location'));
+
+        $fresh = session('checkout_token');
+        $this->assertNotEmpty($fresh);
+        $this->assertNotSame($stale, $fresh);
+        $this->assertTrue(
+            CheckoutSession::query()->where('token', $fresh)->where('status', CheckoutSession::STATUS_OPEN)->exists()
+        );
     }
 
     public function test_customer_cannot_view_another_customers_order(): void

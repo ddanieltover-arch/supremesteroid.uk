@@ -361,16 +361,25 @@ export default function CheckoutIndex({
             }))}
             totals={totals}
           />
-          {Object.keys(errors).length > 0 && (
-            <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
-              <p className="font-semibold">Please check required fields:</p>
-              <ul className="mt-1 list-disc pl-4 space-y-0.5">
-                {Object.values(errors).slice(0, 3).map((err, idx) => (
-                  <li key={idx}>{err}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {(() => {
+            const fieldSummaries = Object.entries(errors)
+              .filter(([key, message]) => key !== 'checkout' && key !== 'message' && typeof message === 'string' && message.trim() !== '')
+              .map(([, message]) => message)
+              .slice(0, 3);
+            if (fieldSummaries.length === 0) {
+              return null;
+            }
+            return (
+              <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
+                <p className="font-semibold">Please check required fields:</p>
+                <ul className="mt-1 list-disc pl-4 space-y-0.5">
+                  {fieldSummaries.map((err) => (
+                    <li key={err}>{err}</li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })()}
           <Button type="submit" variant="gold" className="mt-6 w-full" isLoading={submitting} disabled={submitting}>
             Continue to delivery
           </Button>

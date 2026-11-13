@@ -99,9 +99,8 @@ class CheckoutController extends Controller
                 ? (string) $exception->getCustomerMessage()
                 : 'We could not continue checkout with these details.';
 
-            return back()
-                ->withErrors(['checkout' => $message])
-                ->with('error', $message);
+            // Single channel: CheckoutAlerts renders errors.checkout (avoid toast duplicate).
+            return back()->withErrors(['checkout' => $message]);
         }
 
         return redirect()->route('checkout.delivery', array_filter([
@@ -127,9 +126,7 @@ class CheckoutController extends Controller
                 ? (string) $exception->getCustomerMessage()
                 : 'We could not save your delivery option.';
 
-            return back()
-                ->withErrors(['checkout' => $message])
-                ->with('error', $message);
+            return back()->withErrors(['checkout' => $message]);
         }
 
         return redirect()->route('checkout.payment', array_filter([
@@ -155,9 +152,7 @@ class CheckoutController extends Controller
                 ? (string) $exception->getCustomerMessage()
                 : 'We could not save your payment method.';
 
-            return back()
-                ->withErrors(['checkout' => $message])
-                ->with('error', $message);
+            return back()->withErrors(['checkout' => $message]);
         }
 
         return back();

@@ -51,9 +51,7 @@ class CheckoutFlowService
         }
 
         // Fallback: resolve actor from active checkout session token in session, cookie, or query
-        $token = $request->session()->get('checkout_token')
-            ?? $request->cookie('ss_checkout_token')
-            ?? $request->query('checkout_token');
+        $token = $this->resolveCheckoutToken($request);
 
         if (is_string($token) && $token !== '') {
             $session = CheckoutSession::query()->where('token', $token)->first();
@@ -68,6 +66,31 @@ class CheckoutFlowService
         }
 
         return null;
+    }
+
+    public function resolveCheckoutToken(Request $request): ?string
+    {
+        $token = $request->session()->get('checkout_token')
+            ?? $request->cookie('ss_checkout_token')
+            ?? $request->query('checkout_token');
+
+        return is_string($token) && $token !== '' ? $token : null;
+    }
+
+    public function forgetCheckoutToken(Request $request): void
+    {
+        $request->session()->forget('checkout_token');
+        cookie()->queue(cookie(
+            'ss_checkout_token',
+            '',
+            -1,
+            '/',
+            null,
+            true,
+            true,
+            false,
+            'lax'
+        ));
     }
 
     public function gate(Request $request, string $step): ?RedirectResponse
@@ -97,7 +120,7 @@ class CheckoutFlowService
 
             if ($completedOrder && ! $empty) {
                 $request->session()->forget('checkout_order_id');
-                $request->session()->forget('checkout_token');
+                $this->forgetCheckoutToken($request);
             }
 
             return $empty ? redirect()->route('cart.index') : null;
@@ -107,15 +130,7 @@ class CheckoutFlowService
             return redirect()->route('cart.index');
         }
 
-        try {
-            $session = $this->openSession($request);
-        } catch (InvalidCheckoutException $exception) {
-            $request->session()->forget('checkout_token');
-
-            return redirect()
-                ->route('cart.index')
-                ->with('error', $exception->getCustomerMessage());
-        }
+        $session = $this->openSession($request);
 
         if (! $session || ! $this->hasDetails($session)) {
             \Illuminate\Support\Facades\Log::info('Checkout delivery gate redirecting to details', [
@@ -137,9 +152,7 @@ class CheckoutFlowService
     public function openSession(Request $request): ?CheckoutSession
     {
         $user = $this->actor($request);
-        $token = $request->session()->get('checkout_token')
-            ?? $request->cookie('ss_checkout_token')
-            ?? $request->query('checkout_token');
+        $token = $this->resolveCheckoutToken($request);
 
         $session = $this->checkoutSessionService->findOwnedSession(
             $user,
@@ -155,10 +168,11 @@ class CheckoutFlowService
         }
 
         if (! $session->isOpen()) {
-            throw new InvalidCheckoutException(
-                'Checkout session is expired or already converted.',
-                'Your checkout session has expired.'
-            );
+            // Stale cookie/session tokens should not poison the details step —
+            // clear them so the shopper can continue and mint a fresh session.
+            $this->forgetCheckoutToken($request);
+
+            return null;
         }
 
         return $session;
@@ -317,7 +331,7 @@ class CheckoutFlowService
 
         $snapshot = $this->checkoutSessionService->syncOpenSession(
             $user,
-            $request->session()->get('checkout_token'),
+            $this->resolveCheckoutToken($request),
             [
                 'items' => $items,
                 'shipping_destination' => $destination,
@@ -627,11 +641,11 @@ class CheckoutFlowService
             'quantity' => max(1, $quantity),
         ]);
         $request->session()->forget([
-            'checkout_token',
             'checkout_idempotency_key',
             'checkout_requires_acknowledgement',
             'checkout_order_id',
         ]);
+        $this->forgetCheckoutToken($request);
     }
 
     public function clearBuyNow(Request $request): void

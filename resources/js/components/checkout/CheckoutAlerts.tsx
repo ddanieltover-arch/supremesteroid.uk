@@ -1,6 +1,10 @@
 import { Link } from '@inertiajs/react';
 import { Alert } from '@/components/ui/Alert';
 
+function normalizeMessage(message: string | null | undefined): string {
+  return (message ?? '').trim().toLowerCase();
+}
+
 export function CheckoutAlerts({
   warnings = [],
   errors = {},
@@ -17,17 +21,32 @@ export function CheckoutAlerts({
     .filter(([key, message]) => key !== 'checkout' && key !== 'message' && typeof message === 'string' && message.trim() !== '')
     .map(([, message]) => message);
   const uniqueFieldErrors = [...new Set(fieldErrors)];
-  const expired = [...warnings, checkoutError].some((message) => message?.toLowerCase().includes('expired'));
-  const stockIssue = affectedItems.length > 0 || [...warnings, checkoutError].some((message) => message?.toLowerCase().includes('no longer available'));
+
+  const noticeMessages = [...warnings, checkoutError]
+    .filter((message): message is string => typeof message === 'string' && message.trim() !== '')
+    .filter((message, index, all) => all.findIndex((item) => normalizeMessage(item) === normalizeMessage(message)) === index);
+
+  const expired = noticeMessages.some((message) => normalizeMessage(message).includes('expired'));
+  const stockIssue = affectedItems.length > 0
+    || noticeMessages.some((message) => normalizeMessage(message).includes('no longer available'));
+
+  const visibleNotices = noticeMessages.filter((message) => {
+    if (expired && normalizeMessage(message).includes('expired')) {
+      return false;
+    }
+    if (stockIssue && normalizeMessage(message).includes('no longer available')) {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <div className="mt-4 space-y-3">
-      {warnings.map((warning) => (
-        <Alert key={warning} type="warning">
-          {warning}
+      {visibleNotices.map((notice) => (
+        <Alert key={notice} type="warning">
+          {notice}
         </Alert>
       ))}
-      {checkoutError && !warnings.includes(checkoutError) ? <Alert type="warning">{checkoutError}</Alert> : null}
       {uniqueFieldErrors.length > 0 ? (
         <Alert type="error">
           Please fix the highlighted details before continuing.
