@@ -88,7 +88,7 @@ class CheckoutController extends Controller
     public function saveDetails(SaveCheckoutDetailsRequest $request): RedirectResponse
     {
         try {
-            $this->checkoutFlowService->saveDetails($request, $request->validated());
+            $snapshot = $this->checkoutFlowService->saveDetails($request, $request->validated());
         } catch (\Throwable $exception) {
             \Illuminate\Support\Facades\Log::error('saveDetails failed: '.$exception->getMessage(), [
                 'exception' => $exception::class,
@@ -104,7 +104,9 @@ class CheckoutController extends Controller
                 ->with('error', $message);
         }
 
-        return redirect()->route('checkout.delivery');
+        return redirect()->route('checkout.delivery', array_filter([
+            'checkout_token' => $snapshot['checkout_token'] ?? null,
+        ]));
     }
 
     public function delivery(Request $request): Response|RedirectResponse
@@ -119,7 +121,7 @@ class CheckoutController extends Controller
     public function saveDelivery(SaveCheckoutDeliveryRequest $request): RedirectResponse
     {
         try {
-            $this->checkoutFlowService->saveDelivery($request, $request->validated());
+            $snapshot = $this->checkoutFlowService->saveDelivery($request, $request->validated());
         } catch (\Throwable $exception) {
             $message = method_exists($exception, 'getCustomerMessage')
                 ? (string) $exception->getCustomerMessage()
@@ -130,7 +132,9 @@ class CheckoutController extends Controller
                 ->with('error', $message);
         }
 
-        return redirect()->route('checkout.payment');
+        return redirect()->route('checkout.payment', array_filter([
+            'checkout_token' => $snapshot['checkout_token'] ?? null,
+        ]));
     }
 
     public function payment(Request $request): Response|RedirectResponse

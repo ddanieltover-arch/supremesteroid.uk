@@ -116,9 +116,13 @@ class CheckoutFlowService
     public function openSession(Request $request): ?CheckoutSession
     {
         $user = $this->actor($request);
+        $token = $request->session()->get('checkout_token')
+            ?? $request->cookie('ss_checkout_token')
+            ?? $request->query('checkout_token');
+
         $session = $this->checkoutSessionService->findOwnedSession(
             $user,
-            $request->session()->get('checkout_token')
+            $token
         );
 
         if (! $session) {
@@ -307,6 +311,20 @@ class CheckoutFlowService
         $request->session()->put('checkout_token', $snapshot['checkout_token'] ?? null);
         $request->session()->put('checkout_idempotency_key', $snapshot['idempotency_key'] ?? (string) Str::uuid());
         $request->session()->forget('checkout_requires_acknowledgement');
+
+        if (! empty($snapshot['checkout_token'])) {
+            cookie()->queue(cookie(
+                'ss_checkout_token',
+                (string) $snapshot['checkout_token'],
+                120,
+                '/',
+                null,
+                true,
+                true,
+                false,
+                'lax'
+            ));
+        }
 
         return $snapshot;
     }
