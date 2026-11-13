@@ -1,0 +1,19 @@
+{
+    "candidates": 1,
+    "migrated": [
+        {
+            "image_id": "01a1a150-771f-737a-a78e-8dec77b7b71c",
+            "product_id": "01a1a150-771b-70f9-8656-5c07dbdfbd26",
+            "name": "Testosterone Cypionate",
+            "slug": "cmd-cdn-1",
+            "remote_url": "https://supremestd.b-cdn.net/products/cmd.jpg",
+            "fetch_url": "https://supremestd.b-cdn.net/products/cmd.jpg",
+            "source_url": "https://supremestd.b-cdn.net/products/cmd.jpg",
+            "status": "dry_run"
+        }
+    ],
+    "failed": [],
+    "skipped": [],
+    "seo_rewritten": [],
+    "dry_run": true
+}
