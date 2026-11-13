@@ -11,9 +11,16 @@ use App\Models\ShippingZone;
 use App\Services\Pricing\PricingService;
 use App\Support\IsoCountry;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class ShippingEngine
 {
+    /** @var Collection<int, ShippingZone>|null */
+    protected static ?Collection $memoizedZones = null;
+
+    /** @var array<string, Collection> */
+    protected static array $memoizedMethods = [];
+
     public function __construct(
         protected PricingService $pricingService
     ) {}
@@ -36,14 +43,31 @@ class ShippingEngine
         $zone = $this->resolveZoneForCountry($countryCode);
 
         if ($zone) {
-            $methods = ShippingMethod::query()
-                ->where('shipping_zone_id', $zone->id)
-                ->where('is_active', true)
-                ->with(['rules' => function ($query) {
-                    $query->where('is_active', true);
-                }])
-                ->orderBy('display_order')
-                ->get();
+            $methods = self::$memoizedMethods[$zone->id] ?? null;
+            if ($methods === null) {
+                try {
+                    $methods = Cache::remember("shipping_methods_zone_{$zone->id}", 300, function () use ($zone) {
+                        return ShippingMethod::query()
+                            ->where('shipping_zone_id', $zone->id)
+                            ->where('is_active', true)
+                            ->with(['rules' => function ($query) {
+                                $query->where('is_active', true);
+                            }])
+                            ->orderBy('display_order')
+                            ->get();
+                    });
+                } catch (\Throwable) {
+                    $methods = ShippingMethod::query()
+                        ->where('shipping_zone_id', $zone->id)
+                        ->where('is_active', true)
+                        ->with(['rules' => function ($query) {
+                            $query->where('is_active', true);
+                        }])
+                        ->orderBy('display_order')
+                        ->get();
+                }
+                self::$memoizedMethods[$zone->id] = $methods;
+            }
 
             if ($methods->isNotEmpty()) {
                 return $methods->map(function (ShippingMethod $method) use ($subtotalPence, $freeThresholdPence) {
@@ -91,9 +115,21 @@ class ShippingEngine
     {
         $countryCode = IsoCountry::normalize($countryCode);
 
-        $zones = ShippingZone::query()
-            ->where('is_active', true)
-            ->get();
+        $zones = self::$memoizedZones;
+        if ($zones === null) {
+            try {
+                $zones = Cache::remember('shipping_active_zones', 300, function () {
+                    return ShippingZone::query()
+                        ->where('is_active', true)
+                        ->get();
+                });
+            } catch (\Throwable) {
+                $zones = ShippingZone::query()
+                    ->where('is_active', true)
+                    ->get();
+            }
+            self::$memoizedZones = $zones;
+        }
 
         $exact = $zones->first(function (ShippingZone $zone) use ($countryCode) {
             $countries = $zone->countries ?? [];

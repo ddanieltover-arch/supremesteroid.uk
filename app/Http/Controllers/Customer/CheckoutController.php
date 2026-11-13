@@ -90,6 +90,11 @@ class CheckoutController extends Controller
         try {
             $this->checkoutFlowService->saveDetails($request, $request->validated());
         } catch (\Throwable $exception) {
+            \Illuminate\Support\Facades\Log::error('saveDetails failed: '.$exception->getMessage(), [
+                'exception' => $exception::class,
+                'trace' => $exception->getTraceAsString(),
+            ]);
+
             $message = method_exists($exception, 'getCustomerMessage')
                 ? (string) $exception->getCustomerMessage()
                 : 'We could not continue checkout with these details.';

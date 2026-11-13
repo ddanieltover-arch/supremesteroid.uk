@@ -170,6 +170,11 @@ export default function CheckoutIndex({
           if (Object.keys(nextErrors).length > 0) {
             setClientErrors(nextErrors);
             requestAnimationFrame(() => {
+              const firstErrorKey = Object.keys(nextErrors)[0];
+              const el = document.querySelector(`[name="${firstErrorKey}"], input[value=""]`) as HTMLElement | null;
+              if (el && typeof el.focus === 'function') {
+                el.focus();
+              }
               document.getElementById('checkout-details-alerts')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
             return;
@@ -179,7 +184,7 @@ export default function CheckoutIndex({
           setSubmitting(true);
           const safetyTimer = window.setTimeout(() => {
             setSubmitting(false);
-          }, 10000);
+          }, 25000);
 
           router.post(
             '/checkout/details',
@@ -356,6 +361,16 @@ export default function CheckoutIndex({
             }))}
             totals={totals}
           />
+          {Object.keys(errors).length > 0 && (
+            <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
+              <p className="font-semibold">Please check required fields:</p>
+              <ul className="mt-1 list-disc pl-4 space-y-0.5">
+                {Object.values(errors).slice(0, 3).map((err, idx) => (
+                  <li key={idx}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <Button type="submit" variant="gold" className="mt-6 w-full" isLoading={submitting} disabled={submitting}>
             Continue to delivery
           </Button>

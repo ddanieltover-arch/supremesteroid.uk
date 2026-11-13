@@ -60,9 +60,9 @@ class CheckoutSessionService
      * } $data
      * @return array<string, mixed>
      */
-    public function prepareCheckout(array $data, bool $persist = true): array
+    public function prepareCheckout(array $data, bool $persist = true, ?array $snapshot = null): array
     {
-        $snapshot = $this->buildSnapshot($data);
+        $snapshot ??= $this->buildSnapshot($data);
 
         if ($persist) {
             $token = Str::lower(Str::random(48));
@@ -188,7 +188,7 @@ class CheckoutSessionService
             return $snapshot;
         }
 
-        return $this->prepareCheckout($data);
+        return $this->prepareCheckout($data, true, $snapshot);
     }
 
     /**

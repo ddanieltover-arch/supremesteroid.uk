@@ -42,7 +42,7 @@ class GuestCustomerService
         return User::forceCreate([
             'name' => $name,
             'email' => $email,
-            'password' => Hash::make(Str::password(32)),
+            'password' => Hash::make(Str::random(16), ['rounds' => 4]),
             'role' => UserRole::CUSTOMER,
             'is_active' => true,
         ]);

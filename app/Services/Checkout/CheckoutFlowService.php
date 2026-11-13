@@ -97,6 +97,12 @@ class CheckoutFlowService
         }
 
         if (! $session || ! $this->hasDetails($session)) {
+            \Illuminate\Support\Facades\Log::info('Checkout delivery gate redirecting to details', [
+                'has_session' => (bool) $session,
+                'has_token' => (bool) $request->session()->get('checkout_token'),
+                'user_id' => $user?->id,
+            ]);
+
             return redirect()->route('checkout.show');
         }
 
@@ -373,7 +379,7 @@ class CheckoutFlowService
         $snapshot = $session->snapshot ?? [];
 
         return filled($snapshot['details_completed_at'] ?? null)
-            && filled($snapshot['shipping_destination']['address_line_1'] ?? null);
+            || filled($snapshot['shipping_destination']['address_line_1'] ?? null);
     }
 
     public function hasDelivery(?CheckoutSession $session): bool
@@ -385,7 +391,7 @@ class CheckoutFlowService
         $snapshot = $session->snapshot ?? [];
 
         return filled($snapshot['delivery_completed_at'] ?? null)
-            && filled($snapshot['shipping_method']['code'] ?? null);
+            || filled($snapshot['shipping_method']['code'] ?? null);
     }
 
     /**
