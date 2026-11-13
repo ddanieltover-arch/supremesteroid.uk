@@ -13,6 +13,9 @@ import CheckoutIndex from './Pages/Checkout/Index';
 import BlogIndex from './Pages/Blog/Index';
 import BlogShow from './Pages/Blog/Show';
 import ContentShow from './Pages/Content/Show';
+import CheckoutDelivery from './Pages/Checkout/Delivery';
+import CheckoutPayment from './Pages/Checkout/Payment';
+import CheckoutConfirmation from './Pages/Checkout/Confirmation';
 
 const eagerPages: Record<string, ComponentType<any>> = {
   'Home': Home,
@@ -23,6 +26,9 @@ const eagerPages: Record<string, ComponentType<any>> = {
   'Blog/Index': BlogIndex,
   'Blog/Show': BlogShow,
   'Content/Show': ContentShow,
+  'Checkout/Delivery': CheckoutDelivery,
+  'Checkout/Payment': CheckoutPayment,
+  'Checkout/Confirmation': CheckoutConfirmation,
 };
 
 const pageModules = import.meta.glob('./Pages/**/*.tsx');
@@ -216,11 +222,7 @@ createInertiaApp({
     }
     return /supreme\s*steroids/i.test(title) ? title : `${title} | Supreme Steroids`;
   },
-  progress: {
-    color: '#1e6fd9',
-    showSpinner: false,
-    delay: 60,
-  },
+  progress: false,
   resolve: (name) => resolvePage(name),
   setup({ el, App, props }) {
     if (!el) {

@@ -224,6 +224,14 @@ class ProductPurchaseEligibilityService
         ?ProductVariant $variant = null,
         int $quantity = 1,
     ): void {
-        $this->assertPurchasable($product, $variant, $quantity, true, false, false);
+        $result = $this->checkCartLineEligibility($product, $variant, $quantity);
+
+        if (! $result['is_eligible']) {
+            $reasonSummary = implode('; ', $result['reasons']);
+            throw new ProductNotPurchasableException(
+                "Product '{$product->name}' ({$product->sku}) is not eligible for purchase: {$reasonSummary}",
+                $result['reasons']
+            );
+        }
     }
 }

@@ -59,6 +59,12 @@ export default function CheckoutPayment({
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      setSubmitting(false);
+    }
+  }, [errors]);
+
+  useEffect(() => {
     if (method && paymentMethods.some((item) => item.code === method)) {
       return;
     }
@@ -166,6 +172,7 @@ export default function CheckoutPayment({
                 return;
               }
               setSubmitting(true);
+              const safetyTimer = window.setTimeout(() => setSubmitting(false), 15000);
               router.post(
                 '/checkout',
                 {
@@ -173,7 +180,20 @@ export default function CheckoutPayment({
                   payment_method: method,
                   idempotency_key: idempotencyKey,
                 },
-                { onFinish: () => setSubmitting(false) },
+                {
+                  onError: () => {
+                    window.clearTimeout(safetyTimer);
+                    setSubmitting(false);
+                  },
+                  onSuccess: () => {
+                    window.clearTimeout(safetyTimer);
+                    setSubmitting(false);
+                  },
+                  onFinish: () => {
+                    window.clearTimeout(safetyTimer);
+                    setSubmitting(false);
+                  },
+                },
               );
             }}
           >

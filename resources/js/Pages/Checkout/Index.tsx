@@ -1,6 +1,6 @@
 import StorefrontLayout from '../../Layouts/StorefrontLayout';
 import { router, useForm, usePage } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CheckoutAlerts } from '@/components/checkout/CheckoutAlerts';
 import { CheckoutProgress, type CheckoutStep } from '@/components/checkout/CheckoutProgress';
 import { OrderSummary } from '@/components/checkout/OrderSummary';
@@ -74,6 +74,15 @@ export default function CheckoutIndex({
     () => ({ ...serverErrors, ...clientErrors }),
     [serverErrors, clientErrors],
   );
+
+  useEffect(() => {
+    if (Object.keys(serverErrors).length > 0) {
+      setSubmitting(false);
+      requestAnimationFrame(() => {
+        document.getElementById('checkout-details-alerts')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, [serverErrors]);
 
   const applyAddress = (address: Address) => {
     form.setData({
@@ -168,6 +177,10 @@ export default function CheckoutIndex({
 
           setClientErrors({});
           setSubmitting(true);
+          const safetyTimer = window.setTimeout(() => {
+            setSubmitting(false);
+          }, 10000);
+
           router.post(
             '/checkout/details',
             {
@@ -179,12 +192,20 @@ export default function CheckoutIndex({
             {
               preserveScroll: false,
               onError: () => {
+                window.clearTimeout(safetyTimer);
                 setSubmitting(false);
                 requestAnimationFrame(() => {
                   document.getElementById('checkout-details-alerts')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 });
               },
-              onFinish: () => setSubmitting(false),
+              onSuccess: () => {
+                window.clearTimeout(safetyTimer);
+                setSubmitting(false);
+              },
+              onFinish: () => {
+                window.clearTimeout(safetyTimer);
+                setSubmitting(false);
+              },
             },
           );
         }}

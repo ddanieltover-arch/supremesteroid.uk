@@ -89,7 +89,7 @@ class CheckoutController extends Controller
     {
         try {
             $this->checkoutFlowService->saveDetails($request, $request->validated());
-        } catch (\App\Exceptions\InvalidCheckoutException|\App\Exceptions\ProductNotPurchasableException|\App\Exceptions\InsufficientInventoryException $exception) {
+        } catch (\Throwable $exception) {
             $message = method_exists($exception, 'getCustomerMessage')
                 ? (string) $exception->getCustomerMessage()
                 : 'We could not continue checkout with these details.';
@@ -113,7 +113,17 @@ class CheckoutController extends Controller
 
     public function saveDelivery(SaveCheckoutDeliveryRequest $request): RedirectResponse
     {
-        $this->checkoutFlowService->saveDelivery($request, $request->validated());
+        try {
+            $this->checkoutFlowService->saveDelivery($request, $request->validated());
+        } catch (\Throwable $exception) {
+            $message = method_exists($exception, 'getCustomerMessage')
+                ? (string) $exception->getCustomerMessage()
+                : 'We could not save your delivery option.';
+
+            return back()
+                ->withErrors(['checkout' => $message])
+                ->with('error', $message);
+        }
 
         return redirect()->route('checkout.payment');
     }
@@ -129,7 +139,17 @@ class CheckoutController extends Controller
 
     public function savePayment(SaveCheckoutPaymentRequest $request): RedirectResponse
     {
-        $this->checkoutFlowService->savePaymentMethod($request, $request->validated());
+        try {
+            $this->checkoutFlowService->savePaymentMethod($request, $request->validated());
+        } catch (\Throwable $exception) {
+            $message = method_exists($exception, 'getCustomerMessage')
+                ? (string) $exception->getCustomerMessage()
+                : 'We could not save your payment method.';
+
+            return back()
+                ->withErrors(['checkout' => $message])
+                ->with('error', $message);
+        }
 
         return back();
     }

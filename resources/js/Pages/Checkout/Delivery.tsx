@@ -49,6 +49,12 @@ export default function CheckoutDelivery({
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      setSubmitting(false);
+    }
+  }, [errors]);
+
+  useEffect(() => {
     if (method) {
       return;
     }
@@ -154,7 +160,25 @@ export default function CheckoutDelivery({
                 return;
               }
               setSubmitting(true);
-              router.post('/checkout/delivery', { shipping_method_code: method }, { onFinish: () => setSubmitting(false) });
+              const safetyTimer = window.setTimeout(() => setSubmitting(false), 10000);
+              router.post(
+                '/checkout/delivery',
+                { shipping_method_code: method },
+                {
+                  onError: () => {
+                    window.clearTimeout(safetyTimer);
+                    setSubmitting(false);
+                  },
+                  onSuccess: () => {
+                    window.clearTimeout(safetyTimer);
+                    setSubmitting(false);
+                  },
+                  onFinish: () => {
+                    window.clearTimeout(safetyTimer);
+                    setSubmitting(false);
+                  },
+                },
+              );
             }}
           >
             Continue to payment
