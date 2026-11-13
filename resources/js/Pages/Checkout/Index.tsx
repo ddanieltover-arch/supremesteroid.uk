@@ -184,7 +184,7 @@ export default function CheckoutIndex({
           setSubmitting(true);
           const safetyTimer = window.setTimeout(() => {
             setSubmitting(false);
-          }, 25000);
+          }, 10000);
 
           router.post(
             '/checkout/details',

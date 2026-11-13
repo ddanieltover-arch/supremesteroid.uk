@@ -172,7 +172,7 @@ export default function CheckoutPayment({
                 return;
               }
               setSubmitting(true);
-              const safetyTimer = window.setTimeout(() => setSubmitting(false), 30000);
+              const safetyTimer = window.setTimeout(() => setSubmitting(false), 10000);
               router.post(
                 '/checkout',
                 {

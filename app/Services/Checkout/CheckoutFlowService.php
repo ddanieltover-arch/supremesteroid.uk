@@ -43,10 +43,31 @@ class CheckoutFlowService
         }
 
         $customerId = $request->session()->get('checkout_customer_id');
+        if (is_string($customerId) && $customerId !== '') {
+            $user = User::query()->find($customerId);
+            if ($user) {
+                return $user;
+            }
+        }
 
-        return is_string($customerId) && $customerId !== ''
-            ? User::query()->find($customerId)
-            : null;
+        // Fallback: resolve actor from active checkout session token in session, cookie, or query
+        $token = $request->session()->get('checkout_token')
+            ?? $request->cookie('ss_checkout_token')
+            ?? $request->query('checkout_token');
+
+        if (is_string($token) && $token !== '') {
+            $session = CheckoutSession::query()->where('token', $token)->first();
+            if ($session && $session->user_id) {
+                $user = User::query()->find($session->user_id);
+                if ($user) {
+                    $request->session()->put('checkout_customer_id', $user->id);
+
+                    return $user;
+                }
+            }
+        }
+
+        return null;
     }
 
     public function gate(Request $request, string $step): ?RedirectResponse
@@ -340,7 +361,15 @@ class CheckoutFlowService
             throw new InvalidCheckoutException('Delivery details are missing.', 'Please complete your delivery details first.');
         }
 
-        $snapshot = $this->checkoutSessionService->refreshOpenSnapshot($session, $this->requireActor($request), [
+        $user = $this->actor($request) ?? $session->user;
+        if (! $user && $session->user_id) {
+            $user = User::query()->find($session->user_id);
+        }
+        if (! $user) {
+            throw new InvalidCheckoutException('Checkout customer is missing.', 'Please complete your details before continuing checkout.');
+        }
+
+        $snapshot = $this->checkoutSessionService->refreshOpenSnapshot($session, $user, [
             'shipping_method_code' => $validated['shipping_method_code'],
             'details_completed_at' => $session->snapshot['details_completed_at'] ?? now()->toIso8601String(),
             'delivery_completed_at' => now()->toIso8601String(),
@@ -362,6 +391,14 @@ class CheckoutFlowService
             throw new InvalidCheckoutException('Payment cannot start yet.', 'Please choose a delivery method first.');
         }
 
+        $user = $this->actor($request) ?? $session->user;
+        if (! $user && $session->user_id) {
+            $user = User::query()->find($session->user_id);
+        }
+        if (! $user) {
+            throw new InvalidCheckoutException('Checkout customer is missing.', 'Please complete your details before continuing checkout.');
+        }
+
         $method = PaymentMethodType::from($validated['payment_method'])->value;
         $grandTotal = $this->resolveCheckoutGrandTotal($session->snapshot ?? []);
         $allowed = $this->allowedPaymentMethodCodes($grandTotal);
@@ -372,7 +409,7 @@ class CheckoutFlowService
             );
         }
 
-        $snapshot = $this->checkoutSessionService->refreshOpenSnapshot($session, $this->requireActor($request), [
+        $snapshot = $this->checkoutSessionService->refreshOpenSnapshot($session, $user, [
             'payment_method' => $method,
             'details_completed_at' => $session->snapshot['details_completed_at'] ?? now()->toIso8601String(),
             'delivery_completed_at' => $session->snapshot['delivery_completed_at'] ?? now()->toIso8601String(),
